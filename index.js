@@ -69,7 +69,8 @@ const scrape = async ({
 }) => {
   const nLeft = queueSet.size;
   const nSeen = seenSet.size;
-  console.info(`[INFO][chrome:${chromePort}] There are ${nLeft} URLs left to scrape. We've already seen ${nSeen}.`);
+  const pct = `${Math.round((100 * nSeen) / nLeft)}`.padStart(3, ' ');
+  console.info(`[INFO][chrome:${chromePort}][est. ${pct}% done]: ${nLeft} URLs left to scrape, ${nSeen} done.`);
   if (nLeft > 0) {
     const { value: nextURL } = queueSet.values().next();
     console.log(`Now scraping URL: ${nextURL}...`);
