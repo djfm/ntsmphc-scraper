@@ -5,6 +5,7 @@ import CRI from 'chrome-remote-interface';
 const options = parseArgv(process.argv.slice(2));
 
 const startURL = options._[0];
+const verbose = options.v;
 
 if (!startURL) {
   console.error('Please provide a start URL as an unnamed argument !');
@@ -20,21 +21,47 @@ const main = async () => {
   });
 
   const protocol = await CRI({ port: chrome.port });
-  const { Page, Runtime } = protocol;
+  const { Network, Page, Runtime } = protocol;
 
-  await Page.enable();
+  await Promise.all([Network.enable(), Page.enable()]);
 
-  Page.navigate({ url: startURL });
+  Page.lifecycleEvent(({
+    frameId,
+    loaderId,
+    name,
+    timestamp,
+  }) => {
+    console.log(`Event by frame ${frameId} loader ${loaderId}: "${name}" at ${timestamp}.`);
+  });
+
+  Network.requestWillBeSent(({ type, requestId, request: { url } }) => {
+    if (verbose) {
+      console.log(`[${type}] Will be sent: request #${requestId} to "${url}".`);
+    }
+  });
+
+  Network.loadingFinished(({ requestId, timestamp }) => {
+    if (verbose) {
+      console.log(`Loading of request #${requestId} finished at ${timestamp}.`);
+    }
+  });
+
+  Page.domContentEventFired(({ timestamp }) => {
+    if (verbose) {
+      console.log(`domContentEventFired at ${timestamp}`);
+    }
+  });
 
   Page.loadEventFired(async () => {
-    const js = 'document.querySelector("title").textContent';
-    const result = await Runtime.evaluate({ expression: js });
-
-    console.log(`Title: ${result.result.value}`);
+    const extractTitleJS = 'document.querySelector("title").textContent';
+    const result = await Runtime.evaluate({ expression: extractTitleJS });
+    console.log(`Reached page: ${result.result.value}`);
 
     protocol.close();
     chrome.kill();
   });
+
+  Page.navigate({ url: startURL });
 };
 
 main();
