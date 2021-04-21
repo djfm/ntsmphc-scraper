@@ -55,7 +55,7 @@ const normalizeURL = (url) => {
 };
 
 // Determines if a URL should be scraped.
-// It should be scraped if it's not a javascript:void() or somehting link,
+// It should be scraped if it's not a javascript:void() or something link,
 // and of course if it is on the same domain as the domain
 // we started scraping from.
 const shouldScrapeURL = (url) => {
