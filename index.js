@@ -102,7 +102,7 @@ const scrape = async ({
       await Page.navigate({ url: nextURL });
     } catch (e) {
       if (e?.response?.code === -32000) {
-        // This error is: "Cannot navigate to invalid URL"
+        // This error is: "Cannot navigate to invalid URL".
         console.error(`Cannot navigate to ${URL}.`);
         // Continue by recursing into scrape(...) because
         // normally loadEventFired does it once an URL
@@ -135,7 +135,7 @@ const createScraperProcess = async ({
   ignoredSet,
   onKill,
 }) => {
-  // Start a new headless chrome instance.
+  // Starts a new headless chrome instance.
   const chrome = await chromeLauncher.launch({
     chromeFlags: [
       '--window-size=1920,1080',
@@ -239,7 +239,7 @@ const createScraperProcess = async ({
     chromePort: chrome.port,
   });
 
-  // Well only startScraping is useful,
+  // Well only "startScraping" is really useful,
   // but I thought the calling function might be interested
   // in accessing the chrome process or the protocol instance.
   return { chrome, protocol, startScraping };
@@ -256,6 +256,7 @@ const main = async () => {
 
   console.log(`Starting scraping of ${startURL} with ${nMaxInstances} parallel chrome instances.`);
 
+  // The number of instances of chrome currently scraping something.
   let nInstances = 0;
 
   // The function that coordinates all the work.
@@ -279,6 +280,8 @@ const main = async () => {
       if (!URLQueue.has(normalizedURL)) {
         URLQueue.add(normalizedURL);
 
+        // If we added some URL to scrape and we can
+        // start a new instance, then we do it.
         if (nInstances < nMaxInstances) {
           nInstances += 1;
           const scraper = await createScraperProcess({
