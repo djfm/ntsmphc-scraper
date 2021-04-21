@@ -61,10 +61,52 @@ const shouldScrapeURL = (url) => {
   return true;
 };
 
-const URLQueue = new Set();
-const URLSeen = new Set();
+const scrape = async ({
+  queueSet,
+  seenSet,
+  Page,
+  chromePort,
+}) => {
+  const nLeft = queueSet.size;
+  const nSeen = seenSet.size;
+  console.info(`[INFO][chrome:${chromePort}] There are ${nLeft} URLs left to scrape. We've already seen ${nSeen}.`);
+  if (nLeft > 0) {
+    const { value: nextURL } = queueSet.values().next();
+    console.log(`Now scraping URL: ${nextURL}...`);
+    queueSet.delete(nextURL);
+    seenSet.add(nextURL);
+    try {
+      await Page.navigate({ url: nextURL });
+    } catch (e) {
+      if (e?.response?.code === -32000) {
+        // "Cannot navigate to invalid URL"
+        console.log(`Cannot navigate to ${URL}.`);
+        // Continue by recursing into scrape() because
+        // normally loadEventFired does it once an URL
+        // is finished being scraped,
+        // but when Page.navigate throws an exception,
+        // obviously loadEventFired is not fired...
+        return scrape({
+          queueSet,
+          seenSet,
+          Page,
+          chromePort,
+        });
+      }
+      throw e;
+    }
+    return true;
+  }
+  return false;
+};
 
-const main = async () => {
+const createScraperProcess = async ({
+  addURLAndScrape,
+  queueSet,
+  seenSet,
+  ignoredSet,
+  onKill,
+}) => {
   const chrome = await chromeLauncher.launch({
     chromeFlags: [
       '--window-size=1920,1080',
@@ -80,45 +122,7 @@ const main = async () => {
     DOM,
   } = protocol;
 
-  const scrape = async () => {
-    const nLeft = URLQueue.size;
-    const nSeen = URLSeen.size;
-    console.info(`[INFO] There are ${nLeft} URLs left to scrape. We've already seen ${nSeen}.`);
-    if (nLeft > 0) {
-      const { value: nextURL } = URLQueue.values().next();
-      console.log(`Now scraping URL: ${nextURL}...`);
-      URLQueue.delete(nextURL);
-      URLSeen.add(nextURL);
-      try {
-        await Page.navigate({ url: nextURL });
-      } catch (e) {
-        if (e?.response?.code === -32000) {
-          // "Cannot navigate to invalid URL"
-          console.log(`Cannot navigate to ${URL}.`);
-          // Continue by recursing into scrape() because
-          // normally loadEventFired does it once an URL
-          // is finished being scraped,
-          // but when Page.navigate throws an exception,
-          // obviously loadEventFired is not fired...
-          return scrape();
-        }
-        throw e;
-      }
-      return true;
-    }
-    return false;
-  };
-
   await Promise.all([Network.enable(), Page.enable(), DOM.enable()]);
-
-  Page.lifecycleEvent(({
-    frameId,
-    loaderId,
-    name,
-    timestamp,
-  }) => {
-    console.log(`Event by frame ${frameId} loader ${loaderId}: "${name}" at ${timestamp}.`);
-  });
 
   Network.requestWillBeSent(({ type, requestId, request: { url } }) => {
     if (verbose) {
@@ -156,21 +160,84 @@ const main = async () => {
 
     for (const attrs of linkAttributes) {
       const href = normalizeURL(attrs.get('href'));
-      if (!URLSeen.has(href) && shouldScrapeURL(href)) {
-        URLQueue.add(href);
+      const shouldScrape = shouldScrapeURL(href);
+
+      if (!seenSet.has(href) && shouldScrape) {
+        addURLAndScrape(href);
+      } else if (!shouldScrape) {
+        ignoredSet.add(href);
       }
     }
 
-    const keepGoing = await scrape();
+    const keepGoing = await scrape({
+      queueSet,
+      seenSet,
+      Page,
+      chromePort: chrome.port,
+    });
 
     if (!keepGoing) {
+      onKill();
       protocol.close();
       chrome.kill();
     }
   });
 
-  scrape();
+  const startScraping = async () => scrape({
+    queueSet,
+    seenSet,
+    Page,
+    chromePort: chrome.port,
+  });
+
+  return { chrome, protocol, startScraping };
 };
 
-URLQueue.add(startURL);
+const main = async () => {
+  const URLQueue = new Set();
+  const URLSeen = new Set();
+  const URLIgnored = new Set();
+
+  const nMaxInstances = options.p || 1;
+
+  console.log(`Starting scraping of ${startURL} with ${nMaxInstances} parallel chrome instances.`);
+
+  let nInstances = 0;
+
+  const run = async () => new Promise((resolve) => {
+    const onKill = () => {
+      nInstances -= 1;
+      // We're done when the queue is empty
+      // and no chrome instance is processing something.
+      if (URLQueue.size === 0 && nInstances === 0) {
+        resolve();
+      }
+    };
+
+    const addURLAndScrape = async (url) => {
+      const normalizedURL = normalizeURL(url);
+      if (!URLQueue.has(normalizedURL)) {
+        URLQueue.add(normalizedURL);
+
+        if (nInstances < nMaxInstances) {
+          nInstances += 1;
+          const scraper = await createScraperProcess({
+            addURLAndScrape,
+            queueSet: URLQueue,
+            seenSet: URLSeen,
+            ignoredSet: URLIgnored,
+            onKill,
+          });
+
+          scraper.startScraping();
+        }
+      }
+    };
+
+    addURLAndScrape(startURL);
+  });
+
+  await run();
+};
+
 main();
