@@ -58,7 +58,12 @@ const normalizeURL = (url) => {
 // It should be scraped if it's not a javascript:void() or something link,
 // and of course if it is on the same domain as the domain
 // we started scraping from.
-const shouldScrapeURL = (url) => {
+// attrs is a Map of all attributes found on the link.
+const shouldScrapeURL = (url, attrs) => {
+  if (attrs && attrs.get('rel') === 'nofollow') {
+    return false;
+  }
+
   const parsedURL = URL.parse(url);
   // eslint-disable-next-line no-script-url
   if (parsedURL.protocol === 'javascript:') {
@@ -200,7 +205,7 @@ const createScraperProcess = async ({
 
     for (const attrs of linkAttributes) {
       const href = normalizeURL(attrs.get('href'));
-      const shouldScrape = shouldScrapeURL(href);
+      const shouldScrape = shouldScrapeURL(href, attrs);
 
       if (!seenSet.has(href) && shouldScrape) {
         addURLAndScrape(href);
