@@ -183,11 +183,11 @@ const createScraperProcess = async ({
   // That's when we start analyzing the page and queuing the
   // next links to process.
   Page.loadEventFired(async () => {
+    const doc = await DOM.getDocument();
+
     const extractTitleJS = 'document.querySelector("title").textContent';
     const titleResult = await Runtime.evaluate({ expression: extractTitleJS });
     console.log(`Reached page: ${titleResult.result.value}`);
-
-    const doc = await DOM.getDocument();
 
     const { nodeId: canonicalNodeId } = await DOM.querySelector({
       nodeId: doc.root.nodeId,
