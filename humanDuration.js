@@ -60,7 +60,7 @@ export default function humanDuration(seconds) {
     ['millenium', 'millenia'],
   ];
 
-  const divisors = [60, 60, 24, 7, 4, 12, 5, 10, 100, 1000];
+  const divisors = [60, 60, 24, 7, 4, 12, 5, 2, 10, 10];
 
   if (seconds === 0) {
     return 'no time at all';
