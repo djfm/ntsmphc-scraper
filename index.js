@@ -236,7 +236,7 @@ const createScraperProcess = async ({
 
   // Returns the method that starts scraping with
   // the brand new chrome instance.
-  // Returning it as an array because I have a feeling
+  // Returning it as an object because I have a feeling
   // I might need to expose more variables later.
   return { startScraping };
 };
