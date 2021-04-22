@@ -356,7 +356,7 @@ const main = async () => {
   // command-line argument.
   if (logFilePath) {
     const textLog = JSON.stringify(log, null, 2);
-    await FSP.writeFile(textLog, logFilePath);
+    await FSP.writeFile(logFilePath, textLog);
     console.log(`Wrote log to "${logFilePath}".`);
   }
 };
