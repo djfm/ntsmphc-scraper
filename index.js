@@ -204,7 +204,8 @@ const createScraperProcess = async ({
     );
 
     for (const attrs of linkAttributes) {
-      const href = normalizeURL(attrs.get('href'));
+      const whichURL = attrs.get('canonical') || attrs.get('href');
+      const href = normalizeURL(whichURL);
       const shouldScrape = shouldScrapeURL(href, attrs);
 
       if (!seenSet.has(href) && shouldScrape) {
