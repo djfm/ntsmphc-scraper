@@ -12,7 +12,7 @@ import { promises as FSP } from 'fs';
 
 import makeURLHelpers from './url.js';
 import { keyValueArrayToMap } from './functional.js';
-import humanDuration from './humanDuration';
+import humanDuration from './humanDuration.js';
 
 const options = parseArgv(process.argv.slice(2));
 
