@@ -94,7 +94,7 @@ const scrape = async ({
   // The progress percentage based on the number of remaining URLs discovered
   // SO FAR.
   // nLeft will keep increasing randomly as more pages are discovered.
-  const pct = `${Math.round((100 * nSeen) / nLeft)}`.padStart(3, ' ');
+  const pct = `${Math.round((100 * nSeen) / (nLeft + nSeen))}`.padStart(3, ' ');
 
   console.info(`[INFO][chrome:${chromePort}][est. ${pct}% done]: ${nLeft} URLs left to scrape, ${nSeen} done.`);
 
