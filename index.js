@@ -3,6 +3,8 @@ import chromeLauncher from 'chrome-launcher';
 import CRI from 'chrome-remote-interface';
 import URL from 'url';
 
+import makeURLHelpers from './url.js';
+
 // Converts an array of keys and values
 // like [key1, value1, key2, value2]
 // to a map like { key1 => value1, key2 => value2 }.
@@ -27,55 +29,12 @@ if (!startURL) {
 
 const parsedStartURL = URL.parse(startURL);
 
+const { normalizeURL, shouldScrapeURL } = makeURLHelpers(parsedStartURL);
+
 if (!parsedStartURL.protocol) {
   console.error('Please include the protocol in the start URL.');
   process.exit(-2);
 }
-
-// Normalizes URLs to avoid scraping the same URL twice
-// because of subtle variations in the URL string.
-// Also adds the protocol for links starting in "//",
-// which the chrome driver considers invalid.
-const normalizeURL = (url) => {
-  if (typeof url !== 'string') {
-    return '';
-  }
-
-  const sanitizedURL = url.toLowerCase().trim();
-
-  if (sanitizedURL.startsWith('//')) {
-    return normalizeURL(`${parsedStartURL.protocol}${sanitizedURL}`);
-  }
-
-  if (sanitizedURL.endsWith('/')) {
-    return normalizeURL(sanitizedURL.slice(0, -1));
-  }
-
-  return sanitizedURL;
-};
-
-// Determines if a URL should be scraped.
-// It should be scraped if it's not a javascript:void() or something link,
-// and of course if it is on the same domain as the domain
-// we started scraping from.
-// attrs is a Map of all attributes found on the link.
-const shouldScrapeURL = (url, attrs) => {
-  if (attrs && attrs.get('rel') === 'nofollow') {
-    return false;
-  }
-
-  const parsedURL = URL.parse(url);
-  // eslint-disable-next-line no-script-url
-  if (parsedURL.protocol === 'javascript:') {
-    return false;
-  }
-
-  if (parsedURL.hostname !== parsedStartURL.hostname) {
-    return false;
-  }
-
-  return true;
-};
 
 // Pops one item from the queue of URLs to scrape
 // and starts scraping it.

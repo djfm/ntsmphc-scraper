@@ -13,5 +13,6 @@ module.exports = {
   rules: {
     'no-console': 0,
     'no-restricted-syntax': 0,
+    'import/extensions': 0, // node requires explicit extensions
   },
 };
