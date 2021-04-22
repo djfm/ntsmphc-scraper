@@ -175,7 +175,7 @@ const createScraperProcess = async ({
     // Explore the links found on this page,
     // but only if it has no canonical URL or if its canonical URL
     // has not yet been scraped.
-    // This may leed to scraping a few too many pages but this feels
+    // This may lead to scraping a few too many pages but this feels
     // safer to me in terms of exhaustivity.
     if (!ignoreNonCanonicalPage) {
       const { nodeIds } = await DOM.querySelectorAll({ nodeId: doc.root.nodeId, selector: 'a' });
