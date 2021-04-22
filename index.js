@@ -262,7 +262,7 @@ const main = async () => {
     if (verbose) {
       console.log('[log]', data);
     }
-    logHistory.push(log);
+    logHistory.push(data);
   };
 
   // Max number of running parallel chrome instances.
@@ -356,7 +356,6 @@ const main = async () => {
   // command-line argument.
   if (logFilePath) {
     const textLog = JSON.stringify(logHistory, null, 2);
-    console.log(textLog);
     await FSP.writeFile(logFilePath, textLog);
     console.log(`Wrote log to "${logFilePath}".`);
   }
