@@ -153,7 +153,7 @@ const createScraperProcess = async ({
 
   // Apparently this needs to be done before starting to use
   // the APIs.
-  await Promise.all([Network.enable(), Page.enable(), DOM.enable()]);
+  await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()]);
 
   // Just some optional logging for now.
   Network.requestWillBeSent(({ type, requestId, request: { url } }) => {
