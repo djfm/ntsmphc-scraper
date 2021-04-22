@@ -260,7 +260,7 @@ const main = async () => {
   let nInstances = 0;
 
   // The function that coordinates all the work.
-  // It returns a promise when every URL is done being scraped.
+  // It returns a promise that fulfills when every URL is done being scraped.
   const run = async () => new Promise((resolve) => {
     const onKill = () => {
       nInstances -= 1;
