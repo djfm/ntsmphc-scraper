@@ -79,9 +79,6 @@ const shouldScrapeURL = (url, attrs) => {
 
 // Pops one item from the queue of URLs to scrape
 // and starts scraping it.
-// Returns true if it started doing something (meaning there
-// might be further work to do... or not).
-// Returns false if there is nothing left to do.
 const scrape = async ({
   queueSet,
   seenSet,
@@ -115,18 +112,17 @@ const scrape = async ({
         // but when Page.navigate throws an exception,
         // obviously loadEventFired is not fired...
         // So the instance would remain alive like a zombie.
-        return scrape({
+        scrape({
           queueSet,
           seenSet,
           Page,
           chromePort,
         });
+        return;
       }
       throw e;
     }
-    return true;
   }
-  return false;
 };
 
 // Starts a chrome instance and returns an object
@@ -137,7 +133,6 @@ const createScraperProcess = async ({
   addURLAndScrape,
   queueSet,
   seenSet,
-  ignoredSet,
   onKill,
 }) => {
   // Starts a new headless chrome instance.
@@ -193,6 +188,19 @@ const createScraperProcess = async ({
     console.log(`Reached page: ${titleResult.result.value}`);
 
     const doc = await DOM.getDocument();
+
+    const { nodeId: canonicalNodeId } = await DOM.querySelector({
+      nodeId: doc.root.nodeId,
+      selector: 'head link[rel=canonical]',
+    });
+
+    if (canonicalNodeId !== 0) {
+      const { attributes } = await DOM.getAttributes({ nodeId: canonicalNodeId });
+      const attrMap = keyValueArrayToMap(attributes);
+      const canonical = normalizeURL(attrMap.get('href'));
+      addURLAndScrape(canonical);
+    }
+
     const { nodeIds } = await DOM.querySelectorAll({ nodeId: doc.root.nodeId, selector: 'a' });
 
     const linkAttributesArrays = await Promise.all(
@@ -206,30 +214,26 @@ const createScraperProcess = async ({
     for (const attrs of linkAttributes) {
       const whichURL = attrs.get('canonical') || attrs.get('href');
       const href = normalizeURL(whichURL);
-      const shouldScrape = shouldScrapeURL(href, attrs);
-
-      if (!seenSet.has(href) && shouldScrape) {
-        addURLAndScrape(href);
-      } else if (!shouldScrape) {
-        ignoredSet.add(href);
-      }
+      addURLAndScrape(href, attrs);
     }
 
-    const keepGoing = await scrape({
-      queueSet,
-      seenSet,
-      Page,
-      chromePort: chrome.port,
-    });
-
-    // Kill the chrome instance if it has nothing more to do.
-    // This is not done by the scrape function as it has
-    // minimal awareness of the technicalities of which
-    // chrome instance is calling it.
-    // The onKill method is responsible for decrementing
-    // the number of running instances and checking
-    // if we are done scraping.
-    if (!keepGoing) {
+    if (queueSet.size > 0) {
+      // If there is work to do,
+      // week doing it.
+      scrape({
+        queueSet,
+        seenSet,
+        Page,
+        chromePort: chrome.port,
+      });
+    } else {
+      // Kill the chrome instance if it has nothing more to do.
+      // This is not done by the scrape function as it has
+      // minimal awareness of the technicalities of which
+      // chrome instance is calling it.
+      // The onKill method is responsible for decrementing
+      // the number of running instances and checking
+      // if we are done scraping.
       onKill();
       protocol.close();
       chrome.kill();
@@ -281,10 +285,22 @@ const main = async () => {
     // If we add an URL and we have less than
     // the maximum number of chrome instances allowed
     // for the scraping, it starts a new instance.
-    const addURLAndScrape = async (url) => {
+    // attrs is an optional Map of attributes found on the link.
+    const addURLAndScrape = async (url, attrs) => {
       const normalizedURL = normalizeURL(url);
-      if (!URLQueue.has(normalizedURL)) {
+      const shouldScrape = shouldScrapeURL(normalizedURL, attrs);
+
+      if (!shouldScrape) {
+        URLIgnored.add(normalizedURL);
+        return;
+      }
+
+      const notAlreadyQueued = !URLQueue.has(normalizedURL);
+      const notAlreadySeen = !URLSeen.has(normalizedURL);
+
+      if (notAlreadyQueued && notAlreadySeen) {
         URLQueue.add(normalizedURL);
+        URLSeen.add(normalizedURL);
 
         // If we added some URL to scrape and we can
         // start a new instance, then we do it.
@@ -294,7 +310,6 @@ const main = async () => {
             addURLAndScrape,
             queueSet: URLQueue,
             seenSet: URLSeen,
-            ignoredSet: URLIgnored,
             onKill,
           });
 
