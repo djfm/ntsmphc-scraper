@@ -1,5 +1,8 @@
 const pluralize = (n, [singular, plural]) => (n === 1 ? `${n} ${singular}` : `${n} ${plural}`);
 
+// Find the biggest unit that's gonna be used.
+// While computing this, keep track of the divisors that are gonna be used
+// later to decompose the number into its sub-units.
 const translateBiggestUnit = (
   n,
   [divisor, ...divisors],
@@ -9,7 +12,7 @@ const translateBiggestUnit = (
   unitsUsed,
 ) => {
   const howManyUnits = n / candidateDivisor;
-  if (howManyUnits >= divisor) {
+  if (howManyUnits >= divisor && divisors.length > 0) {
     return translateBiggestUnit(
       n,
       divisors,

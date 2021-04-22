@@ -1,20 +1,24 @@
-// USAGE: node index.js https://url.example.com [-p N] [-v]
+// USAGE: node index.js https://url.example.com [-p N] [-v] [--log-file path/to/log.json]
 // Scrapes website found at given URL, optionnally using N parallel
 // headless chrome instances.
-// The -v flag increases the verbosity. It is not very useful at the moment.
+// The -v flag increases the verbosity.
+// Pass --log-file some/path.json to log interesting stuff the scraper may have found.
 
 import parseArgv from 'minimist';
 import chromeLauncher from 'chrome-launcher';
 import CRI from 'chrome-remote-interface';
 import URL from 'url';
+import { promises as FSP } from 'fs';
 
 import makeURLHelpers from './url.js';
 import { keyValueArrayToMap } from './functional.js';
+import humanDuration from './humanDuration';
 
 const options = parseArgv(process.argv.slice(2));
 
 const startURL = options._[0];
 const verbose = options.v;
+const logFilePath = options['log-file'];
 
 if (!startURL) {
   console.error('Please provide a start URL as an unnamed argument !');
@@ -87,6 +91,7 @@ const createScraperProcess = async ({
   queueSet,
   seenSet,
   onKill,
+  log,
 }) => {
   // Starts a new headless chrome instance.
   const chrome = await chromeLauncher.launch({
@@ -109,23 +114,19 @@ const createScraperProcess = async ({
   await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()]);
 
   // Just some optional logging for now.
-  Network.requestWillBeSent(({ type, requestId, request: { url } }) => {
+  Network.requestWillBeSent(({ type, requestId, url }) => {
     if (verbose) {
       console.log(`[${type}] Will be sent: request #${requestId} to "${url}".`);
     }
   });
 
-  // Just some optional logging for now.
-  Network.loadingFinished(({ requestId, timestamp }) => {
-    if (verbose) {
-      console.log(`Loading of request #${requestId} finished at ${timestamp}.`);
-    }
-  });
-
-  // Just some optional logging for now.
-  Page.domContentEventFired(({ timestamp }) => {
-    if (verbose) {
-      console.log(`domContentEventFired at ${timestamp}`);
+  Network.responseReceived(({ response }) => {
+    if (response.status !== 200) {
+      log({
+        url: response.url,
+        status: response.status,
+        referer: response?.requestHeaders?.Referer || '',
+      });
     }
   });
 
@@ -250,6 +251,20 @@ const main = async () => {
   // Set of URLs that have been found but ignored for some reason.
   const URLIgnored = new Set();
 
+  // Repository for interesting things
+  // logged while scraping.
+  const logHistory = [];
+
+  // A logging function that is used by the scraper
+  // processes to save various things that
+  // may be useful for later anlysis.
+  const log = (data) => {
+    if (verbose) {
+      console.log('[log]', data);
+    }
+    logHistory.push(log);
+  };
+
   // Max number of running parallel chrome instances.
   // Provide it to the cli with the "p" option,
   // e.g. node index.js https://mysite.example.com -p4
@@ -311,6 +326,7 @@ const main = async () => {
             queueSet: URLQueue,
             seenSet: URLSeen,
             onKill,
+            log,
           });
 
           startScraping();
@@ -325,7 +341,24 @@ const main = async () => {
     addURLAndScrape(startURL);
   });
 
+  const startedAt = Date.now();
   await run();
+  const elapsed = Math.round((Date.now() - startedAt) / 1000);
+
+  console.log('------------------');
+  console.log('Scraping finished!');
+  console.log(`Took ${humanDuration(elapsed)}.`);
+  console.log(`Analyzed ${URLSeen.size} URLs.`);
+  console.log(`Ignored ${URLIgnored.size} URLs found on the scraped pages.`);
+
+  // Pretty-print the log array in JSON format
+  // to a file if specified by the [--log-file some/path.json]
+  // command-line argument.
+  if (logFilePath) {
+    const textLog = JSON.stringify(log, null, 2);
+    await FSP.writeFile(textLog, logFilePath);
+    console.log(`Wrote log to "${logFilePath}".`);
+  }
 };
 
 // Sit back and relax.
