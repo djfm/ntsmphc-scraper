@@ -194,27 +194,34 @@ const createScraperProcess = async ({
       selector: 'head link[rel=canonical]',
     });
 
+    let ignoreNonCanonicalPage = false;
+
     if (canonicalNodeId !== 0) {
       const { attributes } = await DOM.getAttributes({ nodeId: canonicalNodeId });
       const attrMap = keyValueArrayToMap(attributes);
       const canonical = normalizeURL(attrMap.get('href'));
+      if (seenSet.has(canonical)) {
+        ignoreNonCanonicalPage = true;
+      }
       addURLAndScrape(canonical);
     }
 
-    const { nodeIds } = await DOM.querySelectorAll({ nodeId: doc.root.nodeId, selector: 'a' });
+    if (!ignoreNonCanonicalPage) {
+      const { nodeIds } = await DOM.querySelectorAll({ nodeId: doc.root.nodeId, selector: 'a' });
 
-    const linkAttributesArrays = await Promise.all(
-      nodeIds.map((nodeId) => DOM.getAttributes({ nodeId })),
-    );
+      const linkAttributesArrays = await Promise.all(
+        nodeIds.map((nodeId) => DOM.getAttributes({ nodeId })),
+      );
 
-    const linkAttributes = linkAttributesArrays.map(
-      ({ attributes }) => keyValueArrayToMap(attributes),
-    );
+      const linkAttributes = linkAttributesArrays.map(
+        ({ attributes }) => keyValueArrayToMap(attributes),
+      );
 
-    for (const attrs of linkAttributes) {
-      const whichURL = attrs.get('canonical') || attrs.get('href');
-      const href = normalizeURL(whichURL);
-      addURLAndScrape(href, attrs);
+      for (const attrs of linkAttributes) {
+        const whichURL = attrs.get('canonical') || attrs.get('href');
+        const href = normalizeURL(whichURL);
+        addURLAndScrape(href, attrs);
+      }
     }
 
     if (queueSet.size > 0) {
