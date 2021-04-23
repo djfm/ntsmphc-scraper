@@ -46,7 +46,7 @@ const divideTime = (nUnits, [divisor, ...divisors], [unit, ...units]) => {
 // string expressing that duration in appropriate units.
 // E.g. 65 yields "1 minute and 5 seconds".
 // This function is unit-tested, see the test file for more examples.
-export default function humanDuration(seconds) {
+const humanDuration = (seconds) => {
   const units = [
     ['second', 'seconds'],
     ['minute', 'minutes'],
@@ -90,4 +90,6 @@ export default function humanDuration(seconds) {
   const lastPart = resultParts[resultParts.length - 1];
 
   return `${csv} and ${lastPart}`;
-}
+};
+
+export default humanDuration;
