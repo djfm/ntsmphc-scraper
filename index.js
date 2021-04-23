@@ -121,7 +121,10 @@ const createScraperProcess = async ({
   });
 
   Network.responseReceived(({ response }) => {
-    if (response.status !== 200) {
+    // Log requests that have responded with an error status code.
+    // I think all error codes are above or equal to 400.
+    // Cf. https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+    if (response.status >= 400) {
       log({
         url: response.url,
         status: response.status,
