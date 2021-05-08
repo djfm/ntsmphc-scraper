@@ -16,7 +16,7 @@ const timeUnits: Unit[] = [
   ['lustrum', 'lustra'],
   ['decade', 'decades'],
   ['century', 'centuries'],
-  ['millenium', 'millenia'],
+  ['millennium', 'millennia'],
 ];
 
 const translateBiggestUnit = (
