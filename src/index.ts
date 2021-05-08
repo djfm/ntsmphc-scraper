@@ -15,6 +15,11 @@ import { keyValueArrayToMap } from './functional';
 import humanDuration from './humanDuration';
 import flattenNodeTree, { filterStylableNodes } from './tree';
 
+interface HasAttributes {
+  // [key1, value1, key2, value2, ...]
+  attributes: string[];
+}
+
 const options = Minimist(process.argv.slice(2));
 
 const startURL = options._[0];
@@ -190,13 +195,13 @@ const createScraperProcess = async ({
     if (!ignoreNonCanonicalPage) {
       const { nodeIds } = await DOM.querySelectorAll({ nodeId: doc.root.nodeId, selector: 'a' });
 
-      const linkAttributesArrays = await Promise.all(
+      const linkAttributesArrays: HasAttributes[] = await Promise.all(
         nodeIds.map((nodeId) => DOM.getAttributes({ nodeId })),
       );
 
       // getAttributes returns an object of the form:
       // { attributes: [attr1, value1, attr2, value2, ...]}
-      // We convert all these arrays to javacript Maps for convenience.
+      // We convert all these arrays to Maps for convenience.
       const linkAttributes = linkAttributesArrays.map(
         ({ attributes }) => keyValueArrayToMap(attributes),
       );

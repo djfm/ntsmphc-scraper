@@ -17,10 +17,13 @@ describe('The humanDuration function translates numbers of seconds to human-read
     [700000, '1 week, 1 day, 2 hours, 26 minutes and 40 seconds'],
   ];
 
-  for (const [input, expected] of examples) {
+  const runTest = (x: Example) => {
+    const [input, expected] = x;
     test(`it translates ${input} to: "${expected}"`, () => {
       const actual = humanDuration(input);
       expect(actual).toEqual(expected);
     });
-  }
+  };
+
+  examples.forEach(runTest);
 });

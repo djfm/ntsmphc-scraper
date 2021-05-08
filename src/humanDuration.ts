@@ -3,7 +3,7 @@ type Unit = [singularForm: string, pluralForm: string];
 const pluralize = (n: number, [singular, plural]: Unit) =>
   (n === 1 ? `${n} ${singular}` : `${n} ${plural}`);
 
-const units: Unit[] = [
+const timeUnits: Unit[] = [
   ['second', 'seconds'],
   ['minute', 'minutes'],
   ['hour', 'hours'],
@@ -54,7 +54,7 @@ const translateBiggestUnit = (
 const divideTime = (
   nUnits: number,
   [divisor, ...divisors]: number[],
-  [unit, ...units]: Unit[]
+  [unit, ...units]: Unit[],
 ) => {
   const div = Math.floor(nUnits / divisor);
   const remainder = nUnits - div * divisor;
@@ -80,7 +80,7 @@ const humanDuration = (seconds: number) => {
     remainingSubUnits,
     divisorsToUse,
     unitsUsed,
-  } = translateBiggestUnit(seconds, divisors, units, 1, [], []);
+  } = translateBiggestUnit(seconds, divisors, timeUnits, 1, [], []);
 
   const rest = remainingSubUnits > 0 ? divideTime(remainingSubUnits, divisorsToUse, unitsUsed) : [];
 
