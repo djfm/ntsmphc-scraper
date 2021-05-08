@@ -776,6 +776,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chalk@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@types/chalk@npm:2.2.0"
+  dependencies:
+    chalk: "*"
+  checksum: 9cded9031f180268be59010fc1e13c7b4384e51f0ca8b75bc7a40bdd46f5f3c4859953525fb53663287e5bb25ca5df59396c276ce5c09e1a83aa7a2aec6a9f59
+  languageName: node
+  linkType: hard
+
 "@types/graceful-fs@npm:^4.1.2":
   version: 4.1.5
   resolution: "@types/graceful-fs@npm:4.1.5"
@@ -1612,6 +1621,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk@npm:*, chalk@npm:^4.0.0, chalk@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "chalk@npm:4.1.1"
+  dependencies:
+    ansi-styles: ^4.1.0
+    supports-color: ^7.1.0
+  checksum: 445c12db7aeed0046500a1e4184d31209a77d165654c885a789c41c8598a6a95bd2392180987cac572c967b93a2a730dda778bb7f87fa06ca63fd8592f8cc59f
+  languageName: node
+  linkType: hard
+
 "chalk@npm:^2.0.0":
   version: 2.4.2
   resolution: "chalk@npm:2.4.2"
@@ -1620,16 +1639,6 @@ __metadata:
     escape-string-regexp: ^1.0.5
     supports-color: ^5.3.0
   checksum: 22c7b7b5bc761c882bb6516454a1a671923f1c53ff972860065aa0b28a195f230163c1d46ee88bcc7a03e5539177d896457d8bc727de7f244c6e87032743038e
-  languageName: node
-  linkType: hard
-
-"chalk@npm:^4.0.0":
-  version: 4.1.1
-  resolution: "chalk@npm:4.1.1"
-  dependencies:
-    ansi-styles: ^4.1.0
-    supports-color: ^7.1.0
-  checksum: 445c12db7aeed0046500a1e4184d31209a77d165654c885a789c41c8598a6a95bd2392180987cac572c967b93a2a730dda778bb7f87fa06ca63fd8592f8cc59f
   languageName: node
   linkType: hard
 
@@ -4854,11 +4863,13 @@ fsevents@^2.1.2:
   version: 0.0.0-use.local
   resolution: "ntsmphc-scraper@workspace:."
   dependencies:
+    "@types/chalk": ^2.2.0
     "@types/jest": ^26.0.23
     "@types/minimist": ^1.2.1
     "@types/node": ^15.0.2
     "@typescript-eslint/eslint-plugin": ^4.22.1
     "@typescript-eslint/parser": ^4.22.1
+    chalk: ^4.1.1
     chrome-launcher: ^0.13.4
     chrome-remote-interface: ^0.30.0
     eslint: ^7.26.0
