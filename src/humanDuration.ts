@@ -1,3 +1,5 @@
+// TODO rewrite in a readable way :)
+
 type Unit = [singularForm: string, pluralForm: string];
 
 const pluralize = (n: number, [singular, plural]: Unit) =>
