@@ -37,7 +37,7 @@ const init: Action = {
   options: [{
     primaryName: 'directory',
     description: 'an empty, existing, directory where all scraping data will be stored',
-    aliases: ['d', '$2'],
+    aliases: ['d', '$'],
     requiresValue: true,
     valueFriendlyName: 'pathToDirectory',
   }],
@@ -132,11 +132,22 @@ if (intendedAction.verb === 'help') {
     process.exit(0);
   }
 
-  log(`The options for the ${chalk.underline(subject)} action are:`);
+  log(`\nThe options for the ${chalk.underline(subject)} action are:\n`);
 
   for (const option of actionForHelp.options) {
-    const optDesc = `${option.primaryName} ${option.valueFriendlyName}`;
-    log(`--${optDesc.padEnd(25)}`);
-    log(`  # ${option.description}\n`);
+    const ovfn = chalk.italic(option.valueFriendlyName);
+    const optDesc = `${option.primaryName} ${ovfn}`;
+    log(`--${optDesc}`);
+    log(`  # ${option.description}\n  #`);
+    if (option.aliases.length > 0) {
+      log('  # the following option aliases are recognized:\n  #');
+      for (const alias of option.aliases) {
+        if (alias !== '$') {
+          log(`  #  -${alias} ${ovfn}`);
+        } else {
+          log(`  #  ${chalk.underline('scrape')} ${subject} ${ovfn}`);
+        }
+      }
+    }
   }
 }
