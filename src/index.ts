@@ -4,6 +4,9 @@
 // The -v flag increases the verbosity.
 // Pass --log-file some/path.json to log interesting stuff the scraper may have found.
 
+import { URL } from 'url';
+import { promises as FSP } from 'fs';
+
 // Cannot convert as a default import without esModuleInterop flag which I don't want.
 import * as Minimist from 'minimist';
 
@@ -11,9 +14,6 @@ import { launch as launchChrome } from 'chrome-launcher';
 
 // TODO add a .d.ts file for this module, since it doesn't provide one
 import * as CDP from 'chrome-remote-interface';
-
-import { URL } from 'url';
-import { promises as FSP } from 'fs';
 
 import makeURLHelpers from './url';
 import { keyValueArrayToMap } from './functional';
