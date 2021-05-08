@@ -1,0 +1,108 @@
+{
+  // there are no eslint config files to look for above this directory
+  "root": true,
+
+  // the all defining parameter, we're linting TypeScript so...
+  //
+  // `yarn add -D eslint`
+  // `yarn add -D @typescript-eslint/parser`
+  "parser": "@typescript-eslint/parser",
+
+  "parserOptions": {
+    // This is expected by eslint to let us use "import" / "export" statements.
+    // But in an all-TypeScript project running with `ts-node`,
+    // don't set "type: module" in `package.json`,
+    // as `ts-node`, strangely, wouldn't recognize `.ts` files as valid.
+    // This is at least true at the time of writing, in early May 2021.
+    "sourceType": "module"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        // For now I'm only using TypeScript modules, so, this is
+        // all I need.
+        // Needed because TS refuses that we use `.ts` extensions
+        // when importing a module, and if we don't tell `eslint` to
+        // automatically resolve `.ts` files we get linting errors
+        // such as "could not resolve module...".
+        "extensions": [".ts"]
+      }
+    }
+  },
+  "plugins": [
+    // lets us lint the JSDoc comments, see https://jsdoc.app/
+    // `yarn add -D eslint-plugin-jsdoc`
+    "jsdoc",
+
+    // adds helpful rules for JSDoc in TS,
+    // such as stopping complaining about
+    // missing parameter or return types that are, in fact,
+    // defined directly in TypeScript
+    //
+    // `yarn add -D eslint-plugin-tsdoc`
+    "eslint-plugin-tsdoc",
+
+    // specific TS rules for `eslint`
+    //
+    // `yarn add -D @typescript-eslint/eslint-plugin`
+    "@typescript-eslint"
+  ],
+  // in "extends", the order matters (I think)
+  "extends": [
+    // a good starting point
+    "eslint:recommended",
+
+    // I like airbnb style guides, they're pretty strict
+    // and IMHO look nice.
+    //
+    // `yarn add -D eslint-config-airbnb-base`
+    // `yarn add -D eslint-plugin-import`
+    "airbnb-base",
+
+    // lets specific TS-eslint recommended rules override
+    // non TS-specific rules that may be wrong in our case
+    "plugin:@typescript-eslint/eslint-recommended"
+  ],
+  // my customizations to the linting rules
+  "rules": {
+    // this is a console project, so there will obviously be a lot
+    // of console logging
+    "no-console": 0,
+
+    // I'm using Node 16.1 at the time of writing,
+    // so no advanced language features actually need to be
+    // emulated and this rule thus doesn't make sense for me.
+    "no-restricted-syntax": 0,
+
+    // I often put the arrow function body on a new line
+    // if the line would otherwise get too long,
+    // so I always disable this.
+    // Lets me write stuff like :
+    //
+    // const x = (some, args) =>
+    //   doStuffWith(some)(args);
+    "implicit-arrow-linebreak": 0,
+
+    // TypeScript doesn't want us to use the `.ts` extension
+    // in "import" so I just blanket-disabled this rule for
+    // convenience, although this could be tuned more finely.
+    // TODO tune more finely
+    "import/extensions": 0,
+
+    // just disables JavaScript's version of the rule,
+    // we keep TypeScript's one, which is way smarter
+    // about determining when stuff is used or not.
+    "no-unused-vars": 0,
+
+    // IMHO, unused vars are a warning, not an error
+    // as the defaults would have it
+    "@typescript-eslint/no-unused-vars": "warn",
+
+    // I sometimes start a newline right after an "=" operator,
+    // when the line would otherwise be too long, so here we go.
+    "operator-linebreak": ["warn", "after"],
+
+    // syntax errors in tsdoc are not errors IMHO
+    "tsdoc/syntax": "warn"
+  }
+}
