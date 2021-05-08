@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 
 import chai from 'chai';
-import humanDuration from '../humanDuration.js';
+import humanDuration from '../src/humanDuration.js';
 
 chai.should();
 
