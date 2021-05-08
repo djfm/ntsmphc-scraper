@@ -176,7 +176,6 @@ for (const option of action.options) {
     if (optionValues.has(pn)) {
       logError(`Merlin’s beard! You specified option "${pn}" too many times.`);
       logError(`Please use only ${chalk.bold('one')} alias.`);
-      console.log(parsedArgv);
       process.exit(ERR_OPTION_DEFINED_SEVERAL_WAYS);
     }
 
