@@ -11,12 +11,14 @@ const logError = (errText: string) => console.log(chalk.red(errText));
 const ERR_MISSING_ACTION = 1;
 const ERR_UNKNOWN_ACTION = 2;
 const ERR_NO_HELP_TO_DISPLAY = 3;
+const ERR_OPTION_DEFINED_SEVERAL_WAYS = 4;
+const ERR_OPTION_UNDEFINED = 5;
 
 type Option = {
   primaryName: string;
   description: string;
   aliases: string[];
-  default?: string;
+  defaultValue?: string;
   requiresValue: boolean;
   valueFriendlyName?: string;
 };
@@ -39,6 +41,7 @@ const init: Action = {
     description: 'an empty, existing, directory where all scraping data will be stored',
     aliases: ['d', '$'],
     requiresValue: true,
+    defaultValue: '.',
     valueFriendlyName: 'pathToDirectory',
   }],
 };
@@ -93,7 +96,7 @@ if (!userProvidedVerb) {
 const intendedAction: Action = actions.find(({ verb }) => verb === userProvidedVerb);
 
 if (intendedAction === undefined) {
-  logError('Corn Nuts!!\n');
+  logError('Corn nuts!!\n');
   logError(`Sorry but the action you specified - "${userProvidedVerb}" - is unknown to me.\n`);
   showUsage();
   process.exit(ERR_UNKNOWN_ACTION);
@@ -151,3 +154,61 @@ if (intendedAction.verb === 'help') {
     }
   }
 }
+
+// TODO add generic --help flag support
+
+// now we know that the action is not "help", so
+// we enter real work territory
+
+const action = intendedAction;
+
+const optionValues = new Map();
+
+for (const option of action.options) {
+  const pn = option.primaryName;
+  const argvNames = Object.keys(parsedArgv).filter((key) => key !== '_');
+
+  if (argvNames.includes(pn)) {
+    optionValues.set(pn, parsedArgv[pn]);
+  }
+
+  const tryToSetOptionValue = (value: any) => {
+    if (optionValues.has(pn)) {
+      logError(`Merlin’s beard! You specified option "${pn}" too many times.`);
+      logError(`Please use only ${chalk.bold('one')} alias.`);
+      console.log(parsedArgv);
+      process.exit(ERR_OPTION_DEFINED_SEVERAL_WAYS);
+    }
+
+    optionValues.set(pn, value);
+  };
+
+  for (const alias of option.aliases) {
+    if (alias !== '$') {
+      if (argvNames.includes(alias)) {
+        tryToSetOptionValue(parsedArgv[alias]);
+      }
+    } else if (parsedArgv._.length > 1) {
+      tryToSetOptionValue(parsedArgv._[1]);
+    }
+  }
+
+  if (!optionValues.has(pn) && option.defaultValue !== undefined) {
+    optionValues.set(pn, option.defaultValue);
+  }
+
+  if (!optionValues.has(pn)) {
+    if (option.requiresValue) {
+      logError(`Cheese and rice! Value for option "${pn}" is undefined.`);
+      process.exit(ERR_OPTION_UNDEFINED);
+    }
+
+    // assume the option is a boolean flag
+    optionValues.set(pn, true);
+  }
+}
+
+log(`Got it.\nRunning action "${chalk.underline(action.verb)}", with options:`);
+optionValues.forEach((value, key) => {
+  log(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
+});
