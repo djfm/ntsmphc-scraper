@@ -13,6 +13,7 @@ import { promises as FSP } from 'fs';
 import makeURLHelpers from './url.js';
 import { keyValueArrayToMap } from './functional.js';
 import humanDuration from './humanDuration.js';
+import flattenNodeTree, { filterStylableNodes } from './tree.js';
 
 const options = parseArgv(process.argv.slice(2));
 
@@ -140,7 +141,13 @@ const createScraperProcess = async ({
   // That's when we start analyzing the page and queuing the
   // next links to process.
   Page.loadEventFired(async () => {
-    const doc = await DOM.getDocument();
+    // Get the root node with all the subtree.
+    const doc = await DOM.getDocument({
+      depth: -1,
+    });
+
+    const nodes = flattenNodeTree(doc.root);
+    const stylableNodes = filterStylableNodes(nodes);
 
     // Get the page's title.
     // This is more convenient to do by executing JS in the host chrome
