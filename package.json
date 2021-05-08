@@ -1,13 +1,14 @@
 {
-  "name": "css-extractor",
+  "name": "ntsmphc-scraper",
   "version": "1.0.0",
-  "description": "Scrape and extract used website CSS",
-  "main": "index.js",
+  "description": "Scrape a website and do useful things while at it.",
+  "main": "src/index.js",
+  "repository": "https://github.com/djfm/ntsmphc-scraper",
   "scripts": {
     "test": "mocha --experimental-modules"
   },
   "type": "module",
-  "author": "",
+  "author": "François-Marie de Jouvencel<fm.de.jouvencel@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "chrome-launcher": "^0.13.4",
