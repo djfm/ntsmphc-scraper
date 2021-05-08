@@ -1,4 +1,4 @@
-import URL from 'url';
+import { URL } from 'url';
 
 // Generates the functions we need to interact with URLs.
 // parsedStartURL is the result of URL.parse called
@@ -41,16 +41,30 @@ const makeURLHelpers = (parsedStartURL) => {
       return false;
     }
 
-    const parsedURL = URL.parse(url);
-    // eslint-disable-next-line no-script-url
-    if (parsedURL.protocol === 'javascript:') {
-      return false;
-    }
+    try {
+      const parsedURL = new URL(url);
 
-    // It's important to use 'hostname' and not 'host'
-    // because hostname doesn't include the port if there is one.
-    if (parsedURL.hostname !== parsedStartURL.hostname) {
-      return false;
+      // eslint-disable-next-line no-script-url
+      if (parsedURL.protocol === 'javascript:') {
+        return false;
+      }
+
+      // It's important to use 'hostname' and not 'host'
+      // because hostname doesn't include the port if there is one.
+      if (parsedURL.hostname !== parsedStartURL.hostname) {
+        return false;
+      }
+    } catch (err) {
+      if (err.code === 'ERR_INVALID_URL') {
+        // TODO This error should be logged.
+        //
+        // So probably just let the caller catch the error.
+        //
+        // Right now I just want to make things work.
+        return false;
+      }
+
+      throw err;
     }
 
     return true;

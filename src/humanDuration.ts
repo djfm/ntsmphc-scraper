@@ -1,12 +1,29 @@
-const pluralize = (n, [singular, plural]) => (n === 1 ? `${n} ${singular}` : `${n} ${plural}`);
+type Unit = [singularForm: string, pluralForm: string];
+
+const pluralize = (n: number, [singular, plural]: Unit) =>
+  (n === 1 ? `${n} ${singular}` : `${n} ${plural}`);
+
+const units: Unit[] = [
+  ['second', 'seconds'],
+  ['minute', 'minutes'],
+  ['hour', 'hours'],
+  ['day', 'days'],
+  ['week', 'weeks'],
+  ['month', 'months'],
+  ['year', 'years'],
+  ['lustrum', 'lustra'],
+  ['decade', 'decades'],
+  ['century', 'centuries'],
+  ['millenium', 'millenia'],
+];
 
 const translateBiggestUnit = (
-  n,
-  [divisor, ...divisors],
-  [unit, ...units],
-  candidateDivisor,
-  divisorsUsed,
-  unitsUsed,
+  n: number,
+  [divisor, ...divisors]: number[],
+  [unit, ...units]: Unit[],
+  candidateDivisor: number,
+  divisorsUsed: number[],
+  unitsUsed: Unit[],
 ) => {
   const howManyUnits = n / candidateDivisor;
   if (howManyUnits >= divisor && divisors.length > 0) {
@@ -34,7 +51,11 @@ const translateBiggestUnit = (
   };
 };
 
-const divideTime = (nUnits, [divisor, ...divisors], [unit, ...units]) => {
+const divideTime = (
+  nUnits: number,
+  [divisor, ...divisors]: number[],
+  [unit, ...units]: Unit[]
+) => {
   const div = Math.floor(nUnits / divisor);
   const remainder = nUnits - div * divisor;
   const head = pluralize(div, unit);
@@ -46,21 +67,7 @@ const divideTime = (nUnits, [divisor, ...divisors], [unit, ...units]) => {
 // string expressing that duration in appropriate units.
 // E.g. 65 yields "1 minute and 5 seconds".
 // This function is unit-tested, see the test file for more examples.
-const humanDuration = (seconds) => {
-  const units = [
-    ['second', 'seconds'],
-    ['minute', 'minutes'],
-    ['hour', 'hours'],
-    ['day', 'days'],
-    ['week', 'weeks'],
-    ['month', 'months'],
-    ['year', 'years'],
-    ['lustrum', 'lustra'],
-    ['decade', 'decades'],
-    ['century', 'centuries'],
-    ['millenium', 'millenia'],
-  ];
-
+const humanDuration = (seconds: number) => {
   const divisors = [60, 60, 24, 7, 4, 12, 5, 2, 10, 10];
 
   if (seconds === 0) {

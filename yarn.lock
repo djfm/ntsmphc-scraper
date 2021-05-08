@@ -92,6 +92,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/minimist@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@types/minimist@npm:1.2.1"
+  checksum: 3a6f5fe35f1656b34a4ccd5a5db1c38509d8d5b59625865b8c2b997994fcb0cfde0d9af7c5507b95dc5a0a32a22886c189e505cd2e52a7ef36d3c9982f07ed5a
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^15.0.2":
   version: 15.0.2
   resolution: "@types/node@npm:15.0.2"
@@ -2260,6 +2267,7 @@ fsevents@~2.3.1:
   version: 0.0.0-use.local
   resolution: "ntsmphc-scraper@workspace:."
   dependencies:
+    "@types/minimist": ^1.2.1
     "@types/node": ^15.0.2
     chai: ^4.3.4
     chrome-launcher: ^0.13.4

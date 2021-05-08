@@ -4,18 +4,18 @@
 // The -v flag increases the verbosity.
 // Pass --log-file some/path.json to log interesting stuff the scraper may have found.
 
-import parseArgv from 'minimist';
-import chromeLauncher from 'chrome-launcher';
-import CRI from 'chrome-remote-interface';
-import URL from 'url';
+import * as Minimist from 'minimist';
+import { launch as launchChrome } from 'chrome-launcher';
+import * as CDP from 'chrome-remote-interface';
+import { URL } from 'url';
 import { promises as FSP } from 'fs';
 
-import makeURLHelpers from './url.js';
-import { keyValueArrayToMap } from './functional.js';
-import humanDuration from './humanDuration.js';
-import flattenNodeTree, { filterStylableNodes } from './tree.js';
+import makeURLHelpers from './url';
+import { keyValueArrayToMap } from './functional';
+import humanDuration from './humanDuration';
+import flattenNodeTree, { filterStylableNodes } from './tree';
 
-const options = parseArgv(process.argv.slice(2));
+const options = Minimist(process.argv.slice(2));
 
 const startURL = options._[0];
 const verbose = options.v;
@@ -26,7 +26,7 @@ if (!startURL) {
   process.exit(-1);
 }
 
-const parsedStartURL = URL.parse(startURL);
+const parsedStartURL = new URL(startURL);
 
 const { normalizeURL, shouldScrapeURL } = makeURLHelpers(parsedStartURL);
 
@@ -95,14 +95,14 @@ const createScraperProcess = async ({
   log,
 }) => {
   // Starts a new headless chrome instance.
-  const chrome = await chromeLauncher.launch({
+  const chrome = await launchChrome({
     chromeFlags: [
       '--window-size=1920,1080',
       '--headless',
     ],
   });
 
-  const protocol = await CRI({ port: chrome.port });
+  const protocol = await CDP({ port: chrome.port });
   const {
     Network,
     Page,
@@ -287,7 +287,7 @@ const main = async () => {
 
   // The function that coordinates all the work.
   // It returns a promise that fulfills once every URL is done being scraped.
-  const run = async () => new Promise((resolve) => {
+  const run = async () => new Promise<void>((resolve) => {
     // The method that is called when a page
     // is finished being scraped and the queue is empty,
     // i.e. right before the destruction of the chrome instance.
@@ -308,7 +308,7 @@ const main = async () => {
     // for the scraping, it starts a new instance.
     // attrs is an optional Map of attributes found on the link
     // element that the URL was extracted from.
-    const addURLAndScrape = async (url, attrs) => {
+    const addURLAndScrape = async (url, attrs?: object) => {
       const normalizedURL = normalizeURL(url);
       const shouldScrape = shouldScrapeURL(normalizedURL, attrs);
 
