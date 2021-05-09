@@ -266,6 +266,9 @@ const initWizard: Wizard = {
         return Math.floor(n) === n;
       },
       explainError: (userInput) => insist(userInput, 'is not an integer, or round number, whatever you call it'),
+    }, {
+      validate: (str) => parseFloat(str) >= 1,
+      explainError: () => 'you need at least 1 instance',
     }],
     converter: (str) => parseFloat(str),
   }],
