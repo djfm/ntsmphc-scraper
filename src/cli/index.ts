@@ -1,5 +1,6 @@
 import { join as joinPaths } from 'path';
 import readline from 'readline';
+import { cpus } from 'os';
 
 import Minimist from 'minimist';
 import chalk from 'chalk';
@@ -248,11 +249,13 @@ const initWizard: Wizard = {
   }, {
     varName: 'nParallel',
     question: [
-      'Please define the number of parallel Headless-Chrome instances',
-      'you would like to run.',
-      'The more the instances, the faster the scrape.',
-      'But your computer needs to be able to handle it.',
-      'Try with some integer between 1 and 4, and increase it later if it works well.',
+      'Please define the number of parallel',
+      'Headless-Chrome instances you would like to run.\n',
+      'The more the instances, the faster the scrape.\n',
+      'But both your computer and the website you are scraping',
+      'need to be able to handle it.',
+      `Half the number of your CPUs (you have ${cpus().length} of them)`,
+      'is a good starting point.\n',
     ],
     validators: [{
       validate: (str) => !Number.isNaN(parseFloat(str)),
