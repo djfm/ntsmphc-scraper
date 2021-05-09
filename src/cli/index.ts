@@ -235,12 +235,6 @@ for (const option of action.options) {
   }
 }
 
-log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
-optionValues.forEach((value, key) => {
-  log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
-});
-log.normal('\n');
-
 const initWizard: Wizard = {
   storageMap: new Map<string, string | number>(),
   questions: [{
@@ -275,6 +269,13 @@ const initWizard: Wizard = {
 };
 
 const main = async () => {
+  // TODO add a global verbose flag to hide this message in by default
+  log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
+  optionValues.forEach((value, key) => {
+    log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
+  });
+  log.normal('\n');
+
   const rl = readline.createInterface(process.stdin, process.stdout);
   const ask: Prompt = (qStr: string) => new Promise<string>((resolve) => {
     rl.question(qStr, (response) => resolve(response));
