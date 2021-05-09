@@ -276,7 +276,7 @@ const initWizard: Wizard = {
 };
 
 const main = async () => {
-  // TODO add a global verbose flag to hide this message in by default
+  // TODO add a global verbose flag to hide this message by default
   log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
   optionValues.forEach((value, key) => {
     log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
