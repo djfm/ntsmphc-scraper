@@ -1,14 +1,44 @@
+import { join as joinPaths } from 'path';
+import readline from 'readline';
+
 import Minimist from 'minimist';
 import chalk from 'chalk';
 
+import {
+  isDirectory,
+  isEmptyDirectory,
+} from './fs-util';
+
+import {
+  isValidURL,
+} from './url-util';
+
 const log = (text: string) => console.log(text);
-const logError = (errText: string) => console.log(chalk.red(errText));
+const logError = (errText: string) => log(chalk.red(errText));
+const logWarning = (warnText: string) => log(chalk.yellow(warnText));
+const logSuccess = (successText: string) => log(chalk.green(successText));
+
+const insist = (subject: string, body: string, ...otherStrings: string[]) => [
+  `"${chalk.bold(subject)}"`,
+  body,
+  ...otherStrings,
+].join(' ');
+
+const newLine = () => log('\n');
 
 const ERR_MISSING_ACTION = 1;
 const ERR_UNKNOWN_ACTION = 2;
 const ERR_NO_HELP_TO_DISPLAY = 3;
 const ERR_OPTION_DEFINED_SEVERAL_WAYS = 4;
 const ERR_OPTION_UNDEFINED = 5;
+const ERR_NOT_A_DIRECTORY = 6;
+const ERR_DIR_NOT_EMPTY = 7;
+
+const bail = (errMsg: string, exitCode: number) => {
+  // TODO echo $? after failure doesn't report my exit code
+  logError(`\n${chalk.underline('ERROR')}: ${errMsg}`);
+  process.exit(exitCode);
+};
 
 type Option = {
   primaryName: string;
@@ -203,7 +233,121 @@ for (const option of action.options) {
   }
 }
 
-log(`Got it.\nRunning action "${chalk.underline(action.verb)}", with options:`);
+log(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
 optionValues.forEach((value, key) => {
   log(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
 });
+newLine();
+
+type UserProvidedStringValidator = {
+  validate: (userInput: string) => boolean;
+  explainError: (userInput: string) => string;
+};
+type StringConverter = (userInput: string) => string | number | object;
+
+type QuestionSpec = {
+  question: string[];
+  varName: string;
+  validators: UserProvidedStringValidator[];
+  converter: StringConverter;
+};
+
+type Wizard = {
+  questions: QuestionSpec[];
+  storageMap: Map<string, string | number | object>
+};
+
+const initWizard: Wizard = {
+  storageMap: new Map<string, string | number>(),
+  questions: [{
+    varName: 'startURL',
+    question: ['Please enter the start URL, with its protocol included ("http://") or ("https://").'],
+    validators: [{
+      validate: isValidURL,
+      explainError: (userInput) => insist(userInput, 'is not a valid URL'),
+    }],
+    converter: (str) => str,
+  }, {
+    varName: 'nParallel',
+    question: [
+      'Please define the number of parallel Headless-Chrome instances',
+      'you would like to run.',
+      'The more the instances, the faster the scrape.',
+      'But your computer needs to be able to handle it.',
+      'Try with some integer between 1 and 4, and increase it later if it works well.',
+    ],
+    validators: [{
+      validate: (str) => !Number.isNaN(parseFloat(str)),
+      explainError: (userInput) => insist(userInput, 'cannot be interpreted as a number'),
+    }, {
+      validate: (str) => {
+        const n = parseFloat(str);
+        return Math.floor(n) === n;
+      },
+      explainError: (userInput) => insist(userInput, 'is not an integer, or round number, whatever you call it'),
+    }],
+    converter: (str) => parseFloat(str),
+  }],
+};
+
+const looksGood = () => logSuccess(`${chalk.bold('✔')} looks good!\n`);
+
+const runWizard = async (wizard: Wizard, ask: (prompt: string) => Promise<string>) => {
+  for (const question of wizard.questions) {
+    const questionString = [
+      ...question.question,
+      `${chalk.underline('your answer')}: `,
+    ].join('\n');
+
+    // eslint-disable-next-line no-labels
+    validation:
+    while (!wizard.storageMap.has(question.varName)) {
+      // eslint-disable-next-line no-await-in-loop
+      const reply = await ask(questionString);
+
+      for (const validator of question.validators) {
+        if (!validator.validate(reply)) {
+          newLine();
+          logWarning(validator.explainError(reply));
+          newLine();
+          // eslint-disable-next-line no-continue, no-labels
+          continue validation;
+        }
+      }
+
+      looksGood();
+      wizard.storageMap.set(question.varName, question.converter(reply));
+    }
+  }
+};
+
+const main = async () => {
+  const rl = readline.createInterface(process.stdin, process.stdout);
+  const question = (qStr: string) => new Promise<string>((resolve) => {
+    rl.question(qStr, (response) => resolve(response));
+  });
+
+  if (action.verb === 'init') {
+    const dir = optionValues.get('directory');
+    const isDir = await isDirectory(dir);
+    if (!isDir) {
+      bail(insist(dir, 'is not a directory'), ERR_NOT_A_DIRECTORY);
+    }
+    const isEmpty = await isEmptyDirectory(dir);
+    if (!isEmpty) {
+      bail(insist(dir, 'is not an empty directory'), ERR_DIR_NOT_EMPTY);
+    }
+
+    const confPath = joinPaths(dir, 'ntsmphc-scraper.json');
+
+    log('I\'m gonna ask you a few questions to initialize your project.');
+    log(`It will save all your responses to the "${confPath}" file.`);
+    log('You\'ll be able to change things later by editing this file.\n\n');
+
+    await runWizard(initWizard, question);
+  }
+
+  rl.close();
+};
+
+main();

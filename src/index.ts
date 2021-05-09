@@ -14,7 +14,7 @@ import { launch as launchChrome } from 'chrome-launcher';
 // TODO add a .d.ts file for this module, since it doesn't provide one
 import CDP from 'chrome-remote-interface';
 
-import makeURLHelpers from './url';
+import makeURLHelpers from './url-util';
 import { keyValueArrayToMap } from './functional';
 import humanDuration from './humanDuration';
 import flattenNodeTree, { filterStylableNodes } from './tree';
@@ -317,7 +317,7 @@ const main = async () => {
     // for the scraping, it starts a new instance.
     // attrs is an optional Map of attributes found on the link
     // element that the URL was extracted from.
-    const addURLAndScrape = async (url, attrs?: object) => {
+    const addURLAndScrape = async (url: string, attrs?: Map<string, any>) => {
       const normalizedURL = normalizeURL(url);
       const shouldScrape = shouldScrapeURL(normalizedURL, attrs);
 

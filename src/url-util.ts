@@ -1,9 +1,25 @@
 import { URL } from 'url';
 
+export const isValidURL = (url: string) => {
+  try {
+    // Sorry eslint, but I'm ONLY interested
+    // in the side-effects here.
+    //
+    // eslint-disable-next-line no-new
+    new URL(url);
+    return true;
+  } catch (err) {
+    if (err.code !== 'ERR_INVALID_URL') {
+      throw err;
+    }
+    return false;
+  }
+};
+
 // Generates the functions we need to interact with URLs.
 // parsedStartURL is the result of URL.parse called
 // on the URL given to the program.
-const makeURLHelpers = (parsedStartURL) => {
+const makeURLHelpers = (parsedStartURL: URL) => {
   // Normalizes URLs to avoid scraping the same URL twice
   // because of subtle variations in the URL string.
   // Will remove leading and trailing whitespace,
@@ -12,7 +28,7 @@ const makeURLHelpers = (parsedStartURL) => {
   // which the chrome driver considers invalid.
   // Uses recursion and does a tiny bit too much of work
   // but this is negligible and I don't like mutating variables.
-  const normalizeURL = (url) => {
+  const normalizeURL = (url: string) => {
     if (typeof url !== 'string') {
       return '';
     }
@@ -36,7 +52,7 @@ const makeURLHelpers = (parsedStartURL) => {
   // and of course if it is on the same domain as the domain
   // we started scraping from.
   // attrs is a Map of all attributes found on the link.
-  const shouldScrapeURL = (url, attrs) => {
+  const shouldScrapeURL = (url: string, attrs: Map<string, any>) => {
     if (attrs && attrs.get('rel') === 'nofollow') {
       return false;
     }
