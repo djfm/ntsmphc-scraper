@@ -9,11 +9,13 @@ import {
 export const runWizard = async (wizard: Wizard, ask: Prompt, log: Logger) => {
   const looksGood = () => log.success(`${chalk.bold('✔')} looks good!\n`);
 
-  for (const question of wizard.questions) {
+  for (const [q, question] of wizard.questions.entries()) {
     const questionString = [
       ...question.question,
       `${chalk.underline('your answer')}: `,
     ].join('\n');
+
+    log.normal(chalk.bold(`# Setting ${q + 1} of ${wizard.questions.length}:\n`));
 
     // eslint-disable-next-line no-labels
     validation:
