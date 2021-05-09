@@ -8,11 +8,11 @@ import chalk from 'chalk';
 import {
   isDirectory,
   isEmptyDirectory,
-} from '../util/fs-util';
+} from '../util/fs';
 
 import {
   isValidURL,
-} from '../util/url-util';
+} from '../util/url';
 
 import {
   ERR_MISSING_ACTION,

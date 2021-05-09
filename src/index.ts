@@ -16,7 +16,7 @@ import { launch as launchChrome } from 'chrome-launcher';
 // TODO add a .d.ts file for this module, since it doesn't provide one
 import CDP from 'chrome-remote-interface';
 
-import makeURLHelpers from './util/url-util';
+import makeURLHelpers from './util/url';
 import { keyValueArrayToMap } from './util/functional';
 import humanDuration from './util/humanDuration';
 import flattenNodeTree, { filterStylableNodes } from './util/tree';
