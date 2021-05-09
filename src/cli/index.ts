@@ -203,9 +203,6 @@ if (intendedAction.verb === 'help') {
 
 // TODO add generic --help flag support
 
-// now we know that the action is not "help", so
-// we enter real work territory
-
 const action = intendedAction;
 
 const optionValues = new Map();
