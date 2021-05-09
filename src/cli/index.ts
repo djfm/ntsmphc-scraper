@@ -124,7 +124,7 @@ if (!userProvidedVerb) {
   log.error([
     'Balderdash!!\n',
     'Please specify an action for me to perform.',
-    'Otherwise, I dunno what to do.',
+    'Otherwise, I dunno what to do.\n',
   ].join('\n'));
   showUsage();
   process.exit(ERR_MISSING_ACTION);
@@ -293,11 +293,13 @@ const initWizard: Wizard = {
 
 const main = async () => {
   // TODO add a global verbose flag to hide this message by default
-  log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
-  optionValues.forEach((value, key) => {
-    log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
-  });
-  log.normal('\n');
+  if (action.verb !== 'help') {
+    log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
+    optionValues.forEach((value, key) => {
+      log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
+    });
+    log.normal('\n');
+  }
 
   const rl = readline.createInterface(process.stdin, process.stdout);
   const ask: Prompt = (qStr: string) => new Promise<string>((resolve) => {
