@@ -12,7 +12,7 @@ export const runWizard = async (wizard: Wizard, ask: Prompt, log: Logger) => {
   for (const [q, question] of wizard.questions.entries()) {
     const questionString = [
       ...question.question,
-      `${chalk.underline('your answer')}: `,
+      `\n${chalk.underline('your answer')}: `,
     ].join('\n');
 
     log.normal(chalk.bold(`# Setting ${q + 1} of ${wizard.questions.length}:\n`));

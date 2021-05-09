@@ -254,7 +254,7 @@ const initWizard: Wizard = {
       'Headless-Chrome instances you would like to run.\n',
       'The more the instances, the faster the scrape.\n',
       'But both your computer and the website you are scraping',
-      'need to be able to handle it.',
+      'need to be able to handle it.\n',
       `Half the number of your CPUs (you have ${cpus().length} of them)`,
       'is a good starting point.\n',
     ],
