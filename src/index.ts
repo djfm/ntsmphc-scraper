@@ -276,7 +276,7 @@ const main = async () => {
 
   // A logging function that is used by the scraper
   // processes to save various things that
-  // may be useful for later anlysis.
+  // may be useful for later analysis.
   const log = (data) => {
     if (verbose) {
       console.log('[log]', data);
