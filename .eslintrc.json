@@ -65,10 +65,6 @@
   ],
   // my customizations to the linting rules
   "rules": {
-    // this is a console project, so there will obviously be a lot
-    // of console logging
-    "no-console": 0,
-
     // I'm using Node 16.1 at the time of writing,
     // so no advanced language features actually need to be
     // emulated and this rule thus doesn't make sense for me.
