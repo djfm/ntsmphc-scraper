@@ -1,6 +1,9 @@
 import { join as joinPaths } from 'path';
 import readline from 'readline';
 import { cpus } from 'os';
+import {
+  writeFile,
+} from 'fs/promises';
 
 import Minimist from 'minimist';
 import chalk from 'chalk';
@@ -8,6 +11,7 @@ import chalk from 'chalk';
 import {
   isDirectory,
   isEmptyDirectory,
+  statOrUndefined,
 } from '../util/fs';
 
 import {
@@ -294,12 +298,19 @@ const main = async () => {
     if (!isDir) {
       bail(insist(dir, 'is not a directory'), ERR_NOT_A_DIRECTORY);
     }
-    const isEmpty = await isEmptyDirectory(dir);
-    if (!isEmpty) {
-      bail(insist(dir, 'is not an empty directory'), ERR_DIR_NOT_EMPTY);
-    }
 
     const confPath = joinPaths(dir, confFileName);
+
+    const isEmpty = await isEmptyDirectory(dir);
+    if (!isEmpty) {
+      const maybeStat = statOrUndefined(confPath);
+      if (maybeStat === undefined) {
+        bail(insist(dir, 'is not an empty directory'), ERR_DIR_NOT_EMPTY);
+      }
+      log.normal('Looks like this directory is already initialized for a scraping project.');
+      log.normal(`See contents of "${chalk.underline(confPath)}" for details.`);
+      process.exit(0);
+    }
 
     log.normal([
       "I'm gonna ask you a few questions to initialize your project.",
@@ -308,6 +319,18 @@ const main = async () => {
     ].join('\n'));
 
     await runWizard(initWizard, ask, log);
+
+    const dataForJSON = {};
+    for (const [key, value] of initWizard.storageMap.entries()) {
+      dataForJSON[key] = value;
+    }
+
+    await writeFile(confPath, JSON.stringify(dataForJSON, null, 2));
+
+    log.success([
+      '\nSuccessfully initialized config file:',
+      `  ${confPath}`,
+    ].join('\n'));
   }
 
   rl.close();
