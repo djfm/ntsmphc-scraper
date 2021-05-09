@@ -1,9 +1,5 @@
-// The following imports cannot be converted as default imports
-// without the "esModuleInterop" flag which I don't want to set.
-// Hence the `ts` warnings I can't get rid of in VSCode.
-// Don't worry and don't touch it.
-import * as Minimist from 'minimist';
-import * as chalk from 'chalk';
+import Minimist from 'minimist';
+import chalk from 'chalk';
 
 const log = (text: string) => console.log(text);
 const logError = (errText: string) => console.log(chalk.red(errText));
