@@ -2,6 +2,7 @@ import { Stats } from 'fs';
 import {
   stat,
   readdir,
+  readFile,
 } from 'fs/promises';
 
 export const statOrUndefined = async (path: string): Promise<Stats> => {
@@ -33,3 +34,13 @@ export const isEmptyDirectory = async (dirPath: string): Promise<boolean> => {
   const entries = await readdir(dirPath);
   return entries.length === 0;
 };
+
+type GenericMap = Map<string, any>;
+
+export const createMapObjectFromJSONFilePath =
+  async (filePath: string): Promise<GenericMap> => {
+    const fileData = await readFile(filePath);
+    const dataString = fileData.toString();
+    const dataObj = JSON.parse(dataString);
+    return new Map(Object.entries(dataObj));
+  };

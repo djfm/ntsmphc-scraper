@@ -12,6 +12,7 @@ import {
   isDirectory,
   isEmptyDirectory,
   statOrUndefined,
+  createMapObjectFromJSONFilePath,
 } from '../util/fs';
 
 import {
@@ -342,6 +343,12 @@ const main = async () => {
       '\nSuccessfully initialized config file:',
       `  ${confPath}`,
     ].join('\n'));
+  } else if (action.verb === 'run') {
+    const dir = optionValues.get('directory');
+    const confPath = joinPaths(dir, confFileName);
+    const confMap = await createMapObjectFromJSONFilePath(confPath);
+    log.success(`Starting scraping from "${confMap.get('startURL')}"...`);
+    log.normal('Might take a while if this is a big site.\n');
   }
 
   rl.close();
