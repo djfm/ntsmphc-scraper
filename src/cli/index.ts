@@ -256,7 +256,7 @@ const initWizard: Wizard = {
       'But both your computer and the website you are scraping',
       'need to be able to handle it.\n',
       `Half the number of your CPUs (you have ${cpus().length} of them)`,
-      'is a good starting point.\n',
+      'is a good starting point.',
     ],
     validators: [{
       validate: (str) => !Number.isNaN(parseFloat(str)),
@@ -304,7 +304,7 @@ const main = async () => {
     log.normal([
       "I'm gonna ask you a few questions to initialize your project.",
       `I will save all your responses to the "${chalk.underline(confPath)}" file.`,
-      "You'll be able to change things later by editing this file.\n\n",
+      "You'll be able to change things later by editing this file.\n",
     ].join('\n'));
 
     await runWizard(initWizard, ask, log);
