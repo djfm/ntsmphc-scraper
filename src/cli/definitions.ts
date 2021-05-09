@@ -1,3 +1,5 @@
+export const confFileName = 'ntsmphc-scraper.json';
+
 export const ERR_MISSING_ACTION = 1;
 export const ERR_UNKNOWN_ACTION = 2;
 export const ERR_NO_HELP_TO_DISPLAY = 3;

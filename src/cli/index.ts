@@ -25,6 +25,7 @@ import {
   Action,
   Wizard,
   Prompt,
+  confFileName,
 } from './definitions';
 
 import runWizard from './wizard';
@@ -298,11 +299,11 @@ const main = async () => {
       bail(insist(dir, 'is not an empty directory'), ERR_DIR_NOT_EMPTY);
     }
 
-    const confPath = joinPaths(dir, 'ntsmphc-scraper.json');
+    const confPath = joinPaths(dir, confFileName);
 
     log.normal([
       "I'm gonna ask you a few questions to initialize your project.",
-      `I will save all your responses to the "${confPath}" file.`,
+      `I will save all your responses to the "${chalk.underline(confPath)}" file.`,
       "You'll be able to change things later by editing this file.\n\n",
     ].join('\n'));
 
