@@ -6,7 +6,7 @@
   "repository": "https://github.com/djfm/ntsmphc-scraper",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "cli": "ts-node src/cl-interface.ts",
+    "scrape": "ts-node src/cli/index.ts",
     "test": "jest",
     "tdd": "jest --watch",
     "lint": "eslint src test"

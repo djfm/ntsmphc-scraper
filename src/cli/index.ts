@@ -7,16 +7,29 @@ import chalk from 'chalk';
 import {
   isDirectory,
   isEmptyDirectory,
-} from './fs-util';
+} from '../util/fs-util';
 
 import {
   isValidURL,
-} from './url-util';
+} from '../util/url-util';
 
-const log = (text: string) => console.log(text);
-const logError = (errText: string) => log(chalk.red(errText));
-const logWarning = (warnText: string) => log(chalk.yellow(warnText));
-const logSuccess = (successText: string) => log(chalk.green(successText));
+import {
+  ERR_MISSING_ACTION,
+  ERR_UNKNOWN_ACTION,
+  ERR_NO_HELP_TO_DISPLAY,
+  ERR_OPTION_DEFINED_SEVERAL_WAYS,
+  ERR_OPTION_UNDEFINED,
+  ERR_NOT_A_DIRECTORY,
+  ERR_DIR_NOT_EMPTY,
+  Action,
+  Wizard,
+  Prompt,
+} from './definitions';
+
+import runWizard from './wizard';
+import createLogger from './logger';
+
+const log = createLogger();
 
 const insist = (subject: string, body: string, ...otherStrings: string[]) => [
   `"${chalk.bold(subject)}"`,
@@ -24,40 +37,16 @@ const insist = (subject: string, body: string, ...otherStrings: string[]) => [
   ...otherStrings,
 ].join(' ');
 
-const newLine = () => log('\n');
-
-const ERR_MISSING_ACTION = 1;
-const ERR_UNKNOWN_ACTION = 2;
-const ERR_NO_HELP_TO_DISPLAY = 3;
-const ERR_OPTION_DEFINED_SEVERAL_WAYS = 4;
-const ERR_OPTION_UNDEFINED = 5;
-const ERR_NOT_A_DIRECTORY = 6;
-const ERR_DIR_NOT_EMPTY = 7;
-
 const bail = (errMsg: string, exitCode: number) => {
   // TODO echo $? after failure doesn't report my exit code
-  logError(`\n${chalk.underline('ERROR')}: ${errMsg}`);
+  log.error(`\n${chalk.underline('ERROR')}: ${errMsg}`);
   process.exit(exitCode);
-};
-
-type Option = {
-  primaryName: string;
-  description: string;
-  aliases: string[];
-  defaultValue?: string;
-  requiresValue: boolean;
-  valueFriendlyName?: string;
-};
-
-type Action = {
-  verb: string;
-  description: string;
-  options: Option[];
 };
 
 const parsedArgv = Minimist(process.argv.slice(2));
 
-const commandPrefix = 'scrape';
+// TODO try to auto-guess instead of hard-coding
+const commandPrefix = 'yarn scrape';
 
 const init: Action = {
   verb: 'init',
@@ -92,9 +81,9 @@ const generateUsageString = () => {
   );
 
   const comments = chalk.italic([
-    `In all of the above, "${chalk.bold('scrape')}" represents`,
+    `In all of the above, "${chalk.bold(commandPrefix)}" represents`,
     'the command you used to get this message, without any additional arguments.',
-    'It could be just "yarn cli", or "node_modules/.bin/ts-node src/cl-interface.ts", etc.',
+    `It could be just "${commandPrefix}", or "node_modules/.bin/ts-node src/cli/index.ts", etc.`,
     'I\'m assuming you know how you\'re invoking this script :)',
     'It\'s a bit tricky for me to determine with certainty.',
   ].join('\n'));
@@ -111,10 +100,14 @@ const generateUsageString = () => {
 
 const userProvidedVerb = parsedArgv._[0];
 
-const showUsage = () => log(generateUsageString());
+const showUsage = () => log.normal(generateUsageString());
 
 if (!userProvidedVerb) {
-  logError('Balderdash!!\n\nPlease specify an action for me to perform.\nOtherwise, I dunno what to do.\n');
+  log.error([
+    'Balderdash!!\n',
+    'Please specify an action for me to perform.',
+    'Otherwise, I dunno what to do.',
+  ].join('\n'));
   showUsage();
   process.exit(ERR_MISSING_ACTION);
 }
@@ -122,8 +115,10 @@ if (!userProvidedVerb) {
 const intendedAction: Action = actions.find(({ verb }) => verb === userProvidedVerb);
 
 if (intendedAction === undefined) {
-  logError('Corn nuts!!\n');
-  logError(`Sorry but the action you specified - "${userProvidedVerb}" - is unknown to me.\n`);
+  log.error([
+    'Corn nuts!!\n',
+    `Sorry but the action you specified - "${userProvidedVerb}" - is unknown to me.`,
+  ].join('\n'));
   showUsage();
   process.exit(ERR_UNKNOWN_ACTION);
 }
@@ -138,43 +133,50 @@ if (intendedAction.verb === 'help') {
   const actionForHelp = actionsMap.get(maybeSubject);
 
   if (!actionForHelp) {
-    logError('Son of a monkey!!\n');
-    logError(`You're looking for help about the "${chalk.underline(maybeSubject)}" action,`);
-    logError('but this action doesn\'t seem to exist.\nSorry about that.');
+    log.error([
+      'Son of a monkey!!\n',
+      `You're looking for help about the "${chalk.underline(maybeSubject)}" action,`,
+      "but this action doesn't seem to exist.",
+      'Sorry about that.',
+    ].join('\n'));
     process.exit(ERR_NO_HELP_TO_DISPLAY);
   }
 
   const subject = maybeSubject;
 
   if (subject === 'help') {
-    log(chalk.italic.green('Haha, if you\'re trying to get me to fall into an infinite loop, try again.\n'));
+    log.normal(
+      chalk.italic.green(
+        'Haha, if you\'re trying to get me to fall into an infinite loop, try again.\n',
+      ),
+    );
     showUsage();
     process.exit(0);
   }
 
   const headerMsg = `Ok, following is some info about the "${chalk.underline(subject)}" action.`;
-  log(chalk.green(headerMsg));
+  log.normal(chalk.green(headerMsg));
 
   if (actionForHelp.options.length === 0) {
-    log('Well, there are no options for this action.');
-    log('So you should be all set :)');
+    log.normal('Well, there are no options for this action.');
+    log.normal('So you should be all set :)');
     process.exit(0);
   }
 
-  log(`\nThe options for the ${chalk.underline(subject)} action are:\n`);
+  log.normal(`\nThe options for the ${chalk.underline(subject)} action are:\n`);
 
   for (const option of actionForHelp.options) {
     const ovfn = chalk.italic(option.valueFriendlyName);
     const optDesc = `${option.primaryName} ${ovfn}`;
-    log(`--${optDesc}`);
-    log(`  # ${option.description}\n  #`);
+    log.normal(`--${optDesc}`);
+    log.normal(`  # ${option.description}\n  #`);
     if (option.aliases.length > 0) {
-      log('  # the following option aliases are recognized:\n  #');
+      log.normal('  # the following option aliases are recognized:\n  #');
       for (const alias of option.aliases) {
         if (alias !== '$') {
-          log(`  #  -${alias} ${ovfn}`);
+          log.normal(`  #  -${alias} ${ovfn}`);
         } else {
-          log(`  #  ${chalk.underline('scrape')} ${subject} ${ovfn}`);
+          log.normal(`  #  ${commandPrefix} ${subject} ${chalk.underline(ovfn)}`);
         }
       }
     }
@@ -200,8 +202,8 @@ for (const option of action.options) {
 
   const tryToSetOptionValue = (value: any) => {
     if (optionValues.has(pn)) {
-      logError(`Merlin’s beard! You specified option "${pn}" too many times.`);
-      logError(`Please use only ${chalk.bold('one')} alias.`);
+      log.error(`Merlin’s beard! You specified option "${pn}" too many times.`);
+      log.error(`Please use only ${chalk.bold('one')} alias.`);
       process.exit(ERR_OPTION_DEFINED_SEVERAL_WAYS);
     }
 
@@ -224,7 +226,7 @@ for (const option of action.options) {
 
   if (!optionValues.has(pn)) {
     if (option.requiresValue) {
-      logError(`Cheese and rice! Value for option "${pn}" is undefined.`);
+      log.error(`Cheese and rice! Value for option "${pn}" is undefined.`);
       process.exit(ERR_OPTION_UNDEFINED);
     }
 
@@ -233,29 +235,11 @@ for (const option of action.options) {
   }
 }
 
-log(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
+log.normal(`Got it.\n\nRunning action "${chalk.underline(action.verb)}", with options:`);
 optionValues.forEach((value, key) => {
-  log(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
+  log.normal(`  --${chalk.bold(key).padEnd(22)} ${chalk.italic(value)}`);
 });
-newLine();
-
-type UserProvidedStringValidator = {
-  validate: (userInput: string) => boolean;
-  explainError: (userInput: string) => string;
-};
-type StringConverter = (userInput: string) => string | number | object;
-
-type QuestionSpec = {
-  question: string[];
-  varName: string;
-  validators: UserProvidedStringValidator[];
-  converter: StringConverter;
-};
-
-type Wizard = {
-  questions: QuestionSpec[];
-  storageMap: Map<string, string | number | object>
-};
+log.normal('\n');
 
 const initWizard: Wizard = {
   storageMap: new Map<string, string | number>(),
@@ -290,40 +274,9 @@ const initWizard: Wizard = {
   }],
 };
 
-const looksGood = () => logSuccess(`${chalk.bold('✔')} looks good!\n`);
-
-const runWizard = async (wizard: Wizard, ask: (prompt: string) => Promise<string>) => {
-  for (const question of wizard.questions) {
-    const questionString = [
-      ...question.question,
-      `${chalk.underline('your answer')}: `,
-    ].join('\n');
-
-    // eslint-disable-next-line no-labels
-    validation:
-    while (!wizard.storageMap.has(question.varName)) {
-      // eslint-disable-next-line no-await-in-loop
-      const reply = await ask(questionString);
-
-      for (const validator of question.validators) {
-        if (!validator.validate(reply)) {
-          newLine();
-          logWarning(validator.explainError(reply));
-          newLine();
-          // eslint-disable-next-line no-continue, no-labels
-          continue validation;
-        }
-      }
-
-      looksGood();
-      wizard.storageMap.set(question.varName, question.converter(reply));
-    }
-  }
-};
-
 const main = async () => {
   const rl = readline.createInterface(process.stdin, process.stdout);
-  const question = (qStr: string) => new Promise<string>((resolve) => {
+  const ask: Prompt = (qStr: string) => new Promise<string>((resolve) => {
     rl.question(qStr, (response) => resolve(response));
   });
 
@@ -340,11 +293,13 @@ const main = async () => {
 
     const confPath = joinPaths(dir, 'ntsmphc-scraper.json');
 
-    log('I\'m gonna ask you a few questions to initialize your project.');
-    log(`It will save all your responses to the "${confPath}" file.`);
-    log('You\'ll be able to change things later by editing this file.\n\n');
+    log.normal([
+      "I'm gonna ask you a few questions to initialize your project.",
+      `I will save all your responses to the "${confPath}" file.`,
+      "You'll be able to change things later by editing this file.\n\n",
+    ].join('\n'));
 
-    await runWizard(initWizard, question);
+    await runWizard(initWizard, ask, log);
   }
 
   rl.close();

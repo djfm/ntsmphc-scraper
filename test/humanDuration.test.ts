@@ -1,4 +1,4 @@
-import humanDuration from '../src/humanDuration';
+import humanDuration from '../src/util/humanDuration';
 
 describe('The humanDuration function translates numbers of seconds to human-readable durations.', () => {
   test('it translates 0 as "no time at all"', () => {
