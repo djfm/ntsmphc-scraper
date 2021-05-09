@@ -7,7 +7,7 @@ import {
 } from './definitions';
 
 export const runWizard = async (wizard: Wizard, ask: Prompt, log: Logger) => {
-  const looksGood = () => log.success(`${chalk.bold('✔')} looks good!\n\n`);
+  const looksGood = () => log.success(`${chalk.bold('✔')} looks good!\n`);
 
   for (const [q, question] of wizard.questions.entries()) {
     const questionString = [
