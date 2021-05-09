@@ -67,13 +67,25 @@ const init: Action = {
   }],
 };
 
+const run: Action = {
+  verb: 'run',
+  description: 'run the operations defined in an existing scraping project',
+  options: [{
+    primaryName: 'directory',
+    description: 'an already initialized scraping project directory',
+    aliases: ['d', '$'],
+    requiresValue: true,
+    valueFriendlyName: 'pathToDirectory',
+  }],
+};
+
 const usage: Action = {
   verb: 'help',
   description: 'display this tool\'s usage information',
   options: [],
 };
 
-const actions: Action[] = [init, usage];
+const actions: Action[] = [init, run, usage];
 
 const actionsMap = new Map();
 
