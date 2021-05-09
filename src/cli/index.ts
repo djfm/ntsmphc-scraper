@@ -305,12 +305,12 @@ const main = async () => {
 
   if (action.verb === 'init') {
     const dir = optionValues.get('directory');
+    const confPath = joinPaths(dir, confFileName);
+
     const isDir = await isDirectory(dir);
     if (!isDir) {
       bail(insist(dir, 'is not a directory'), ERR_NOT_A_DIRECTORY);
     }
-
-    const confPath = joinPaths(dir, confFileName);
 
     const isEmpty = await isEmptyDirectory(dir);
     if (!isEmpty) {
