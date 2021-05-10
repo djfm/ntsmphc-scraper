@@ -20,7 +20,7 @@ const mode: ConfMode = isDevelopment ? 'development' : 'production';
 
 const config = {
   mode,
-  entry: ['./src/web-ui/client-src/index.tsx', 'webpack-hot-middleware/client'],
+  entry: ['./src/web-ui/client-src/router.tsx', 'webpack-hot-middleware/client'],
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, './src/web-ui/public/'),

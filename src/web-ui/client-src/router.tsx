@@ -10,6 +10,7 @@ import {
 
 import Home from './components/Home';
 import NewScrapingProject from './components/NewScrapingProject';
+import PageNotFound from './components/PageNotFound';
 
 const App = () => {
   const tree = (
@@ -27,11 +28,14 @@ const App = () => {
         </nav>
 
         <Switch>
-          <Route path="/new-scraping-project">
+          <Route exact path="/new-scraping-project">
             <NewScrapingProject />
           </Route>
-          <Route path="/">
+          <Route exact path="/">
             <Home />
+          </Route>
+          <Route>
+            <PageNotFound />
           </Route>
         </Switch>
       </div>

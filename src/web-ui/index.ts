@@ -19,6 +19,10 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(devMiddleware);
 app.use(hotMiddleware);
 
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
 const port = 8080;
 app.listen(port, () => {
   console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
