@@ -7,11 +7,13 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const plugins = [];
 const babelLoaderPlugins = [];
+const entry = ['./src/web-ui/client-src/router.tsx'];
 
 if (isDevelopment) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
   plugins.push(new ReactRefreshWebpackPlugin());
   babelLoaderPlugins.push(require.resolve('react-refresh/babel'));
+  entry.push('webpack-hot-middleware/client');
 }
 
 type ConfMode = 'development' | 'production';
@@ -20,7 +22,7 @@ const mode: ConfMode = isDevelopment ? 'development' : 'production';
 
 const config = {
   mode,
-  entry: ['./src/web-ui/client-src/router.tsx', 'webpack-hot-middleware/client'],
+  entry,
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, './src/web-ui/public/'),

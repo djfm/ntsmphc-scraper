@@ -4,8 +4,10 @@
   "description": "Scrape a website and do useful things while at it.",
   "repository": "https://github.com/djfm/ntsmphc-scraper",
   "scripts": {
-    "start": "NODE_ENV=development ts-node-dev --watch src/web-ui/index.ts,src/web-ui/server-src src/web-ui/index.ts",
+    "start": "NODE_ENV=development ts-node-dev --watch src/web-ui/server-src src/web-ui/server.ts",
     "build": "NODE_ENV=development webpack",
+    "startProd": "NODE_ENV=production ts-node src/web-ui/server.ts",
+    "buildProd": "NODE_ENV=production webpack",
     "old-scrape": "ts-node src/index.ts",
     "scrape": "ts-node src/cli/index.ts",
     "test": "jest",
