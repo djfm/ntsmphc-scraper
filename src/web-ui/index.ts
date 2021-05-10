@@ -1,28 +1,25 @@
 /* eslint-disable no-console */
-import { join as joinPaths } from 'path';
+import path from 'path';
+import express from 'express';
 
-import makeFastify from 'fastify';
-import fastifyStatic from 'fastify-static';
-import fastifyHMR from 'fastify-webpack-hmr';
 import webpack from 'webpack';
-
 import webpackConfig from '../../webpack.config';
 
 const webpackCompiler = webpack(webpackConfig);
 
-const server = makeFastify();
-
-server.register(fastifyHMR, { compiler: webpackCompiler });
-
-server.register(fastifyStatic, {
-  root: joinPaths(__dirname, 'public'),
-  prefix: '/',
+const devMiddleware = require('webpack-dev-middleware')(webpackCompiler, {
+  publicPath: webpackConfig.output.publicPath,
 });
 
-server.listen(8080, (err, address) => {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
-  console.log(`Head over to ${address} and start using the scraper!`);
+const hotMiddleware = require('webpack-hot-middleware')(webpackCompiler);
+
+const app = express();
+
+app.use(express.static(path.resolve(__dirname, 'public')));
+app.use(devMiddleware);
+app.use(hotMiddleware);
+
+const port = 8080;
+app.listen(port, () => {
+  console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
 });

@@ -1,4 +1,4 @@
-console.log('hi from fastify');
+console.log('hi from fastify :)');
 
 if (module.hot) {
   module.hot.accept();

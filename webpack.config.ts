@@ -18,11 +18,12 @@ const mode: ConfMode = isDevelopment ? 'development' : 'production';
 
 const config = {
   mode,
-  entry: './src/web-ui/client-src/index.ts',
+  entry: ['./src/web-ui/client-src/index.ts', 'webpack-hot-middleware/client'],
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, './src/web-ui/public/'),
     filename: 'index.js',
+    publicPath: '/',
   },
   module: {
     rules: [{
@@ -32,6 +33,9 @@ const config = {
         loader: 'babel-loader',
       }],
     }],
+  },
+  devServer: {
+    hot: true,
   },
   plugins,
 };
