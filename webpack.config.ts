@@ -1,4 +1,7 @@
+/* eslint-disable node/no-unpublished-import */
+/* eslint-disable node/no-unpublished-require */
 /* eslint-disable import/no-extraneous-dependencies */
+
 import path from 'path';
 import webpack from 'webpack';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
