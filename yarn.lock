@@ -2043,6 +2043,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webidl-conversions@npm:*":
+  version: 6.1.0
+  resolution: "@types/webidl-conversions@npm:6.1.0"
+  checksum: 5a939bfc40f097b3a0a9390178b294ca901f35d3fc9fcf042658bc5da4ac85fa50c60f23dbba57b8e594d9e8c1b5fca738174a395527ecc1bbe094ee900c7502
+  languageName: node
+  linkType: hard
+
 "@types/webpack-dev-middleware@npm:^4.1.3":
   version: 4.1.3
   resolution: "@types/webpack-dev-middleware@npm:4.1.3"
@@ -2093,6 +2100,16 @@ __metadata:
     "@types/webpack-sources": "*"
     source-map: ^0.6.0
   checksum: 0edd48873e23e3f9290721596ad3a553495d16e906a8ee81d03dca1453a15a10ca90a71fc1b8a056ef97fa861ae36c69f9df880f3c69b1ec728fbb40fae7026f
+  languageName: node
+  linkType: hard
+
+"@types/whatwg-url@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "@types/whatwg-url@npm:8.2.0"
+  dependencies:
+    "@types/node": "*"
+    "@types/webidl-conversions": "*"
+  checksum: 503fe74cec32b66437e088287c98b2ef7149e0dd0d96251b7c0b3d206bd33286ed492b784a00d28483a248e27fbebd24e254fd4d36b610760ae18f8820e825a0
   languageName: node
   linkType: hard
 
@@ -8349,6 +8366,7 @@ fsevents@^1.2.7:
     "@types/webpack-dev-middleware": ^4.1.3
     "@types/webpack-env": ^1.16.0
     "@types/webpack-hot-middleware": ^2.25.4
+    "@types/whatwg-url": ^8.2.0
     "@typescript-eslint/eslint-plugin": ^4.22.1
     "@typescript-eslint/parser": ^4.22.1
     babel-loader: ^8.2.2
@@ -8381,6 +8399,7 @@ fsevents@^1.2.7:
     webpack-cli: ^4.7.0
     webpack-dev-middleware: ^4.1.0
     webpack-hot-middleware: ^2.25.0
+    whatwg-url: ^8.5.0
   languageName: unknown
   linkType: soft
 
