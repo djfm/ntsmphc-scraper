@@ -12,6 +12,14 @@ import Home from './components/Home';
 import NewScrapingProject from './components/NewScrapingProject';
 import PageNotFound from './components/PageNotFound';
 
+import {
+  askServer,
+} from './webSockets';
+
+askServer('hello', {
+  sup: 'dude',
+});
+
 const App = () => {
   const tree = (
     <Router>

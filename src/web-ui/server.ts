@@ -2,6 +2,8 @@
 import path from 'path';
 import express from 'express';
 
+import WebSocket from 'ws';
+
 import webpack from 'webpack';
 import webpackConfig from '../../webpack.config';
 
@@ -25,11 +27,24 @@ if (isDevelopment) {
 }
 
 app.use(express.static(path.resolve(__dirname, 'public')));
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
 const port = 8080;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
+});
+
+const wss = new WebSocket.Server({
+  server,
+  path: '/wss-internal',
+});
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    console.log('Received: ', message);
+    ws.send(JSON.stringify({ hello: 'world' }));
+  });
 });

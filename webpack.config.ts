@@ -10,7 +10,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const plugins = [];
 const babelLoaderPlugins = [];
-const entry = ['./src/web-ui/client-src/router.tsx'];
+const entry = ['@babel/polyfill', './src/web-ui/client-src/router.tsx'];
 
 if (isDevelopment) {
   plugins.push(new webpack.HotModuleReplacementPlugin());

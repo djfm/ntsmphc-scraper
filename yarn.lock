@@ -1141,6 +1141,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/polyfill@npm:^7.12.1":
+  version: 7.12.1
+  resolution: "@babel/polyfill@npm:7.12.1"
+  dependencies:
+    core-js: ^2.6.5
+    regenerator-runtime: ^0.13.4
+  checksum: 299db4d4260ea0eacd357727418755a791cd152b642494ed15c18d029f55ea625017a6f1c398f7839e30b2d5a48cd6165e0c1f39ac1b81f863e15f056a149d54
+  languageName: node
+  linkType: hard
+
 "@babel/preset-env@npm:^7.14.1":
   version: 7.14.1
   resolution: "@babel/preset-env@npm:7.14.1"
@@ -2110,6 +2120,15 @@ __metadata:
     "@types/node": "*"
     "@types/webidl-conversions": "*"
   checksum: 503fe74cec32b66437e088287c98b2ef7149e0dd0d96251b7c0b3d206bd33286ed492b784a00d28483a248e27fbebd24e254fd4d36b610760ae18f8820e825a0
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:^7.4.2":
+  version: 7.4.2
+  resolution: "@types/ws@npm:7.4.2"
+  dependencies:
+    "@types/node": "*"
+  checksum: 29fc34b61cc039c0f51e835ff8746faf7b98186e6bf785fb099c9fb006ae79825312e62a0c1e856b405543ae6302e196d1a1d372753dbcdce59ab5b72011a9f2
   languageName: node
   linkType: hard
 
@@ -4086,6 +4105,13 @@ __metadata:
   version: 3.12.1
   resolution: "core-js-pure@npm:3.12.1"
   checksum: f1f797aaccb4a612ddb24293bfad478bbec212353021019d3763557c737b0c9a00b445e3ff2ca80b2b8b14422181859a1c2b4a941f58e89c605ff9a8f66a6166
+  languageName: node
+  linkType: hard
+
+"core-js@npm:^2.6.5":
+  version: 2.6.12
+  resolution: "core-js@npm:2.6.12"
+  checksum: b865823ce9cb5bc63336856440f6525e4996bb91af30660081e82bf447d177f36104f0986906a34ea0c9c03cb8b3d960380848a478e2621dac30c9b8198d28da
   languageName: node
   linkType: hard
 
@@ -8351,6 +8377,7 @@ fsevents@^1.2.7:
   dependencies:
     "@babel/core": ^7.14.0
     "@babel/plugin-transform-react-jsx": ^7.13.12
+    "@babel/polyfill": ^7.12.1
     "@babel/preset-env": ^7.14.1
     "@babel/preset-typescript": ^7.13.0
     "@pmmmwh/react-refresh-webpack-plugin": ^0.4.3
@@ -8367,6 +8394,7 @@ fsevents@^1.2.7:
     "@types/webpack-env": ^1.16.0
     "@types/webpack-hot-middleware": ^2.25.4
     "@types/whatwg-url": ^8.2.0
+    "@types/ws": ^7.4.2
     "@typescript-eslint/eslint-plugin": ^4.22.1
     "@typescript-eslint/parser": ^4.22.1
     babel-loader: ^8.2.2
@@ -8400,6 +8428,7 @@ fsevents@^1.2.7:
     webpack-dev-middleware: ^4.1.0
     webpack-hot-middleware: ^2.25.0
     whatwg-url: ^8.5.0
+    ws: ^7.4.5
   languageName: unknown
   linkType: soft
 
@@ -11815,7 +11844,7 @@ typescript@^4.2.4:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.2.0, ws@npm:^7.4.4":
+"ws@npm:^7.2.0, ws@npm:^7.4.4, ws@npm:^7.4.5":
   version: 7.4.5
   resolution: "ws@npm:7.4.5"
   peerDependencies:

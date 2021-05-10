@@ -46,6 +46,8 @@
     }],
     "jsx-a11y/label-has-associated-control": ["warn", {
       "assert": "either"
-    }]
+    }],
+    "no-unused-vars": 0,
+    "@typescript-eslint/no-unused-vars": "warn"
   }
 }
