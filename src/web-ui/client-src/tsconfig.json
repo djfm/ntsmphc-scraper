@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "sourceMap": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+  }
+}
