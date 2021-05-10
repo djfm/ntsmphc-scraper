@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+
 import { join as joinPaths } from 'path';
 import readline from 'readline';
 import { cpus } from 'os';

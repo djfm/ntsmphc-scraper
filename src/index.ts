@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, no-process-exit */
 
 // USAGE: node index.js https://url.example.com [-p N] [-v] [--log-file path/to/log.json]
 // Scrapes website found at given URL, optionally using N parallel
