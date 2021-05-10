@@ -4,6 +4,7 @@
     "target": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "sourceMap": true
   }
 }
