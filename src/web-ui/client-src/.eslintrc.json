@@ -36,6 +36,10 @@
     ],
     "no-use-before-define": 0,
     "@typescript-eslint/no-use-before-define": ["error"],
-    "react/jsx-one-expression-per-line": 0
+    "react/jsx-one-expression-per-line": 0,
+    "import/extensions": ["error", {
+      "ts": "never",
+      "tsx": "never"
+    }]
   }
 }

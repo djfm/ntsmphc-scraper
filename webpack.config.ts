@@ -6,10 +6,12 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const plugins = [];
+const babelLoaderPlugins = [];
 
 if (isDevelopment) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
   plugins.push(new ReactRefreshWebpackPlugin());
+  babelLoaderPlugins.push(require.resolve('react-refresh/babel'));
 }
 
 type ConfMode = 'development' | 'production';
@@ -31,8 +33,14 @@ const config = {
       exclude: /node_modules/,
       use: [{
         loader: 'babel-loader',
+        options: {
+          plugins: babelLoaderPlugins,
+        },
       }],
     }],
+  },
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx'],
   },
   devServer: {
     hot: true,

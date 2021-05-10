@@ -1,18 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Example = () => {
-  const [count, setCount] = useState(0);
+import {
+  BrowserRouter as Router,
+  Link,
+  Switch,
+  Route,
+} from 'react-router-dom';
 
-  return (
-    <div>
-      <p>You clicked {count} times.</p>
-      <button type="button" onClick={() => setCount(count + 1)}>
-        Click me!
-      </button>
-    </div>
+import Home from './components/Home';
+import NewScrapingProject from './components/NewScrapingProject';
+
+const App = () => {
+  const tree = (
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/new-scraping-project">Create New Scraping Project</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <Switch>
+          <Route path="/new-scraping-project">
+            <NewScrapingProject />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
+
+  return tree;
 };
 
 const rootElement = document.getElementById('appRoot');
-ReactDOM.render(<Example />, rootElement);
+ReactDOM.render(<App />, rootElement);
