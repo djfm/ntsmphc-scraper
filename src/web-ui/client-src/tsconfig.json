@@ -5,6 +5,7 @@
     "sourceMap": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "importHelpers": true
   }
 }
