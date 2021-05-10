@@ -8,6 +8,10 @@
   // `yarn add -D @typescript-eslint/parser`
   "parser": "@typescript-eslint/parser",
 
+  // the only JS files here are build artefacts
+  // in my case
+  "ignorePatterns": ["src/web-ui/public/*.js"],
+
   "parserOptions": {
     // This is expected by eslint to let us use "import" / "export" statements.
     // But in an all-TypeScript project running with `ts-node`,
@@ -61,7 +65,14 @@
 
     // lets specific TS-eslint recommended rules override
     // non TS-specific rules that may be wrong in our case
-    "plugin:@typescript-eslint/eslint-recommended"
+    "plugin:@typescript-eslint/eslint-recommended",
+
+    // Since this is mostly a node project...
+    // there is a specific .eslintrc.json for the web-ui so
+    // this is fine.
+    //
+    // `yarn add -D eslint-plugin-node`
+    "plugin:node/recommended"
   ],
   // my customizations to the linting rules
   "rules": {
@@ -99,6 +110,23 @@
     "operator-linebreak": ["warn", "after"],
 
     // syntax errors in tsdoc are not errors IMHO
-    "tsdoc/syntax": "warn"
+    "tsdoc/syntax": "warn",
+
+    // trust me, I have a good Node
+    "node/no-unsupported-features/es-syntax": 0,
+
+    // how many times do I have to define this?
+    "node/no-missing-import": ["error", {
+      "tryExtensions": [".js", ".ts"]
+    }],
+
+    // disabled as per https://eslint.org/docs/rules/global-require,
+    // deprecated rule, and I have eslint-plugin-node enabled
+    "global-require": 0,
+
+    // alert me if I use stuff unsupported in node 16.1
+    "node/no-unsupported-features/node-builtins": ["error", {
+      "version": ">=16.1.0"
+    }]
   }
 }

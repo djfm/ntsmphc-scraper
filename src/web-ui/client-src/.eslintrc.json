@@ -40,6 +40,9 @@
     "import/extensions": ["error", {
       "ts": "never",
       "tsx": "never"
+    }],
+    "node/no-missing-import": ["error", {
+      "tryExtensions": [".ts", ".tsx"]
     }]
   }
 }
