@@ -43,6 +43,9 @@
     }],
     "node/no-missing-import": ["error", {
       "tryExtensions": [".ts", ".tsx"]
+    }],
+    "jsx-a11y/label-has-associated-control": ["warn", {
+      "assert": "either"
     }]
   }
 }
