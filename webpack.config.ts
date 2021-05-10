@@ -38,6 +38,8 @@ const config = {
         options: {
           plugins: babelLoaderPlugins,
         },
+      }, {
+        loader: 'ts-loader',
       }],
     }],
   },

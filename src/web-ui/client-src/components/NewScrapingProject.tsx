@@ -1,9 +1,24 @@
 import React from 'react';
 
+import {
+  isValidURL,
+} from '../../../util/url';
+
 const NewScrapingProject = () => (
-  <div>
-    Welcome to NewScrapingProject!
-  </div>
+  <main>
+    <h1>Create New Scraping Project</h1>
+
+    <section>
+      <form>
+        <label>
+          Start URL
+          <p>
+            <input type="text" />
+          </p>
+        </label>
+      </form>
+    </section>
+  </main>
 );
 
 export default NewScrapingProject;
