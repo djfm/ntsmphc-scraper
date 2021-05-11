@@ -9,6 +9,10 @@ import {
 } from 'react-redux';
 
 import {
+  Link,
+} from 'react-router-dom';
+
+import {
   addNotificationAction,
   setProjectsAction,
 } from '../redux/actions';
@@ -58,7 +62,11 @@ const ScrapingProjects = () => {
       <div>
         {projects.map((project: any) => (
           <article key={project.id}>
-            <h2>{project.projectName}</h2>
+            <h2>
+              <Link to={`/projects/${project.id}`}>
+                {project.projectName}
+              </Link>
+            </h2>
             <dl>
               <dt>Start URL</dt>
               <dd>{project.startURL}</dd>

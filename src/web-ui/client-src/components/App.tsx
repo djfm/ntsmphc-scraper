@@ -16,6 +16,7 @@ import Home from './Home';
 import NewScrapingProject from './NewScrapingProject';
 import PageNotFound from './PageNotFound';
 import ScrapingProjects from './ScrapingProjects';
+import OneScrapingProject from './OneScrapingProject';
 
 import {
   removeNotificationAction,
@@ -93,6 +94,9 @@ const App = () => (
         </Route>
         <Route exact path="/projects">
           <ScrapingProjects />
+        </Route>
+        <Route exact path="/projects/:id">
+          <OneScrapingProject />
         </Route>
         <Route exact path="/">
           <Home />
