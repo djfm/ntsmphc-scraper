@@ -4,6 +4,15 @@ import React, {
   BaseSyntheticEvent,
 } from 'react';
 
+import {
+  Prompt,
+} from 'react-router-dom';
+
+import {
+  Location,
+// eslint-disable-next-line import/no-extraneous-dependencies
+} from 'history';
+
 import { URL } from 'whatwg-url';
 
 import {
@@ -31,10 +40,53 @@ const NewScrapingProject = () => {
   const [isStartURLValid, setStartURLValid] = useState(undefined);
   const [isStartURLResponding, setStartURLResponding] = useState(undefined);
 
+  const [projectName, setProjectName] = useState('');
+
+  const [isBlocking, setIsBlocking] = useState(false);
+
+  const startURLOK = isStartURLValid && isStartURLResponding;
+  const projectNameOK = projectName !== '';
+  const allGood = startURLOK && projectNameOK;
+
   const handleStartURLChange = ((event: BaseSyntheticEvent) => {
     const url = event.target.value;
     setStartURL(url);
     setStartURLValid(isValidURL(url));
+    // TODO handle isBlocking for all fields,
+    // in a smart generalizable way.
+    setIsBlocking(true);
+  });
+
+  const handleProjectNameChange = ((event: BaseSyntheticEvent) => {
+    // TODO check availability of project name
+    // once we start storing them.
+    const name = event.target.value;
+    setProjectName(name);
+  });
+
+  const handleCreateScrapingProjectFormSubmission = ((event: BaseSyntheticEvent) => {
+    event.preventDefault();
+    if (!allGood) {
+      // Probably happening because the user hit the `Return` key
+      // and that tried to submit the form, before the submit button
+      // appeared. The submit button should only appear when the form
+      // is ready.
+      // TODO handle this error message gracefully
+      // eslint-disable-next-line no-alert
+      alert('Some settings are not defined properly, please double-check everything...');
+      return;
+    }
+
+    askServer('createProject', {
+      startURL,
+      projectName,
+    }).then(() => {
+
+    }, (err) => {
+      // TODO gracefully handle error
+      // eslint-disable-next-line no-alert
+      alert(`Something went wrong: "${err.message}"`);
+    });
   });
 
   useEffect(() => {
@@ -72,19 +124,88 @@ const NewScrapingProject = () => {
 
   const urlFeedback = wrapFeedback(startURLFeedback);
 
+  const makePromptString = (location: Location) => [
+    `Are you sure you want to go to "${location.pathname}" ?\n`,
+    "You will lose all the data you've input so far.",
+  ].join('\n');
+
   const ui = (
     <main>
       <h1>Create New Scraping Project</h1>
 
+      <Prompt
+        when={isBlocking}
+        message={makePromptString}
+      />
+
+      <p>
+        In the form below, you will need to provide a <strong>valid</strong>,&nbsp;
+        <strong>reachable URL</strong>, <br />
+        including its protocol <strong>(http://)</strong> or <strong>(https://)</strong>.
+      </p>
+
+      <p>
+        <i>
+          The rest of the questions (there aren&apos;t many),<br />
+          will appear as you complete each step.
+        </i>
+      </p>
+
       <section>
-        <form>
+        <form onSubmit={handleCreateScrapingProjectFormSubmission}>
           <label>
-            Start URL
+            <strong>Start URL</strong>
+            <p>
+              <i>
+                That&apos;s the URL from which the scraper will<br />
+                start doing its job.<br />
+                It will explore it, then explore all the pages<br />
+                reachable from it and belonging to the same site,<br />
+                etc. until it has explored all pages.
+              </i>
+            </p>
             <p>
               <input type="text" value={startURL} onChange={handleStartURLChange} />
             </p>
             {urlFeedback}
           </label>
+
+          {startURLOK && (
+            <label>
+              <strong>Project Name</strong>
+              <p>
+                <i>
+                  This setting is for you to identify your project,<br />
+                  you are free to name it however you wish.
+                </i>
+              </p>
+              <p>
+                <input type="text" value={projectName} onChange={handleProjectNameChange}/>
+              </p>
+            </label>
+          )}
+
+          {allGood && (
+            <div>
+              <p>
+                <strong>You&apos;re all set!</strong>
+              </p>
+              <p>
+                The scraper will start scraping at &quot;<strong>{startURL}</strong>&quot;,<br />
+                and along the way:
+                <ul>
+                  <li>identify all pages that produce HTTP error codes</li>
+                  <li>identify all links to external resources that are not valid</li>
+                </ul>
+              </p>
+
+              <p>
+                <button type="submit">
+                  Create Scraping Project
+                </button>
+              </p>
+            </div>
+          )}
         </form>
       </section>
     </main>

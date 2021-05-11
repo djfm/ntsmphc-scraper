@@ -48,6 +48,9 @@
       "assert": "either"
     }],
     "no-unused-vars": 0,
-    "@typescript-eslint/no-unused-vars": "warn"
+    "@typescript-eslint/no-unused-vars": "warn",
+    // FIXME how to not inherit node rules from parent .eslintrc.json?
+    // they do not make sense here, our target is Browser.
+    "node/no-extraneous-import": 0
   }
 }

@@ -10,7 +10,7 @@
 
   // the only JS files here are build artefacts
   // in my case
-  "ignorePatterns": ["src/web-ui/public/*.js"],
+  "ignorePatterns": ["src/web-ui/public/*.js", "/node_modules/"],
 
   "parserOptions": {
     // This is expected by eslint to let us use "import" / "export" statements.
