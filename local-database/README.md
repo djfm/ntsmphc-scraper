@@ -45,6 +45,7 @@ exposed by the `src/db.ts` file and
     - id
     - projectName
     - startURL
+    - createdAt
 - the `createProject` method is responsible for creating
   projects
 - `createProject` accepts a single `params` argument of type

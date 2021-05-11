@@ -116,6 +116,7 @@ const createProjectInMemory = (params: CreateProjectParams) =>
       id,
       projectName,
       startURL: params.startURL,
+      createdAt: Date.now(),
     };
 
     storage.set(projectName, projectMetaData);
