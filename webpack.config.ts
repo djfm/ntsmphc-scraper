@@ -4,13 +4,14 @@
 
 import path from 'path';
 import webpack from 'webpack';
+import CompressionPlugin from 'compression-webpack-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-const plugins = [];
+const plugins = [new CompressionPlugin()];
 const babelLoaderPlugins = [];
-const entry = ['@babel/polyfill', './src/web-ui/client-src/router.tsx'];
+const entry = ['@babel/polyfill', './src/web-ui/client-src/index.tsx'];
 
 if (isDevelopment) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
