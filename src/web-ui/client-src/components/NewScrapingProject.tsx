@@ -1,4 +1,8 @@
-import React, { useState, BaseSyntheticEvent } from 'react';
+import React, {
+  useState,
+  useEffect,
+  BaseSyntheticEvent,
+} from 'react';
 
 import { URL } from 'whatwg-url';
 
@@ -25,13 +29,18 @@ const isReachableURL = async (url: string) => {
 const NewScrapingProject = () => {
   const [startURL, setStartURL] = useState('');
   const [isStartURLValid, setStartURLValid] = useState(undefined);
-  const [isStartURLResponding, setStartURLResponding] = useState(false);
+  const [isStartURLResponding, setStartURLResponding] = useState(undefined);
 
   const handleStartURLChange = ((event: BaseSyntheticEvent) => {
     const url = event.target.value;
-    setStartURLValid(isValidURL(url));
     setStartURL(url);
+    setStartURLValid(isValidURL(url));
   });
+
+  useEffect(() => {
+    setStartURLResponding(undefined);
+    askServer('isRespondingHTTP', { url: startURL }).then(setStartURLResponding);
+  }, [startURL]);
 
   const startURLFeedback = [];
 
@@ -48,13 +57,14 @@ const NewScrapingProject = () => {
   };
 
   if (isStartURLValid) {
-    askServer('isRespondingHTTP', { url: startURL }).then(setStartURLResponding);
     startURLFeedback.push('✔ Looks good!');
 
     if (isStartURLResponding) {
       startURLFeedback.push("✔ It's responding to HTTP requests, good!");
-    } else {
+    } else if (isStartURLResponding === false) {
       startURLFeedback.push("It doesn't seem to be reachable over HTTP.");
+    } else {
+      startURLFeedback.push("I'm trying to see if this URL is reachable over HTTP...");
     }
   } else if (isStartURLValid === false) {
     startURLFeedback.push('This URL seems invalid.');

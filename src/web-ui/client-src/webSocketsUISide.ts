@@ -26,7 +26,7 @@ const connectToServer = async () => new Promise<WebSocket>((resolveConnection) =
 
   s.addEventListener('message', (event) => {
     // eslint-disable-next-line no-console
-    console.log(`Currently, ${pendingRequests.size} are pending.`);
+    console.log(`Currently, ${pendingRequests.size} requests are pending.`);
     try {
       const data = JSON.parse(event.data);
       if (pendingRequests.has(data.id)) {
@@ -37,13 +37,15 @@ const connectToServer = async () => new Promise<WebSocket>((resolveConnection) =
           resolve(data.response);
         }
         pendingRequests.delete(data.id);
+        // eslint-disable-next-line no-console
+        console.log(`I settled one, so now, ${pendingRequests.size} are pending.`);
       } else {
         // eslint-disable-next-line no-console
-        console.log('Received JSON message I could not understand: ', data);
+        console.error('Received JSON message I could not understand: ', data);
       }
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.log(err);
+      console.error(err);
     }
   });
 });

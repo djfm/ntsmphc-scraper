@@ -93,7 +93,9 @@ const makeURLHelpers = (parsedStartURL: URL) => {
 
 export const isRespondingHTTP = async (url: string): Promise<boolean> => {
   try {
-    await fetch(url);
+    await fetch(url, {
+      timeout: 5000,
+    });
     return true;
   } catch (err) {
     return false;
