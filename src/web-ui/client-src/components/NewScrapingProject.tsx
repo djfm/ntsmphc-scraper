@@ -180,7 +180,7 @@ const NewScrapingProject = () => {
                 </i>
               </p>
               <p>
-                <input type="text" value={projectName} onChange={handleProjectNameChange}/>
+                <input type="text" value={projectName} onChange={handleProjectNameChange} />
               </p>
             </label>
           )}
