@@ -57,17 +57,17 @@ const NewScrapingProject = () => {
   };
 
   if (isStartURLValid) {
-    startURLFeedback.push('✔ Looks good!');
+    startURLFeedback.push('Looks like a URL! ✔');
 
     if (isStartURLResponding) {
-      startURLFeedback.push("✔ It's responding to HTTP requests, good!");
+      startURLFeedback.push("It's responding to HTTP requests, good! ✔");
     } else if (isStartURLResponding === false) {
-      startURLFeedback.push("It doesn't seem to be reachable over HTTP.");
+      startURLFeedback.push("It doesn't seem to be reachable over HTTP. ✘");
     } else {
       startURLFeedback.push("I'm trying to see if this URL is reachable over HTTP...");
     }
   } else if (isStartURLValid === false) {
-    startURLFeedback.push('This URL seems invalid.');
+    startURLFeedback.push('This URL seems invalid. ✘');
   }
 
   const urlFeedback = wrapFeedback(startURLFeedback);
