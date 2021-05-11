@@ -15,6 +15,9 @@ import {
 
 import {
   Location,
+  // TODO this is dirty, may break accidentally
+  // if history doesn't get installed...
+  // and I just need it for the type!
 // eslint-disable-next-line import/no-extraneous-dependencies
 } from 'history';
 
