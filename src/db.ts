@@ -48,7 +48,7 @@ const lockAndUse = (fileToUsePath: string) =>
     let fnResult: MaybeError = "Err: Something bad happened at the storage level. I don't know what.";
 
     try {
-      // write to the file,
+      // write to the lock file,
       // failing if it exists already.
       await writeFile(lockFilePath, lockFileData, {
         flag: 'wx',
@@ -66,7 +66,7 @@ const lockAndUse = (fileToUsePath: string) =>
       // TODO check that this code is reliable across different
       // platforms: e.g. Mac OS, Windows.
       if (err.code === 'EEXIST') {
-        // the lockfile already exist,
+        // the lock file already exists,
         // let's watch the lockfile and try again later!
 
         // TODO check if this can get us into infinite loops
