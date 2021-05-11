@@ -8,3 +8,5 @@ node_modules
 !.yarn/versions
 output/*
 !output/.gitkeep
+local-database/*
+!local-database/README.md
