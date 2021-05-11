@@ -51,7 +51,8 @@ const connectToServer = async () => new Promise<WebSocket>((resolveConnection) =
 });
 
 export const askServer = async (action: string, params: object) => {
-  if (!socket) {
+  // TODO check that a new socket is really obtained when needed
+  if (!socket || socket.readyState >= 1) {
     socket = await connectToServer();
   }
 

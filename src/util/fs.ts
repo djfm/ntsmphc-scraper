@@ -3,6 +3,7 @@ import {
   stat,
   readdir,
   readFile,
+  writeFile,
 } from 'fs/promises';
 
 export const statOrUndefined = async (path: string): Promise<Stats> => {
@@ -35,7 +36,7 @@ export const isEmptyDirectory = async (dirPath: string): Promise<boolean> => {
   return entries.length === 0;
 };
 
-type GenericMap = Map<string, any>;
+export type GenericMap = Map<string, any>;
 
 export const createMapObjectFromJSONFilePath =
   async (filePath: string): Promise<GenericMap> => {
@@ -43,4 +44,20 @@ export const createMapObjectFromJSONFilePath =
     const dataString = fileData.toString();
     const dataObj = JSON.parse(dataString);
     return new Map(Object.entries(dataObj));
+  };
+
+const createObjectFromMap = (map: GenericMap): object => {
+  const obj = {};
+  for (const [key, value] of map.entries()) {
+    obj[key] = value;
+  }
+  return obj;
+};
+
+export const writeJSONFileFromMapObject = (filePath: string) =>
+  async (map: GenericMap): Promise<string> => {
+    const obj = createObjectFromMap(map);
+    const JSONDataString = JSON.stringify(obj, null, 2);
+    await writeFile(filePath, JSONDataString);
+    return filePath;
   };

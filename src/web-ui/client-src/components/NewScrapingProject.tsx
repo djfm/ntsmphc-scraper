@@ -91,6 +91,9 @@ const NewScrapingProject = () => {
 
   useEffect(() => {
     setStartURLResponding(undefined);
+    // TODO à debugger, des fois le statut de isRespondingHTTP
+    // n'est pas synchro avec la startURL, je n'ai pas encore
+    // compris pourquoi
     askServer('isRespondingHTTP', { url: startURL }).then(setStartURLResponding);
   }, [startURL]);
 
@@ -193,11 +196,12 @@ const NewScrapingProject = () => {
               <p>
                 The scraper will start scraping at &quot;<strong>{startURL}</strong>&quot;,<br />
                 and along the way:
-                <ul>
-                  <li>identify all pages that produce HTTP error codes</li>
-                  <li>identify all links to external resources that are not valid</li>
-                </ul>
               </p>
+
+              <ul>
+                <li>identify all pages that produce HTTP error codes</li>
+                <li>identify all links to external resources that are not valid</li>
+              </ul>
 
               <p>
                 <button type="submit">
