@@ -32,6 +32,8 @@ exposed by the `src/db.ts` file and
   foreseen / expected (such as caused by user actions)
   and an error in my stupid code, which would result in
   an `Error` being thrown.
+- use the exported `isError` method to check if the `MaybeError`
+  type actually represents an error
 
 ## Storing projects and meta-info
 
@@ -39,9 +41,15 @@ exposed by the `src/db.ts` file and
   called `projects.json`,
   it contains a pretty-printed JSON dictionary
   of project names to meta-info
+  Currently meta-info consists of:
+    - id
+    - projectName
+    - startURL
 - the `createProject` method is responsible for creating
   projects
 - `createProject` accepts a single `params` argument of type
   `CreateProjectParams` and returns a promise for a `MaybeError`
   type, which is either a `string`, indicating an error,
-  or a the value `true`, indicating success.
+  or `true`, indicating success, or an `object`, also
+  also indicating success but returning useful data
+  in the same go.

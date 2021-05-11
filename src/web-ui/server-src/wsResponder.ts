@@ -4,8 +4,7 @@ import {
 
 import {
   CreateProjectParams,
-  MaybeError,
-  ErrorMessage,
+  isError,
   createProject,
 } from '../../db';
 
@@ -50,11 +49,11 @@ export const respond = async (action: string, params: object): Promise<any> => {
     }
     const creationResult = await createProject(params);
 
-    if (creationResult === true) {
-      return true;
+    if (isError(creationResult)) {
+      throw new Error(creationResult);
     }
 
-    throw new Error(creationResult);
+    return creationResult;
   }
 
   throw new Error(`unknown action "${action}"`);

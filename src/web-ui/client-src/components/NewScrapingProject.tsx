@@ -6,6 +6,7 @@ import React, {
 
 import {
   Prompt,
+  useHistory,
 } from 'react-router-dom';
 
 import {
@@ -48,6 +49,8 @@ const NewScrapingProject = () => {
   const projectNameOK = projectName !== '';
   const allGood = startURLOK && projectNameOK;
 
+  const history = useHistory();
+
   const handleStartURLChange = ((event: BaseSyntheticEvent) => {
     const url = event.target.value;
     setStartURL(url);
@@ -66,6 +69,7 @@ const NewScrapingProject = () => {
 
   const handleCreateScrapingProjectFormSubmission = ((event: BaseSyntheticEvent) => {
     event.preventDefault();
+
     if (!allGood) {
       // Probably happening because the user hit the `Return` key
       // and that tried to submit the form, before the submit button
@@ -80,8 +84,13 @@ const NewScrapingProject = () => {
     askServer('createProject', {
       startURL,
       projectName,
-    }).then(() => {
-
+    }).then(({ id }) => {
+      // eslint-disable-next-line no-console
+      console.log(`Successfully created project ${id}.`);
+      // do not forget to stop preventing navigation when
+      // navigation is what we want :)
+      setIsBlocking(false);
+      history.push(`/projects/${id}`);
     }, (err) => {
       // TODO gracefully handle error
       // eslint-disable-next-line no-alert

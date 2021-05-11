@@ -27,7 +27,15 @@ export interface CreateProjectParams {
 
 export type ErrorMessage = string;
 
-export type MaybeError = true | ErrorMessage
+export type MaybeError = true | ErrorMessage | object
+
+export const isError = (dunnoWhat: MaybeError): dunnoWhat is ErrorMessage => {
+  if (typeof dunnoWhat === 'string') {
+    return true;
+  }
+
+  return false;
+};
 
 type RunWithLockedFileFunction = (lockedFilePath?: string) => MaybeError | Promise<MaybeError>;
 
@@ -102,14 +110,17 @@ const createProjectInMemory = (params: CreateProjectParams) =>
       return `Error: project already exists. Project name: "${projectName}".`;
     }
 
+    const id = storage.size + 1;
+
     const projectMetaData = {
+      id,
       projectName,
       startURL: params.startURL,
     };
 
     storage.set(projectName, projectMetaData);
 
-    return true;
+    return projectMetaData;
   };
 
 export const createProject = async (params: CreateProjectParams): Promise<MaybeError> =>
@@ -125,7 +136,7 @@ export const createProject = async (params: CreateProjectParams): Promise<MaybeE
     const store: GenericMap = await obtainStore();
     const created = createProjectInMemory(params)(store);
 
-    if (created === true) {
+    if (!isError(created)) {
       await writeJSONFileFromMapObject(dbPath)(store);
     }
 
