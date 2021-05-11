@@ -10,6 +10,10 @@ import {
 } from 'react-router-dom';
 
 import {
+  useDispatch,
+} from 'react-redux';
+
+import {
   Location,
 // eslint-disable-next-line import/no-extraneous-dependencies
 } from 'history';
@@ -19,6 +23,10 @@ import { URL } from 'whatwg-url';
 import {
   askServer,
 } from '../webSocketsUISide';
+
+import {
+  addNotificationAction,
+} from '../redux/actions';
 
 const isValidURL = (url: string) => {
   try {
@@ -44,6 +52,8 @@ const NewScrapingProject = () => {
   const [projectName, setProjectName] = useState('');
 
   const [isBlocking, setIsBlocking] = useState(false);
+
+  const dispatch = useDispatch();
 
   const startURLOK = isStartURLValid && isStartURLResponding;
   const projectNameOK = projectName !== '';
@@ -85,12 +95,17 @@ const NewScrapingProject = () => {
       startURL,
       projectName,
     }).then(({ id }) => {
+      const notificationMessage = `Successfully created project "${projectName}" (#${id}).`;
       // eslint-disable-next-line no-console
-      console.log(`Successfully created project ${id}.`);
+      console.log(notificationMessage);
       // do not forget to stop preventing navigation when
       // navigation is what we want :)
       setIsBlocking(false);
       history.push(`/projects/${id}`);
+      dispatch(addNotificationAction({
+        message: notificationMessage,
+        severity: 'success',
+      }));
     }, (err) => {
       // TODO gracefully handle error
       // eslint-disable-next-line no-alert

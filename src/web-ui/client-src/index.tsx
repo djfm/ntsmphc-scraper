@@ -19,7 +19,7 @@ const render = () => {
 };
 
 if (process.env.NODE_ENV !== 'production' && module.hot) {
-  module.hot.accept('./components/App', () => {
+  module.hot.accept('./components/App.tsx', () => {
     // eslint-disable-next-line no-console
     console.log('[HMR] Attempting to hot-reload React app...');
     render();

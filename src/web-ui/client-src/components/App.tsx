@@ -7,12 +7,55 @@ import {
   Route,
 } from 'react-router-dom';
 
+import {
+  useSelector,
+  useDispatch,
+} from 'react-redux';
+
 import Home from './Home';
 import NewScrapingProject from './NewScrapingProject';
 import PageNotFound from './PageNotFound';
 
+import {
+  removeNotificationAction,
+} from '../redux/actions';
+
+import {
+  getAllNotifications,
+} from '../redux/selectors';
+
+import {
+  Notification,
+} from '../redux/reducers/notifications';
+
+const Notifications = () => {
+  const notifications = useSelector(getAllNotifications);
+  const dispatch = useDispatch();
+
+  const removeNotification = (notification: Notification) => () => {
+    dispatch(removeNotificationAction(notification));
+  };
+
+  if (notifications.length === 0) {
+    return null;
+  }
+
+  return (
+    <div>
+      {notifications.map((notification: Notification) => (
+        <aside key={notification.id} role="alert">
+          <p>{notification.message}</p>
+          <button type="button" onClick={removeNotification(notification)}>Remove Notification</button>
+        </aside>
+      ))}
+    </div>
+  );
+};
+
 const App = () => (
   <Router>
+    <Notifications />
+
     <div>
       <nav>
         <ul>
