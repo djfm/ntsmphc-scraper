@@ -15,6 +15,7 @@ import {
 import Home from './Home';
 import NewScrapingProject from './NewScrapingProject';
 import PageNotFound from './PageNotFound';
+import ScrapingProjects from './ScrapingProjects';
 
 import {
   removeNotificationAction,
@@ -80,12 +81,18 @@ const App = () => (
           <li>
             <Link to="/new-scraping-project">Create New Scraping Project</Link>
           </li>
+          <li>
+            <Link to="/projects">View all Scraping Projects</Link>
+          </li>
         </ul>
       </nav>
 
       <Switch>
         <Route exact path="/new-scraping-project">
           <NewScrapingProject />
+        </Route>
+        <Route exact path="/projects">
+          <ScrapingProjects />
         </Route>
         <Route exact path="/">
           <Home />
