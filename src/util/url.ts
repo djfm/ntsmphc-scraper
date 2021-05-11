@@ -1,5 +1,7 @@
 import { URL } from 'url';
 
+import fetch from 'node-fetch';
+
 export const isValidURL = (url: string) => {
   try {
     // Sorry eslint, but I'm ONLY interested
@@ -87,6 +89,15 @@ const makeURLHelpers = (parsedStartURL: URL) => {
   };
 
   return { normalizeURL, shouldScrapeURL };
+};
+
+export const isRespondingHTTP = async (url: string): Promise<boolean> => {
+  try {
+    await fetch(url);
+    return true;
+  } catch (err) {
+    return false;
+  }
 };
 
 export default makeURLHelpers;

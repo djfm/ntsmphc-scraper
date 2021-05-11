@@ -25,6 +25,8 @@ const connectToServer = async () => new Promise<WebSocket>((resolveConnection) =
   });
 
   s.addEventListener('message', (event) => {
+    // eslint-disable-next-line no-console
+    console.log(`Currently, ${pendingRequests.size} are pending.`);
     try {
       const data = JSON.parse(event.data);
       if (pendingRequests.has(data.id)) {
