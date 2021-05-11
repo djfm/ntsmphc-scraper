@@ -5,7 +5,9 @@ import express from 'express';
 import WebSocket from 'ws';
 
 import webpack from 'webpack';
+
 import webpackConfig from '../../webpack.config';
+import messageReceived from './server-src/webSocketsServerSide';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -44,7 +46,6 @@ const wss = new WebSocket.Server({
 
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
-    console.log('Received: ', message);
-    ws.send(JSON.stringify({ hello: 'world' }));
+    messageReceived(message, ws);
   });
 });

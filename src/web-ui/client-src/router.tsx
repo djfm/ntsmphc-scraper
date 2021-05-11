@@ -14,7 +14,7 @@ import PageNotFound from './components/PageNotFound';
 
 import {
   askServer,
-} from './webSockets';
+} from './webSocketsUISide';
 
 askServer('hello', {
   sup: 'dude',
