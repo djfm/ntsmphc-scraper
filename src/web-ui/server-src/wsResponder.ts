@@ -6,6 +6,7 @@ import {
   CreateProjectParams,
   isError,
   createProject,
+  listProjects,
 } from '../../db';
 
 interface WithURL {
@@ -56,7 +57,19 @@ export const respond = async (action: string, params: object): Promise<any> => {
     return creationResult;
   }
 
-  throw new Error(`unknown action "${action}"`);
+  if (action === 'listProjects') {
+    const projects = await listProjects();
+
+    if (isError(projects)) {
+      throw new Error(projects);
+    }
+
+    // quick & dirty way to convert iterator
+    // to plain old Array
+    return [...projects];
+  }
+
+  throw new Error(`WebSocket: unknown server action "${action}"`);
 };
 
 export default respond;

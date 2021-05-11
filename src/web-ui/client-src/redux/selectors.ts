@@ -1,2 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
-export const getAllNotifications = (store) => store.notifications;
+export const getAllNotifications = (store: any) => store.notifications;
+
+export const getAllProjects = (store: any) => store.projects;

@@ -143,3 +143,8 @@ export const createProject = async (params: CreateProjectParams): Promise<MaybeE
 
     return created;
   });
+
+export const listProjects = async () => {
+  const projectsMap = await createMapObjectFromJSONFilePath(projectsFilePath);
+  return projectsMap.values();
+};

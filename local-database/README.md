@@ -53,4 +53,6 @@ exposed by the `src/db.ts` file and
   type, which is either a `string`, indicating an error,
   or `true`, indicating success, or an `object`, also
   also indicating success but returning useful data
-  in the same go.
+  in the same go
+- the `listProjects` method takes no argument at all and returns
+  a list of all projects the db knows about

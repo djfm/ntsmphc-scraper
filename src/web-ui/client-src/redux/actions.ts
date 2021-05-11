@@ -10,6 +10,8 @@ import {
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 
+export const SET_PROJECTS = 'SET_PROJECTS';
+
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
     ...createDefaultNotification(),
@@ -35,3 +37,8 @@ export function removeNotificationAction(idOrObject: number | Notification): Any
     id: idOrObject.id,
   };
 }
+
+export const setProjectsAction = (projects: object[]) => ({
+  type: SET_PROJECTS,
+  projects,
+});
