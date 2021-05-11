@@ -13,7 +13,6 @@ export type Milliseconds = number;
 export type Notification = {
   id: number,
   message: string,
-  moreInfo: '',
   severity: NotificationSeverity,
   createdAt: number,
   selfDestroyDelay: Milliseconds,
@@ -30,10 +29,12 @@ const makeUniqueNotificationId = () => {
 export const createDefaultNotification = (): Notification => ({
   id: makeUniqueNotificationId(),
   message: '',
-  moreInfo: '',
+  // TODO not used yet graphically
   severity: 'info',
   createdAt: Date.now(),
+  // TODO not implemented
   selfDestroyDelay: 0,
+  // actually implemented :)
   userDismissible: true,
 });
 

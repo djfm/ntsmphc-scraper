@@ -40,12 +40,27 @@ const Notifications = () => {
     return null;
   }
 
+  const maybeRenderDismissButton = (notification: Notification) => {
+    if (!notification.userDismissible) {
+      return null;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={removeNotification(notification)}
+      >
+        Remove Notification
+      </button>
+    );
+  };
+
   return (
     <div>
       {notifications.map((notification: Notification) => (
         <aside key={notification.id} role="alert">
           <p>{notification.message}</p>
-          <button type="button" onClick={removeNotification(notification)}>Remove Notification</button>
+          {maybeRenderDismissButton(notification)}
         </aside>
       ))}
     </div>
