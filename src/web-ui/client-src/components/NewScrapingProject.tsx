@@ -91,10 +91,17 @@ const NewScrapingProject = () => {
 
   useEffect(() => {
     setStartURLResponding(undefined);
-    // TODO à debugger, des fois le statut de isRespondingHTTP
-    // n'est pas synchro avec la startURL, je n'ai pas encore
-    // compris pourquoi
-    askServer('isRespondingHTTP', { url: startURL }).then(setStartURLResponding);
+    let updateIsStartURLResponding = true;
+
+    askServer('isRespondingHTTP', { url: startURL }).then((isResponding) => {
+      if (updateIsStartURLResponding) {
+        setStartURLResponding(isResponding);
+      }
+    });
+
+    return () => {
+      updateIsStartURLResponding = false;
+    };
   }, [startURL]);
 
   const startURLFeedback = [];
