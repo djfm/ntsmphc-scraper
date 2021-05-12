@@ -101,7 +101,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
       sendPayload({
         type: 'test',
-        data: params,
+        data: project,
       });
 
       return true;
