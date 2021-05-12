@@ -68,7 +68,7 @@ const ScrapingProjects = () => {
               </Link>
             </h2>
             <dl>
-              <dt>Start URL:</dt>
+              <dt><strong>Start URL</strong>:</dt>
               <dd>{project.startURL}</dd>
             </dl>
           </article>
