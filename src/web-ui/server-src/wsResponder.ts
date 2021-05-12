@@ -3,6 +3,10 @@ import {
 } from '../../util/url';
 
 import {
+  hasAllOwnProperties,
+} from '../../util/functional';
+
+import {
   CreateProjectParams,
   isError,
   createProject,
@@ -24,23 +28,6 @@ type Project = {
   projetName: string;
   createdAt: number,
 }
-
-// TODO what should we return when we get an empty array of propNames?
-// current behavior is to bug, which is OK for my use case but not
-// very clean.
-const hasAllOwnProperties = ([propName, ...otherPropNames]: string[]) =>
-  (obj: object): boolean => {
-    const hasPropName = Object.prototype.hasOwnProperty.call(obj, propName);
-    if (!hasPropName) {
-      return false;
-    }
-
-    if (otherPropNames.length === 0) {
-      return true;
-    }
-
-    return hasAllOwnProperties(otherPropNames)(obj);
-  };
 
 const hasURLParam = (params: object): params is WithURL =>
   Object.prototype.hasOwnProperty.call(params, 'url');
