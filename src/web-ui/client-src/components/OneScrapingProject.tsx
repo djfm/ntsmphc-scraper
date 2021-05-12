@@ -30,7 +30,7 @@ const OneScrapingProject = () => {
 
   return (
     <main>
-      <h1>Scraping Project &quot;{project.projectName}&quot; (#{id})</h1>
+      <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
       <p>
         <strong>Here is some basic info about this project</strong>:
         <dl>
