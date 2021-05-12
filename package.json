@@ -6,6 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development ts-node-dev --watch src/web-ui/server-src src/web-ui/server.ts",
     "build": "NODE_ENV=development webpack",
+    "startDebug": "NODE_ENV=development ts-node src/web-ui/server.ts",
     "startProd": "NODE_ENV=production ts-node src/web-ui/server.ts",
     "buildProd": "NODE_ENV=production webpack",
     "old-scrape": "ts-node src/index.ts",
