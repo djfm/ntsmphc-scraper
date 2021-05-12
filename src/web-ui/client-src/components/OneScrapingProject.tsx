@@ -1,4 +1,7 @@
-import React, { BaseSyntheticEvent } from 'react';
+import React, {
+  BaseSyntheticEvent,
+  useState,
+} from 'react';
 
 // TODO lots of factorization in this file
 
@@ -8,8 +11,8 @@ import {
 } from 'react-redux';
 
 import {
-  useParams as useRouterParams,
   useHistory,
+  useParams as useRouterParams,
 } from 'react-router-dom';
 
 import {
@@ -24,15 +27,32 @@ import {
   addNotificationAction,
 } from '../redux/actions';
 
+import {
+  wrapFeedback,
+} from '../util';
+
+type SetterFunction<T> = React.Dispatch<T>;
+
+const passValueTo = (setter: SetterFunction<any>) =>
+  (event: BaseSyntheticEvent) =>
+    setter(event.target.value);
+
 const OneScrapingProject = () => {
   const routerParams = useRouterParams() as any;
   const id: number = parseFloat(routerParams.id);
   const project = useSelector(getProjectById(id));
   const history = useHistory();
+  const [nParallel, setNParallel] = useState(3);
 
   const dispatch = useDispatch();
 
   const createdDate = new Date(project.createdAt);
+
+  const nParallelFeedback = [];
+
+  if (nParallel <= 0) {
+    nParallelFeedback.push('This value must be strictly greater than 0. ✘');
+  }
 
   const handleProjectDeletion = (projectId: number) => (event: BaseSyntheticEvent) => {
     event.preventDefault();
@@ -82,19 +102,47 @@ const OneScrapingProject = () => {
         <strong>Here is some basic info about this project</strong>:
       </p>
       <dl>
-        <dt>Start URL:</dt>
+        <dt><strong>Start URL</strong>:</dt>
         <dd>{project.startURL}</dd>
-        <dt>Creation date:</dt>
+        <dt><strong>Creation date</strong>:</dt>
         <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
       </dl>
-      <p>
-        <button type="button" onClick={handleStartScraping}>Start Scraping</button>
-      </p>
-      <p>
-        <button type="button" onClick={handleProjectDeletion(id)}>
-          Delete Project
-        </button>
-      </p>
+      <ul>
+        <li>
+          <label>
+            <strong>Number of parallel Chrome instances</strong>
+            <p>
+              <i>
+                To make things faster, I&apos;m gonna start many<br />
+                Chrome instances in parallel to do the scraping.<br />
+                Tuning it to an appropriate value depends on both<br />
+                the performance of the server doing the scraping,<br />
+                and of that of the server receiving the requests.
+              </i>
+            </p>
+            <p>
+              <input
+                type="number"
+                value={nParallel}
+                onChange={passValueTo(setNParallel)}
+              />
+              {wrapFeedback(nParallelFeedback)}
+            </p>
+          </label>
+          <p>
+            <button type="button" onClick={handleStartScraping}>
+              Start Scraping
+            </button>
+          </p>
+        </li>
+        <li>
+          <p>
+            <button type="button" onClick={handleProjectDeletion(id)}>
+              Delete Project
+            </button>
+          </p>
+        </li>
+      </ul>
     </main>
   );
 };
