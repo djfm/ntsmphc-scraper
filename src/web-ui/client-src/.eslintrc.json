@@ -54,6 +54,7 @@
     "node/no-extraneous-import": 0,
     // Why TF do I have to re-disable this rule,
     // which is already disabled in root .eslintrc.json
-    "implicit-arrow-linebreak": 0
+    "implicit-arrow-linebreak": 0,
+    "no-restricted-syntax": 0
   }
 }

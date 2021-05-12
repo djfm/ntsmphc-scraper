@@ -6,6 +6,13 @@ import App from './components/App';
 
 import store from './redux/store';
 
+import {
+  addOnInfoCallback,
+  clearOnInfoCallbacks,
+} from './webSocketsUISide';
+
+import handlePayloadFromServer from './handlePayloadFromServer';
+
 const ReduxApp = () => (
   <Provider store={store}>
     <App />
@@ -18,6 +25,8 @@ const render = () => {
   ReactDOM.render(<ReduxApp />, rootElement);
 };
 
+addOnInfoCallback(handlePayloadFromServer(store));
+
 if (process.env.NODE_ENV !== 'production' && module.hot) {
   module.hot.accept('./components/App.tsx', () => {
     // TODO check if it works,
@@ -25,6 +34,11 @@ if (process.env.NODE_ENV !== 'production' && module.hot) {
     // eslint-disable-next-line no-console
     console.log('[HMR] Attempting to hot-reload React app...');
     render();
+  });
+
+  module.hot.accept('./handlePayloadFromServer', () => {
+    clearOnInfoCallbacks();
+    addOnInfoCallback(handlePayloadFromServer(store));
   });
 }
 

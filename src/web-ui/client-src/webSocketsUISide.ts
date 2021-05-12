@@ -6,10 +6,9 @@ import {
   objectToMap,
 } from '../../util/functional';
 
-const { host } = window.location;
-
 type ResolveCallback = (data: any) => any;
 type RejectCallback = (reason: any) => any;
+type OnInfoCallback = (data: Map<string, any>) => any;
 
 type PromiseSettler = {
   resolve: ResolveCallback;
@@ -22,9 +21,11 @@ export type WSRequest = {
   params: object;
 };
 
+const { host } = window.location;
 let socket: WebSocket;
 let nextRequestId = 0;
 const pendingRequests = new Map<number, PromiseSettler>();
+const onInfoReceivedCallbacks: OnInfoCallback[] = [];
 
 const createNewSocket = async (): Promise<WebSocket> => {
   const s = new WebSocket(`ws://${host}/wss-internal`);
@@ -69,7 +70,13 @@ const resolveRequest = (data: Map<string, any>): boolean => {
   return false;
 };
 
-const setupListeners = (s: WebSocket) => {
+const handleInfoReceivedFromServer = (payload: Map<string, any>) => {
+  for (const cb of onInfoReceivedCallbacks) {
+    cb(payload);
+  }
+};
+
+const setupEventListeners = (s: WebSocket) => {
   s.addEventListener('message', (event: MessageEvent) => {
     try {
       const data = objectToMap(tryToParseJSON(event.data));
@@ -77,6 +84,21 @@ const setupListeners = (s: WebSocket) => {
       // is a response to a request
       if (data.has('id')) {
         resolveRequest(data);
+      } else if (data.has('payload')) {
+        // when we get a message we didn't ask for
+        const payloadReceived = data.get('payload');
+
+        if (typeof payloadReceived !== 'object') {
+          throw new Error('The "payload" should be an object.');
+        }
+
+        if (payloadReceived instanceof Array) {
+          throw new Error('Received an array as "payload".');
+        }
+
+        const payload = objectToMap(payloadReceived);
+
+        handleInfoReceivedFromServer(payload);
       }
     } catch (err) {
       if (!(err instanceof JSONParseError)) {
@@ -108,7 +130,7 @@ const ensureConnectionToServer = async (): Promise<WebSocket> => {
   // we got a new socket, so we need to setup
   // its handlers for the app to function properly
   if (oldSocket !== socket) {
-    setupListeners(socket);
+    setupEventListeners(socket);
   }
 
   return socket;
@@ -136,6 +158,17 @@ export const askServer = async (action: string, params: object) => {
   nextRequestId += 1;
 
   return promise;
+};
+
+export const addOnInfoCallback = (cb: OnInfoCallback) => {
+  onInfoReceivedCallbacks.push(cb);
+};
+
+export const clearOnInfoCallbacks = () => {
+  onInfoReceivedCallbacks.splice(
+    0,
+    onInfoReceivedCallbacks.length,
+  );
 };
 
 export default askServer;
