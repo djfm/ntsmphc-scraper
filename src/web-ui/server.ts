@@ -9,6 +9,10 @@ import webpack from 'webpack';
 import webpackConfig from '../../webpack.config';
 import messageReceived from './server-src/webSocketsServerSide';
 
+import {
+  onServerStart,
+} from './onServerStart';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const app = express();
@@ -88,6 +92,9 @@ const connectToUIUsingWebSocket = async () => {
 
 connectToUIUsingWebSocket();
 
+// TODO this doesn't make sense to export
+// because nothing can import server.ts,
+// which is the entry point.
 export const sendPayloadToUI = async (payload: object) => {
   if (payload instanceof Array) {
     throw new Error([
