@@ -24,19 +24,25 @@ export const objectToMap = (obj: object): Map<string, any> => {
   return map;
 };
 
-// TODO what should we return when we get an empty array of propNames?
-// current behavior is to bug, which is OK for my use case but not
-// very clean.
-export const hasAllOwnProperties = ([propName, ...otherPropNames]: string[]) =>
+// Will (or should, this is untested) return false if passed
+// an empty array of propNames,
+// unless`seen` is set to a number > 0.
+export const hasAllOwnProperties = (propNames: string[], seen: number = 0) =>
   (obj: object): boolean => {
+    if (propNames.length === 0) {
+      if (seen > 0) {
+        return true;
+      }
+
+      return false;
+    }
+
+    const [propName, ...otherPropNames] = propNames;
+
     const hasPropName = Object.prototype.hasOwnProperty.call(obj, propName);
     if (!hasPropName) {
       return false;
     }
 
-    if (otherPropNames.length === 0) {
-      return true;
-    }
-
-    return hasAllOwnProperties(otherPropNames)(obj);
+    return hasAllOwnProperties(otherPropNames, seen + 1)(obj);
   };
