@@ -66,7 +66,7 @@ const Notifications = () => {
     <div>
       {notifications.map((notification: Notification) => (
         <aside key={notification.id} role="alert">
-          <p>[{date(notification.createdAt)}]: <strong>{notification.message}</strong></p>
+          <p>[{date(notification.createdAt)}] <strong>{notification.message}</strong></p>
           {maybeRenderDismissButton(notification)}
         </aside>
       ))}
