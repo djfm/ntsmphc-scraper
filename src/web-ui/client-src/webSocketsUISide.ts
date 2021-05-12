@@ -52,7 +52,13 @@ const connectToServer = async () => new Promise<WebSocket>((resolveConnection) =
 
 export const askServer = async (action: string, params: object) => {
   // TODO check that a new socket is really obtained when needed
-  if (!socket || socket.readyState >= 1) {
+  // readyState can be:
+  //  - 0 => CONNECTING
+  //  - 1 => OPEN
+  //  - 2 => CLOSING
+  //  - 3 => CLOSED
+  // see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
+  if (!socket || socket.readyState >= 2) {
     socket = await connectToServer();
   }
 
