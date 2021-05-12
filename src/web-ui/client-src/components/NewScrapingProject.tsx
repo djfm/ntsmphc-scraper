@@ -32,6 +32,10 @@ import {
   addProjectAction,
 } from '../redux/actions';
 
+import {
+  wrapFeedback,
+} from '../util';
+
 const isValidURL = (url: string) => {
   try {
     // eslint-disable-next-line no-new
@@ -133,18 +137,6 @@ const NewScrapingProject = () => {
   }, [startURL]);
 
   const startURLFeedback = [];
-
-  const wrapFeedback = (messages: string[]): any => {
-    if (messages.length === 0) {
-      return null;
-    }
-
-    return (
-      <ul>
-        { messages.map((message) => (<li key={message}>{message}</li>)) }
-      </ul>
-    );
-  };
 
   if (isStartURLValid) {
     startURLFeedback.push('Looks like a URL! ✔');
