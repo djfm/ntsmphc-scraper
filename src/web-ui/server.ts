@@ -9,10 +9,6 @@ import webpack from 'webpack';
 import webpackConfig from '../../webpack.config';
 import messageReceived from './server-src/webSocketsServerSide';
 
-import {
-  onServerStart,
-} from './onServerStart';
-
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const app = express();
