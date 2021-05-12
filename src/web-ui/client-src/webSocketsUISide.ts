@@ -1,3 +1,7 @@
+import {
+  JSONParseError,
+} from '../../errors';
+
 const { host } = window.location;
 
 type ResolveCallback = (data: any) => any;
@@ -33,6 +37,14 @@ const createNewSocket = async (): Promise<WebSocket> => {
   });
 };
 
+const tryToParseJSON = (str: string): any => {
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    throw new JSONParseError(err.message ?? 'Could not parse string as JSON.');
+  }
+};
+
 const ensureConnectionToServer = async (): Promise<WebSocket> => {
   const oldSocket = socket;
 
@@ -52,11 +64,11 @@ const ensureConnectionToServer = async (): Promise<WebSocket> => {
   // we got a new socket, so we need to setup
   // its handlers for the app to function properly
   if (oldSocket !== socket) {
-    socket.addEventListener('message', (event) => {
+    socket.addEventListener('message', (event: MessageEvent) => {
       // eslint-disable-next-line no-console
       console.log(`Currently, ${pendingRequests.size} requests are pending.`);
       try {
-        const data = JSON.parse(event.data);
+        const data = tryToParseJSON(event.data);
         if (pendingRequests.has(data.id)) {
           const { resolve, reject } = pendingRequests.get(data.id);
           if (data.err) {
@@ -72,8 +84,10 @@ const ensureConnectionToServer = async (): Promise<WebSocket> => {
           console.error('Received JSON message I could not understand: ', data);
         }
       } catch (err) {
-        // this would likely happen if we received something
-        // that is not proper JSON
+        if (!(err instanceof JSONParseError)) {
+          throw err;
+        }
+
         // eslint-disable-next-line no-console
         console.error(err);
       }
