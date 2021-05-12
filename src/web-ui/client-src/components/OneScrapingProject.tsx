@@ -46,8 +46,6 @@ const OneScrapingProject = () => {
 
   const dispatch = useDispatch();
 
-  const createdDate = new Date(project.createdAt);
-
   const nParallelFeedback = [];
 
   if (nParallel <= 0) {
@@ -93,6 +91,8 @@ const OneScrapingProject = () => {
       </main>
     );
   }
+
+  const createdDate = new Date(project.createdAt);
 
   // TODO Add confirmation on Delete
   return (
