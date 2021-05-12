@@ -7,10 +7,15 @@ import {
   isError,
   createProject,
   listProjects,
+  deleteProject,
 } from '../../db';
 
 interface WithURL {
   url: string;
+}
+
+interface WithProjectId {
+  projectId: number;
 }
 
 // TODO what should we return when we get an empty array of propNames?
@@ -32,6 +37,9 @@ const hasAllOwnProperties = ([propName, ...otherPropNames]: string[]) =>
 
 const hasURLParam = (params: object): params is WithURL =>
   Object.prototype.hasOwnProperty.call(params, 'url');
+
+const hasProjectId = (params: object): params is WithProjectId =>
+  hasAllOwnProperties(['projectId'])(params);
 
 const isCreateProjectParams = (params: object): params is CreateProjectParams =>
   hasAllOwnProperties(['startURL', 'projectName'])(params);
@@ -67,6 +75,19 @@ export const respond = async (action: string, params: object): Promise<any> => {
     // quick & dirty way to convert iterator
     // to plain old Array
     return [...projects];
+  }
+
+  if (action === 'deleteProject') {
+    if (!hasProjectId(params)) {
+      throw new Error('Error: params provided to "deleteProject" miss property "projectId"');
+    }
+
+    const deleted = await deleteProject(params.projectId);
+    if (isError(deleted)) {
+      throw new Error(deleted);
+    }
+
+    return deleted;
   }
 
   throw new Error(`WebSocket: unknown server action "${action}"`);

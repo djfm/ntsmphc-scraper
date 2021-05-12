@@ -1,23 +1,53 @@
-import React from 'react';
+import React, { BaseSyntheticEvent } from 'react';
 
 import {
   useSelector,
+  useDispatch,
 } from 'react-redux';
 
 import {
   useParams as useRouterParams,
+  useHistory,
 } from 'react-router-dom';
 
 import {
   getProjectById,
 } from '../redux/selectors';
 
+import {
+  askServer,
+} from '../webSocketsUISide';
+
+import {
+  addNotificationAction,
+} from '../redux/actions';
+
 const OneScrapingProject = () => {
   const routerParams = useRouterParams() as any;
   const id: number = parseFloat(routerParams.id);
   const project = useSelector(getProjectById(id));
+  const history = useHistory();
+
+  const dispatch = useDispatch();
 
   const createdDate = new Date(project.createdAt);
+
+  const handleProjectDeletion = (projectId: number) => (event: BaseSyntheticEvent) => {
+    event.preventDefault();
+    askServer('deleteProject', ({ projectId })).then(
+      () => {
+        dispatch(addNotificationAction({
+          message: `Successfully deleted project "${project.projectName}".`,
+          severity: 'success',
+        }));
+        history.push('/projects');
+      },
+      (err: Error) => dispatch(addNotificationAction({
+        message: err.message,
+        severity: 'error',
+      })),
+    );
+  };
 
   if (project === undefined) {
     return (
@@ -28,6 +58,7 @@ const OneScrapingProject = () => {
     );
   }
 
+  // TODO Add confirmation on Delete
   return (
     <main>
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
@@ -39,6 +70,11 @@ const OneScrapingProject = () => {
           <dt>Creation date:</dt>
           <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
         </dl>
+      </p>
+      <p>
+        <button type="button" onClick={handleProjectDeletion(id)}>
+          Delete Project
+        </button>
       </p>
     </main>
   );

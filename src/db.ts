@@ -124,21 +124,21 @@ const createProjectInMemory = (params: CreateProjectParams) =>
     return projectMetaData;
   };
 
-export const createProject = async (params: CreateProjectParams): Promise<MaybeError> =>
-  lockAndUse(projectsFilePath)(async (dbPath): Promise<MaybeError> => {
-    const obtainStore = async () => {
-      const stat = await statOrUndefined(dbPath);
-      if (stat === undefined) {
-        return new Map<string, any>();
-      }
-      return createMapObjectFromJSONFilePath(dbPath);
-    };
+const obtainProjectsStore = async () => {
+  const stat = await statOrUndefined(projectsFilePath);
+  if (stat === undefined) {
+    return new Map<string, any>();
+  }
+  return createMapObjectFromJSONFilePath(projectsFilePath);
+};
 
-    const store: GenericMap = await obtainStore();
+export const createProject = async (params: CreateProjectParams): Promise<MaybeError> =>
+  lockAndUse(projectsFilePath)(async (): Promise<MaybeError> => {
+    const store: GenericMap = await obtainProjectsStore();
     const created = createProjectInMemory(params)(store);
 
     if (!isError(created)) {
-      await writeJSONFileFromMapObject(dbPath)(store);
+      await writeJSONFileFromMapObject(projectsFilePath)(store);
     }
 
     return created;
@@ -148,3 +148,16 @@ export const listProjects = async () => {
   const projectsMap = await createMapObjectFromJSONFilePath(projectsFilePath);
   return projectsMap.values();
 };
+
+export const deleteProject = async (projectId: number): Promise<MaybeError> =>
+  lockAndUse(projectsFilePath)(async (): Promise<MaybeError> => {
+    const store: GenericMap = await obtainProjectsStore();
+    for (const [key, value] of store.entries()) {
+      if (value.id === projectId) {
+        store.delete(key);
+      }
+    }
+    await writeJSONFileFromMapObject(projectsFilePath)(store);
+
+    return true;
+  });
