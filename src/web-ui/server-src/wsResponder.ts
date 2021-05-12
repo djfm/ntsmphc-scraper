@@ -15,7 +15,7 @@ import {
 } from '../../db';
 
 import {
-  SendPayloadFunc
+  SendPayloadFunc,
 } from './webSocketsServerSide';
 
 interface WithURL {
