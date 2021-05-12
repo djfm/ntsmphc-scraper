@@ -28,7 +28,7 @@ const render = () => {
 addOnInfoCallback(handlePayloadFromServer(store));
 
 if (process.env.NODE_ENV !== 'production' && module.hot) {
-  module.hot.accept('./components/App.tsx', () => {
+  module.hot.accept('./components/App', () => {
     // TODO check if it works,
     // it seems to, but I have a feeling it's only working thanks to react-refresh
     // eslint-disable-next-line no-console
