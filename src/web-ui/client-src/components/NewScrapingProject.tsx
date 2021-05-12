@@ -110,9 +110,10 @@ const NewScrapingProject = () => {
         severity: 'success',
       }));
     }, (err) => {
-      // TODO gracefully handle error
-      // eslint-disable-next-line no-alert
-      alert(`Something went wrong: "${err.message}"`);
+      dispatch(addNotificationAction({
+        message: `Something went wrong: "${err.message}"`,
+        severity: 'error',
+      }));
     });
   });
 
