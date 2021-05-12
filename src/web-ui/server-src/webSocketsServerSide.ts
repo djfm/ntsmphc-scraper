@@ -20,7 +20,9 @@ const dataToString = (data: WebSocket.Data): string => {
   throw new Error('unexpected data type when trying to convert to string');
 };
 
-export const messageReceived = (ws: WebSocket) =>
+export type SendPayloadFunc = (payload: object) => Promise<any>;
+
+export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
   async (message: WebSocket.Data) => {
     // eslint-disable-next-line no-console
     console.log('Received from UI:', message);
@@ -29,7 +31,7 @@ export const messageReceived = (ws: WebSocket) =>
       // defined in webSocketsUISide.ts at the time of writing
       const { id, action, params }: WSRequest = JSON.parse(dataToString(message));
       try {
-        const response = await respond(action, params);
+        const response = await respond(sendPayload)(action, params);
         ws.send(JSON.stringify({
           id,
           response,

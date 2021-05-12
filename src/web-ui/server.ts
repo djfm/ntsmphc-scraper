@@ -39,66 +39,33 @@ const server = app.listen(port, () => {
   console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
 });
 
-let globalWebSocket: WebSocket;
+const wss = new WebSocket.Server({
+  server,
+  path: '/wss-internal',
+});
 
-const createNewWebSocket = async (): Promise<WebSocket> => {
-  const wss = new WebSocket.Server({
-    server,
-    path: '/wss-internal',
-  });
+const sendPayloadToUI = (ws: WebSocket) =>
+  async (payload: object) => {
+    if (payload instanceof Array) {
+      throw new Error([
+        'Sending an array payload to the UI is not supported.',
+        'The payload must be a Plain Old Data Object.',
+        'Not even a literal value. An object that is serializable to JSON.',
+      ].join(' '));
+    }
 
-  return new Promise<WebSocket>((resolve) => {
-    wss.on('connection', (ws) => {
-      resolve(ws);
-    });
-  });
-};
-
-export type ObtainedWebSocket = {
-  ws: WebSocket;
-  isNew: true | false;
-};
-
-const obtainWebSocket = async (): Promise<ObtainedWebSocket> => {
-  if (globalWebSocket === undefined || globalWebSocket.readyState !== 1) {
-    const ws = await createNewWebSocket();
-    globalWebSocket = ws;
-
-    return {
-      ws,
-      isNew: true,
-    };
-  }
-
-  return {
-    ws: globalWebSocket,
-    isNew: false,
+    ws.send(JSON.stringify({
+      type: 'payloadFromServer',
+      payload,
+    }));
   };
-};
 
-const connectToUIUsingWebSocket = async () => {
-  const { ws, isNew } = await obtainWebSocket();
+wss.on('connection', (ws: WebSocket) => {
+  ws.on('message', (message: any) => {
+    messageReceived(ws, sendPayloadToUI(ws))(message);
+  });
 
-  if (isNew) {
-    ws.on('message', (message: any) => {
-      messageReceived(ws)(message);
-    });
-  }
-};
-
-connectToUIUsingWebSocket();
-
-export const sendPayloadToUI = async (payload: object) => {
-  if (payload instanceof Array) {
-    throw new Error([
-      'Sending array payload to the UI is not supported.',
-      'The payload must be a Plain Old Data Object.',
-    ].join(' '));
-  }
-
-  const { ws } = await obtainWebSocket();
-  ws.send(JSON.stringify({
-    type: 'payloadFromServer',
-    payload,
-  }));
-};
+  ws.on('close', () => {
+    console.log('Websocket is closed.');
+  });
+});

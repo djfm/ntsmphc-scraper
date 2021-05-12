@@ -14,6 +14,10 @@ import {
   deleteProject,
 } from '../../db';
 
+import {
+  SendPayloadFunc
+} from './webSocketsServerSide';
+
 interface WithURL {
   url: string;
 }
@@ -41,63 +45,69 @@ const isCreateProjectParams = (params: object): params is CreateProjectParams =>
 const isProject = (params: object): params is Project =>
   hasAllOwnProperties['projectName, id, startURL'];
 
-export const respond = async (action: string, params: object): Promise<any> => {
-  if (action === 'isRespondingHTTP') {
-    if (!hasURLParam(params)) {
-      throw new Error('Missing "url" param in "params" provided to action "isRespondingHTTP"');
-    }
-    return isRespondingHTTP(params.url);
-  }
-
-  if (action === 'createProject') {
-    if (!isCreateProjectParams(params)) {
-      throw new Error('Missing properties to qualify as a "params" for "createProject"');
-    }
-    const creationResult = await createProject(params);
-
-    if (isError(creationResult)) {
-      throw new Error(creationResult);
+export const respond = (sendPayload: SendPayloadFunc) =>
+  async (action: string, params: object): Promise<any> => {
+    if (action === 'isRespondingHTTP') {
+      if (!hasURLParam(params)) {
+        throw new Error('Missing "url" param in "params" provided to action "isRespondingHTTP"');
+      }
+      return isRespondingHTTP(params.url);
     }
 
-    return creationResult;
-  }
+    if (action === 'createProject') {
+      if (!isCreateProjectParams(params)) {
+        throw new Error('Missing properties to qualify as a "params" for "createProject"');
+      }
+      const creationResult = await createProject(params);
 
-  if (action === 'listProjects') {
-    const projects = await listProjects();
+      if (isError(creationResult)) {
+        throw new Error(creationResult);
+      }
 
-    if (isError(projects)) {
-      throw new Error(projects);
+      return creationResult;
     }
 
-    // quick & dirty way to convert iterator
-    // to plain old Array
-    return [...projects];
-  }
+    if (action === 'listProjects') {
+      const projects = await listProjects();
 
-  if (action === 'deleteProject') {
-    if (!hasProjectId(params)) {
-      throw new Error('Error: params provided to "deleteProject" miss property "projectId"');
+      if (isError(projects)) {
+        throw new Error(projects);
+      }
+
+      // quick & dirty way to convert iterator
+      // to plain old Array
+      return [...projects];
     }
 
-    const deleted = await deleteProject(params.projectId);
-    if (isError(deleted)) {
-      throw new Error(deleted);
+    if (action === 'deleteProject') {
+      if (!hasProjectId(params)) {
+        throw new Error('Error: params provided to "deleteProject" miss property "projectId"');
+      }
+
+      const deleted = await deleteProject(params.projectId);
+      if (isError(deleted)) {
+        throw new Error(deleted);
+      }
+
+      return deleted;
     }
 
-    return deleted;
-  }
+    if (action === 'startScraping') {
+      if (!isProject(params)) {
+        throw new Error('Error: invalid params provided to `startScraping`, should be a full Project meta-data.');
+      }
 
-  if (action === 'startScraping') {
-    if (!isProject(params)) {
-      throw new Error('Error: invalid params provided to `startScraping`, should be a full Project meta-data.');
+      const project: Project = params;
+
+      sendPayload({
+        type: 'test',
+        data: params,
+      });
+
+      return true;
     }
 
-    const project: Project = params;
-
-    return true;
-  }
-
-  throw new Error(`WebSocket: unknown server action "${action}"`);
-};
+    throw new Error(`WebSocket: unknown server action "${action}"`);
+  };
 
 export default respond;
