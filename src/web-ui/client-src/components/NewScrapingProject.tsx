@@ -99,8 +99,6 @@ const NewScrapingProject = () => {
       projectName,
     }).then(({ id }) => {
       const notificationMessage = `Successfully created project "${projectName}" (#${id}).`;
-      // eslint-disable-next-line no-console
-      console.log(notificationMessage);
       // do not forget to stop preventing navigation when
       // navigation is what we want :)
       setIsBlocking(false);
