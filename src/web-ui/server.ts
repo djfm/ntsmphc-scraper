@@ -64,7 +64,7 @@ export type ObtainedWebSocket = {
 };
 
 const obtainWebSocket = async (): Promise<ObtainedWebSocket> => {
-  if (globalWebSocket === undefined || globalWebSocket.readyState >= 2) {
+  if (globalWebSocket === undefined || globalWebSocket.readyState !== 1) {
     const ws = await createNewWebSocket();
     globalWebSocket = ws;
 
