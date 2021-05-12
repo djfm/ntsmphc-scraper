@@ -43,7 +43,7 @@ const isCreateProjectParams = (params: object): params is CreateProjectParams =>
   hasAllOwnProperties(['startURL', 'projectName'])(params);
 
 const isProject = (params: object): params is Project =>
-  hasAllOwnProperties['projectName, id, startURL'];
+  hasAllOwnProperties(['projectName', 'id', 'startURL'])(params);
 
 export const respond = (sendPayload: SendPayloadFunc) =>
   async (action: string, params: object): Promise<any> => {
