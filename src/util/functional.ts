@@ -15,3 +15,11 @@ export const keyValueArrayToMap = (arr) => {
 export function compose2 <A, B, C>(f: (a: A) => B, g: (b: B) => C): (a: A) => C {
   return (a: A) => g(f(a));
 }
+
+export const objectToMap = (obj: object): Map<string, any> => {
+  const map = new Map<string, any>();
+  for (const key of Object.keys(obj)) {
+    map.set(key, obj[key]);
+  }
+  return map;
+};

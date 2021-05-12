@@ -2,6 +2,10 @@ import {
   JSONParseError,
 } from '../../errors';
 
+import {
+  objectToMap,
+} from '../../util/functional';
+
 const { host } = window.location;
 
 type ResolveCallback = (data: any) => any;
@@ -45,6 +49,46 @@ const tryToParseJSON = (str: string): any => {
   }
 };
 
+const resolveRequest = (data: Map<string, any>): boolean => {
+  const id = data.get('id');
+  if (pendingRequests.has(id)) {
+    const { resolve, reject } = pendingRequests.get(id);
+    if (data.has('err')) {
+      reject(data.get('err'));
+    } else {
+      resolve(data.get('response'));
+    }
+    pendingRequests.delete(id);
+    // eslint-disable-next-line no-console
+    console.log(`[Pending Request Settled] ${pendingRequests.size} remaining`);
+    return true;
+  }
+
+  // eslint-disable-next-line no-console
+  console.error(`Could not resolve request with id "${id}".`);
+  return false;
+};
+
+const setupListeners = (s: WebSocket) => {
+  s.addEventListener('message', (event: MessageEvent) => {
+    try {
+      const data = objectToMap(tryToParseJSON(event.data));
+      // TODO find a better way to encode the fact that this
+      // is a response to a request
+      if (data.has('id')) {
+        resolveRequest(data);
+      }
+    } catch (err) {
+      if (!(err instanceof JSONParseError)) {
+        throw err;
+      }
+
+      // eslint-disable-next-line no-console
+      console.error(err);
+    }
+  });
+};
+
 const ensureConnectionToServer = async (): Promise<WebSocket> => {
   const oldSocket = socket;
 
@@ -64,34 +108,7 @@ const ensureConnectionToServer = async (): Promise<WebSocket> => {
   // we got a new socket, so we need to setup
   // its handlers for the app to function properly
   if (oldSocket !== socket) {
-    socket.addEventListener('message', (event: MessageEvent) => {
-      // eslint-disable-next-line no-console
-      console.log(`Currently, ${pendingRequests.size} requests are pending.`);
-      try {
-        const data = tryToParseJSON(event.data);
-        if (pendingRequests.has(data.id)) {
-          const { resolve, reject } = pendingRequests.get(data.id);
-          if (data.err) {
-            reject(data.err);
-          } else {
-            resolve(data.response);
-          }
-          pendingRequests.delete(data.id);
-          // eslint-disable-next-line no-console
-          console.log(`I settled one, so now, ${pendingRequests.size} are pending.`);
-        } else {
-          // eslint-disable-next-line no-console
-          console.error('Received JSON message I could not understand: ', data);
-        }
-      } catch (err) {
-        if (!(err instanceof JSONParseError)) {
-          throw err;
-        }
-
-        // eslint-disable-next-line no-console
-        console.error(err);
-      }
-    });
+    setupListeners(socket);
   }
 
   return socket;
