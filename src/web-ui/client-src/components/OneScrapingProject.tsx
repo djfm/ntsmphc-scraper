@@ -72,7 +72,7 @@ const OneScrapingProject = () => {
   const handleStartScraping = (event: BaseSyntheticEvent) => {
     event.preventDefault();
 
-    askServer('startSraping', { project }).then(
+    askServer('startScraping', { project }).then(
       (res: any) => {
 
       },
