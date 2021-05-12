@@ -29,7 +29,6 @@ import {
 import {
   Notification,
 } from '../redux/reducers/notifications';
-import { timeStamp } from 'console';
 
 const Notifications = () => {
   const notifications = useSelector(getAllNotifications);

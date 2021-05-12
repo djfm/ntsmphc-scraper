@@ -19,6 +19,7 @@ import {
   createMapObjectFromJSONFilePath,
   writeJSONFileFromMapObject,
 } from './util/fs';
+import { readFile } from 'fs/promises';
 
 export interface CreateProjectParams {
   startURL: string;
@@ -27,7 +28,7 @@ export interface CreateProjectParams {
 
 export type ErrorMessage = string;
 
-export type MaybeError = true | ErrorMessage | object
+export type MaybeError = true | ErrorMessage | object | number
 
 export const isError = (dunnoWhat: MaybeError): dunnoWhat is ErrorMessage => {
   if (typeof dunnoWhat === 'string') {
@@ -47,6 +48,7 @@ export const isSafeKeyForObjectMap = (keyName: string) => {
 const dbRootPath = path.resolve(__dirname, '..', 'local-database');
 
 const projectsFilePath = path.join(dbRootPath, 'projects.json');
+const maxUIDFilePath = path.join(dbRootPath, 'maxUID.json');
 
 const lockAndUse = (fileToUsePath: string) =>
   async (fnToRun: RunWithLockedFileFunction): Promise<MaybeError> => {
@@ -98,7 +100,21 @@ const lockAndUse = (fileToUsePath: string) =>
     return fnResult;
   };
 
-const createProjectInMemory = (params: CreateProjectParams) =>
+const getUID = () => lockAndUse(maxUIDFilePath)(async (dbPath: string): Promise <MaybeError> => {
+  try {
+    const contents = await readFile(dbPath);
+    const maxId = parseFloat(contents.toString());
+    const newMaxId = maxId + 1;
+    await writeFile(dbPath, `${newMaxId}`);
+    return newMaxId;
+  } catch (err) {
+    const maxId = 1;
+    await writeFile(dbPath, `${maxId}`);
+    return maxId;
+  }
+});
+
+const createProjectInMemory = (params: CreateProjectParams, id: number) =>
   (storage: GenericMap): MaybeError => {
     const { projectName } = params;
 
@@ -109,8 +125,6 @@ const createProjectInMemory = (params: CreateProjectParams) =>
     if (storage.has(projectName)) {
       return `Error: project already exists. Project name: "${projectName}".`;
     }
-
-    const id = storage.size + 1;
 
     const projectMetaData = {
       id,
@@ -135,7 +149,17 @@ const obtainProjectsStore = async () => {
 export const createProject = async (params: CreateProjectParams): Promise<MaybeError> =>
   lockAndUse(projectsFilePath)(async (): Promise<MaybeError> => {
     const store: GenericMap = await obtainProjectsStore();
-    const created = createProjectInMemory(params)(store);
+    const id = await getUID();
+
+    if (isError(id)) {
+      throw new Error('Error: unable to get UID.');
+    }
+
+    if (typeof id !== 'number') {
+      throw new Error('Error: unexpected uid type.');
+    }
+
+    const created = createProjectInMemory(params, id)(store);
 
     if (!isError(created)) {
       await writeJSONFileFromMapObject(projectsFilePath)(store);
