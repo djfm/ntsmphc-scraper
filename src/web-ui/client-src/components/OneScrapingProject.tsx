@@ -17,6 +17,8 @@ const OneScrapingProject = () => {
   const id: number = parseFloat(routerParams.id);
   const project = useSelector(getProjectById(id));
 
+  const createdDate = new Date(project.createdAt);
+
   if (project === undefined) {
     return (
       <main>
@@ -30,10 +32,12 @@ const OneScrapingProject = () => {
     <main>
       <h1>Scraping Project &quot;{project.projectName}&quot; (#{id})</h1>
       <p>
-        Here is some basic info about this project:
+        <strong>Here is some basic info about this project</strong>:
         <dl>
-          <dt>Start URL</dt>
+          <dt>Start URL:</dt>
           <dd>{project.startURL}</dd>
+          <dt>Creation date:</dt>
+          <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
         </dl>
       </p>
     </main>
