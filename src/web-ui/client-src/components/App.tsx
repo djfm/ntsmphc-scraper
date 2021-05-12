@@ -29,6 +29,7 @@ import {
 import {
   Notification,
 } from '../redux/reducers/notifications';
+import { timeStamp } from 'console';
 
 const Notifications = () => {
   const notifications = useSelector(getAllNotifications);
@@ -57,11 +58,16 @@ const Notifications = () => {
     );
   };
 
+  const date = (ts: number) => {
+    const d = new Date(ts);
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+  };
+
   return (
     <div>
       {notifications.map((notification: Notification) => (
         <aside key={notification.id} role="alert">
-          <p>{notification.message}</p>
+          <p>[{date(notification.createdAt)}]: <strong>{notification.message}</strong></p>
           {maybeRenderDismissButton(notification)}
         </aside>
       ))}

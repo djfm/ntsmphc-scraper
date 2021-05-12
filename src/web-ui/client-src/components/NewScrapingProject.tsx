@@ -29,6 +29,7 @@ import {
 
 import {
   addNotificationAction,
+  addProjectAction,
 } from '../redux/actions';
 
 const isValidURL = (url: string) => {
@@ -97,12 +98,13 @@ const NewScrapingProject = () => {
     askServer('createProject', {
       startURL,
       projectName,
-    }).then(({ id }) => {
-      const notificationMessage = `Successfully created project "${projectName}" (#${id}).`;
+    }).then((project: any) => {
+      const notificationMessage = `Successfully created project "${project.projectName}" (#${project.id}).`;
       // do not forget to stop preventing navigation when
       // navigation is what we want :)
       setIsBlocking(false);
-      history.push(`/projects/${id}`);
+      dispatch(addProjectAction(project));
+      history.push(`/projects/${project.id}`);
       dispatch(addNotificationAction({
         message: notificationMessage,
         severity: 'success',

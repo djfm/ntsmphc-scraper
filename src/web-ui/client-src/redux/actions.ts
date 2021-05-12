@@ -12,6 +12,7 @@ export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 
 export const SET_PROJECTS = 'SET_PROJECTS';
 export const DELETE_PROJECT = 'DELETE_PROJECT';
+export const ADD_PROJECT = 'ADD_PROJECT';
 
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
@@ -47,4 +48,9 @@ export const setProjectsAction = (projects: object[]) => ({
 export const deleteProjectAction = (id: number) => ({
   type: DELETE_PROJECT,
   id,
+});
+
+export const addProjectAction = (project: any) => ({
+  type: ADD_PROJECT,
+  project,
 });
