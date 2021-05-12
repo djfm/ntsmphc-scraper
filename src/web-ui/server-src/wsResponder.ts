@@ -102,7 +102,7 @@ export const respond = async (action: string, params: object): Promise<any> => {
 
   if (action === 'startScraping') {
     if (!isProject(params)) {
-      throw new Error('Invalid params provided to `startScraping`, should be a full Project meta-data.');
+      throw new Error('Error: invalid params provided to `startScraping`, should be a full Project meta-data.');
     }
 
     const project: Project = params;
