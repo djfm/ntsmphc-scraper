@@ -18,6 +18,13 @@ interface WithProjectId {
   projectId: number;
 }
 
+type Project = {
+  id: number;
+  startURL: string;
+  projetName: string;
+  createdAt: number,
+}
+
 // TODO what should we return when we get an empty array of propNames?
 // current behavior is to bug, which is OK for my use case but not
 // very clean.
@@ -43,6 +50,9 @@ const hasProjectId = (params: object): params is WithProjectId =>
 
 const isCreateProjectParams = (params: object): params is CreateProjectParams =>
   hasAllOwnProperties(['startURL', 'projectName'])(params);
+
+const isProject = (params: object): params is Project =>
+  hasAllOwnProperties['projectName, id, startURL'];
 
 export const respond = async (action: string, params: object): Promise<any> => {
   if (action === 'isRespondingHTTP') {
@@ -88,6 +98,16 @@ export const respond = async (action: string, params: object): Promise<any> => {
     }
 
     return deleted;
+  }
+
+  if (action === 'startScraping') {
+    if (!isProject(params)) {
+      throw new Error('Invalid params provided to `startScraping`, should be a full Project meta-data.');
+    }
+
+    const project: Project = params;
+
+    return true;
   }
 
   throw new Error(`WebSocket: unknown server action "${action}"`);

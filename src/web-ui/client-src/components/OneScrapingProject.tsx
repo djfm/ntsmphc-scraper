@@ -1,5 +1,7 @@
 import React, { BaseSyntheticEvent } from 'react';
 
+// TODO lots of factorization in this file
+
 import {
   useSelector,
   useDispatch,
@@ -49,6 +51,20 @@ const OneScrapingProject = () => {
     );
   };
 
+  const handleStartScraping = (event: BaseSyntheticEvent) => {
+    event.preventDefault();
+
+    askServer('startSraping', { project }).then(
+      (res: any) => {
+
+      },
+      (err: Error) => dispatch(addNotificationAction({
+        message: err.message,
+        severity: 'error',
+      })),
+    );
+  };
+
   if (project === undefined) {
     return (
       <main>
@@ -64,12 +80,15 @@ const OneScrapingProject = () => {
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
       <p>
         <strong>Here is some basic info about this project</strong>:
-        <dl>
-          <dt>Start URL:</dt>
-          <dd>{project.startURL}</dd>
-          <dt>Creation date:</dt>
-          <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
-        </dl>
+      </p>
+      <dl>
+        <dt>Start URL:</dt>
+        <dd>{project.startURL}</dd>
+        <dt>Creation date:</dt>
+        <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
+      </dl>
+      <p>
+        <button type="button" onClick={handleStartScraping}>Start Scraping</button>
       </p>
       <p>
         <button type="button" onClick={handleProjectDeletion(id)}>

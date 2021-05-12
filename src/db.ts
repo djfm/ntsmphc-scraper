@@ -7,6 +7,7 @@ import path from 'path';
 import {
   writeFile,
   unlink,
+  readFile,
 } from 'fs/promises';
 
 // for watching files, see:
@@ -19,7 +20,6 @@ import {
   createMapObjectFromJSONFilePath,
   writeJSONFileFromMapObject,
 } from './util/fs';
-import { readFile } from 'fs/promises';
 
 export interface CreateProjectParams {
   startURL: string;
