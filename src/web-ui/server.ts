@@ -88,9 +88,6 @@ const connectToUIUsingWebSocket = async () => {
 
 connectToUIUsingWebSocket();
 
-// TODO this doesn't make sense to export
-// because nothing can import server.ts,
-// which is the entry point.
 export const sendPayloadToUI = async (payload: object) => {
   if (payload instanceof Array) {
     throw new Error([
