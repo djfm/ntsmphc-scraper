@@ -25,6 +25,8 @@ export const messageReceived = (ws: WebSocket) =>
     // eslint-disable-next-line no-console
     console.log('Received from UI:', message);
     try {
+      // TODO extract JSON.parse to use `tryToParseJSON`
+      // defined in webSocketsUISide.ts at the time of writing
       const { id, action, params }: WSRequest = JSON.parse(dataToString(message));
       try {
         const response = await respond(action, params);
