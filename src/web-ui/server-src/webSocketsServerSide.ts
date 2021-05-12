@@ -20,33 +20,34 @@ const dataToString = (data: WebSocket.Data): string => {
   throw new Error('unexpected data type when trying to convert to string');
 };
 
-export const messageReceived = async (message: WebSocket.Data, ws: WebSocket) => {
-  // eslint-disable-next-line no-console
-  console.log('Received from UI:', message);
-  try {
-    const { id, action, params }: WSRequest = JSON.parse(dataToString(message));
-    try {
-      const response = await respond(action, params);
-      ws.send(JSON.stringify({
-        id,
-        response,
-      }));
-    } catch (couldNotRespondErr) {
-      const props = Object.getOwnPropertyNames(couldNotRespondErr);
-      const errObj = {};
-      for (const prop of props) {
-        errObj[prop] = couldNotRespondErr[prop];
-      }
-      ws.send(JSON.stringify({
-        id,
-        err: errObj,
-      }));
-    }
-  } catch (err) {
-    // TODO something with the error
+export const messageReceived = (ws: WebSocket) =>
+  async (message: WebSocket.Data) => {
     // eslint-disable-next-line no-console
-    console.log(err);
-  }
-};
+    console.log('Received from UI:', message);
+    try {
+      const { id, action, params }: WSRequest = JSON.parse(dataToString(message));
+      try {
+        const response = await respond(action, params);
+        ws.send(JSON.stringify({
+          id,
+          response,
+        }));
+      } catch (couldNotRespondErr) {
+        const props = Object.getOwnPropertyNames(couldNotRespondErr);
+        const errObj = {};
+        for (const prop of props) {
+          errObj[prop] = couldNotRespondErr[prop];
+        }
+        ws.send(JSON.stringify({
+          id,
+          err: errObj,
+        }));
+      }
+    } catch (err) {
+      // TODO something with the error
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
 
 export default messageReceived;

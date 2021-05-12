@@ -39,13 +39,66 @@ const server = app.listen(port, () => {
   console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
 });
 
-const wss = new WebSocket.Server({
-  server,
-  path: '/wss-internal',
-});
+let globalWebSocket: WebSocket;
 
-wss.on('connection', (ws) => {
-  ws.on('message', (message) => {
-    messageReceived(message, ws);
+const createNewWebSocket = async (): Promise<WebSocket> => {
+  const wss = new WebSocket.Server({
+    server,
+    path: '/wss-internal',
   });
-});
+
+  return new Promise<WebSocket>((resolve) => {
+    wss.on('connection', (ws) => {
+      resolve(ws);
+    });
+  });
+};
+
+export type ObtainedWebSocket = {
+  ws: WebSocket;
+  isNew: true | false;
+};
+
+const obtainWebSocket = async (): Promise<ObtainedWebSocket> => {
+  if (globalWebSocket === undefined || globalWebSocket.readyState >= 2) {
+    const ws = await createNewWebSocket();
+    globalWebSocket = ws;
+
+    return {
+      ws,
+      isNew: true,
+    };
+  }
+
+  return {
+    ws: globalWebSocket,
+    isNew: false,
+  };
+};
+
+const connectToUIUsingWebSocket = async () => {
+  const { ws, isNew } = await obtainWebSocket();
+
+  if (isNew) {
+    ws.on('message', (message: any) => {
+      messageReceived(ws)(message);
+    });
+  }
+};
+
+connectToUIUsingWebSocket();
+
+export const sendPayloadToUI = async (payload: object) => {
+  if (payload instanceof Array) {
+    throw new Error([
+      'Sending array payload to the UI is not supported.',
+      'The payload must be a Plain Old Data Object.',
+    ].join(' '));
+  }
+
+  const { ws } = await obtainWebSocket();
+  ws.send(JSON.stringify({
+    type: 'payloadFromServer',
+    payload,
+  }));
+};
