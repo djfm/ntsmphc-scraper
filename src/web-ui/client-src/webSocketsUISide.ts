@@ -3,6 +3,10 @@ import {
 } from '../../errors';
 
 import {
+  tryToParseJSON,
+} from '../../util/json';
+
+import {
   objectToMap,
 } from '../../util/functional';
 
@@ -40,14 +44,6 @@ const createNewSocket = async (): Promise<WebSocket> => {
 
     s.addEventListener('open', () => resolve(s));
   });
-};
-
-const tryToParseJSON = (str: string): any => {
-  try {
-    return JSON.parse(str);
-  } catch (err) {
-    throw new JSONParseError(err.message ?? 'Could not parse string as JSON.');
-  }
 };
 
 const resolveRequest = (data: Map<string, any>): boolean => {
