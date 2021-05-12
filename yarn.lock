@@ -2051,6 +2051,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/redux@npm:^3.6.0":
+  version: 3.6.31
+  resolution: "@types/redux@npm:3.6.31"
+  checksum: cf977fc072b3b4ac527308fffd6631aeaaa5e076015e170c4865ec2cc3f6ff039b4402b9b5bf44496588f8e6b1c6394c9680e3da8a5798d34adff9231ddccc0d
+  languageName: node
+  linkType: hard
+
 "@types/scheduler@npm:*":
   version: 0.16.1
   resolution: "@types/scheduler@npm:0.16.1"
@@ -8485,6 +8492,7 @@ fsevents@^1.2.7:
     "@types/react-dom": ^17.0.3
     "@types/react-redux": ^7.1.16
     "@types/react-router-dom": ^5.1.7
+    "@types/redux": ^3.6.0
     "@types/redux-devtools-extension": ^2.13.2
     "@types/webpack": 4.x
     "@types/webpack-dev-middleware": ^4.1.3
