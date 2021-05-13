@@ -34,13 +34,6 @@ interface WithProjectId {
   projectId: number;
 }
 
-type Project = {
-  id: number;
-  startURL: string;
-  projetName: string;
-  createdAt: number,
-}
-
 type ScrapingTaskParams = {
   projectId: number;
   startURL: string;
