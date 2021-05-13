@@ -1,3 +1,7 @@
+import {
+  JSONParseError,
+} from '../errors';
+
 export const tryToParseJSON = (str: string): any => {
   try {
     return JSON.parse(str);
