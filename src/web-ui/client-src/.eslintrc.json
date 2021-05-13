@@ -55,6 +55,8 @@
     // Why TF do I have to re-disable this rule,
     // which is already disabled in root .eslintrc.json
     "implicit-arrow-linebreak": 0,
-    "no-restricted-syntax": 0
+    "no-restricted-syntax": 0,
+    "global-require": 0,
+    "node/no-missing-require": 0
   }
 }
