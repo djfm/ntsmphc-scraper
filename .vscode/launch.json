@@ -39,6 +39,27 @@
         "NODE_ENV": "development",
         "PATH": "${workspaceFolder}/node_modules/.bin:${env:PATH}"
       }
+    },
+    {
+      "name": "UI Debugger - New chrome instance",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8080/",
+      "webRoot": "${workspaceFolder}/src/web-ui/client-src"
+    },
+    {
+      // To make this work, you need to launch chrome with
+      // remote debugging enabled, like this:
+      // #> google-chrome --remote-debugging-port=9222
+      // You'll need to close all chrome windows before being
+      // able to launch a remote-debug enabled session,
+      // at least under Linux.
+      "name": "UI Debugger - Attached chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "url": "http://localhost:8080/",
+      "webRoot": "${workspaceFolder}/src/web-ui/client-src"
     }
   ],
 }
