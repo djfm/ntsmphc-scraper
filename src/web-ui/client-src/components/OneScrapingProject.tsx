@@ -72,7 +72,13 @@ const OneScrapingProject = () => {
   const handleStartScraping = (event: BaseSyntheticEvent) => {
     event.preventDefault();
 
-    askServer('startScraping', project).then(
+    const scrapingParams = {
+      projectId: project.id,
+      nParallel,
+      startURL: project.startURL,
+    };
+
+    askServer('startScraping', scrapingParams).then(
       (res: any) => {
 
       },

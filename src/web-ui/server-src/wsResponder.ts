@@ -7,6 +7,10 @@ import {
 } from '../../util/functional';
 
 import {
+  addNotificationAction,
+} from '../client-src/redux/actions';
+
+import {
   CreateProjectParams,
   isError,
   createProject,
@@ -17,6 +21,10 @@ import {
 import {
   SendPayloadFunc,
 } from './webSocketsServerSide';
+
+import {
+  PAYLOAD_TYPE_REDUX_ACTION,
+} from '../../constants';
 
 interface WithURL {
   url: string;
@@ -33,6 +41,15 @@ type Project = {
   createdAt: number,
 }
 
+type ScrapingTaskParams = {
+  projectId: number;
+  startURL: string;
+  /**
+   * How many headless chrome instances to launch.
+   */
+  nParallel: number;
+}
+
 const hasURLParam = (params: object): params is WithURL =>
   Object.prototype.hasOwnProperty.call(params, 'url');
 
@@ -42,8 +59,13 @@ const hasProjectId = (params: object): params is WithProjectId =>
 const isCreateProjectParams = (params: object): params is CreateProjectParams =>
   hasAllOwnProperties(['startURL', 'projectName'])(params);
 
-const isProject = (params: object): params is Project =>
-  hasAllOwnProperties(['projectName', 'id', 'startURL'])(params);
+// TODO I feel like I'm duplicating a lot of code here
+// Isn't there a smarter way to do what I'm doing ?
+// Google is pretty vague when it comes to advanced
+// type issues. Need to RTFM. Need more time.
+// Will leave it like that for now.
+const isScrapingTaskParams = (params: object): params is ScrapingTaskParams =>
+  hasAllOwnProperties(['projectId', 'startURL', 'nParallel'])(params);
 
 export const respond = (sendPayload: SendPayloadFunc) =>
   async (action: string, params: object): Promise<any> => {
@@ -93,15 +115,15 @@ export const respond = (sendPayload: SendPayloadFunc) =>
     }
 
     if (action === 'startScraping') {
-      if (!isProject(params)) {
-        throw new Error('Error: invalid params provided to `startScraping`, should be a full Project meta-data.');
+      if (!isScrapingTaskParams(params)) {
+        throw new Error('Error: invalid params provided to `startScraping`.');
       }
 
-      const project: Project = params;
-
       sendPayload({
-        type: 'test',
-        data: project,
+        type: PAYLOAD_TYPE_REDUX_ACTION,
+        action: addNotificationAction({
+          message: `Starting scraping from "${params.startURL}"...`,
+        }),
       });
 
       return true;
