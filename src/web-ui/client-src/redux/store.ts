@@ -12,7 +12,9 @@ if (process.env.NODE_ENV !== 'production' && module.hot) {
   module.hot.accept('./reducers/index', () => {
     // eslint-disable-next-line no-console
     console.log("[HMR] Attempting hot-reload of redux store's reducer...");
-    store.replaceReducer(rootReducer);
+
+    const nextReducer = require('./reducers/index');
+    store.replaceReducer(nextReducer);
   });
 }
 

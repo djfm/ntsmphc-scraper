@@ -28,17 +28,13 @@ const render = () => {
 addOnInfoCallback(handlePayloadFromServer(store));
 
 if (process.env.NODE_ENV !== 'production' && module.hot) {
-  module.hot.accept('./components/App', () => {
-    // TODO check if it works,
-    // it seems to, but I have a feeling it's only working thanks to react-refresh
-    // eslint-disable-next-line no-console
-    console.log('[HMR] Attempting to hot-reload React app...');
-    render();
-  });
-
   module.hot.accept('./handlePayloadFromServer', () => {
+    // eslint-disable-next-line no-console
+    console.log('[HMR] Attempting to hot-reload on-info callbacks...');
     clearOnInfoCallbacks();
-    addOnInfoCallback(handlePayloadFromServer(store));
+
+    const next = require('./webSocketsUISide');
+    next.addOnInfoCallback(next.handlePayloadFromServer(store));
   });
 }
 
