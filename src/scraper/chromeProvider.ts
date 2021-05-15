@@ -76,11 +76,14 @@ export type ChromeDOM = {
   querySelectorAll: (options: QuerySelectorOptions) => Promise<{nodeIds: number[]}>
 };
 
+type ByeFunction = () => any;
+
 export type ChromeProtocol = {
   Network: any;
   Page: any;
   Runtime: any;
   DOM: ChromeDOM;
+  terminate: (onTerminate?: ByeFunction) => void;
 };
 
 // TODO support specifying window size
@@ -99,6 +102,15 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     Runtime,
     DOM,
   } = protocol;
+
+  protocol.terminate = (onTerminate?: ByeFunction) => {
+    if (onTerminate) {
+      onTerminate();
+    }
+
+    protocol.close();
+    chrome.kill();
+  };
 
   // Apparently this needs to be done before starting to use
   // the APIs.

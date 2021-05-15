@@ -157,9 +157,6 @@ const scrapeURL = (
 
           const to = linkCanonical || href;
 
-          // eslint-disable-next-line no-console
-          console.log(`Looking at link: ${to}...`);
-
           if (!to) {
             // TODO handle this case properly
             // dunno what it means...
@@ -205,6 +202,10 @@ const scrapeURL = (
       }
     });
 
+export const waitMs = async (milliseconds: number) => new Promise((resolve) => {
+  setTimeout(resolve, milliseconds);
+});
+
 export const startScraping = (notifiers: ScraperNotifiers) =>
   async (params: ScrapingTaskParams) => {
     const {
@@ -214,10 +215,69 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     const scrape = scrapeURL(isInternalURL, normalizeURL);
 
-    const protocol = await chromeProvider();
+    const urlsRemaining = new Set();
+    const urlsSeen = new Set();
+    let nChromesRunning = 0;
 
-    const result = await scrape(protocol)(params.startURL);
-    notifiers.notifyPageScraped(result);
+    urlsRemaining.add(params.startURL);
 
-    return result;
+    const startAChrome = async (): Promise<number> => {
+      let urlsScrapedCount = 0;
+      if (urlsRemaining.size > 0 && nChromesRunning < params.nParallel) {
+        nChromesRunning += 1;
+
+        const protocol = await chromeProvider();
+
+        const processOneURL = async (): Promise<number> => {
+          if (urlsRemaining.size === 0) {
+            return urlsScrapedCount;
+          }
+
+          const { value: nextURL } = urlsRemaining.values().next();
+
+          console.log(`Now scraping URL: ${nextURL} and there remain ${urlsRemaining.size}...`);
+
+          urlsRemaining.delete(nextURL);
+          urlsSeen.add(normalizeURL(nextURL));
+
+          const result = await scrape(protocol)(params.startURL);
+
+          for (const [url, canonical] of result.internalURLs.entries()) {
+            const toScrape = canonical || url;
+            if (toScrape && !urlsSeen.has(toScrape)) {
+              urlsRemaining.add(toScrape);
+            }
+          }
+
+          notifiers.notifyPageScraped(result);
+          urlsScrapedCount += 1;
+
+          // TODO clear cookies here if wanted, between two pages
+          // seen by the same browser
+
+          if (urlsRemaining.size > 0) {
+            processOneURL();
+            const chromesStarted = [];
+            while (nChromesRunning < params.nParallel && nChromesRunning < urlsRemaining.size) {
+              // wait a bit in order not to overload chrome
+              waitMs(500);
+              console.log('Starting a chrome!');
+              chromesStarted.push(startAChrome());
+            }
+            return Promise.all(chromesStarted).then(
+              (counts) => counts.reduce((total, current) => total + current, 0),
+            );
+          }
+          protocol.terminate();
+          nChromesRunning -= 1;
+          return urlsScrapedCount;
+        };
+
+        return processOneURL();
+      }
+
+      return urlsScrapedCount;
+    };
+
+    return startAChrome();
   };
