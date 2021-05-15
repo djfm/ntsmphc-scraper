@@ -41,6 +41,10 @@ export type ScrapeResult = {
   problematicURLs: Map<urlString, URLProblem[]>;
 };
 
+export type ScraperNotifiers = {
+  notifyPageScraped: (result: ScrapeResult) => any;
+};
+
 type StrToStrFunc = (input: string) => string;
 
 const extractCanonical = async (
@@ -201,10 +205,6 @@ const scrapeURL = (
         }
       }
     });
-
-export type ScraperNotifiers = {
-  notifyPageScraped: (result: ScrapeResult) => any;
-};
 
 export const startScraping = (notifiers: ScraperNotifiers) =>
   async (params: ScrapingTaskParams) => {
