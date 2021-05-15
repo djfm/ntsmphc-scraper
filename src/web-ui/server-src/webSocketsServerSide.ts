@@ -8,6 +8,11 @@ import {
   respond,
 } from './wsResponder';
 
+import {
+  serialize,
+  deserialize,
+} from '../../util/serialization';
+
 const dataToString = (data: WebSocket.Data): string => {
   if (data instanceof Buffer) {
     return data.toString();
@@ -26,31 +31,23 @@ export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
   async (message: WebSocket.Data) => {
     // eslint-disable-next-line no-console
     console.log('Received from UI:', message);
+    const { id, action, params } = deserialize(dataToString(message)) as WSRequest;
     try {
-      // TODO extract JSON.parse to use `tryToParseJSON`
-      // defined in webSocketsUISide.ts at the time of writing
-      const { id, action, params }: WSRequest = JSON.parse(dataToString(message));
-      try {
-        const response = await respond(sendPayload)(action, params);
-        ws.send(JSON.stringify({
-          id,
-          response,
-        }));
-      } catch (couldNotRespondErr) {
-        const props = Object.getOwnPropertyNames(couldNotRespondErr);
-        const errObj = {};
-        for (const prop of props) {
-          errObj[prop] = couldNotRespondErr[prop];
-        }
-        ws.send(JSON.stringify({
-          id,
-          err: errObj,
-        }));
+      const response = await respond(sendPayload)(action, params);
+      ws.send(serialize({
+        id,
+        response,
+      }));
+    } catch (couldNotRespondErr) {
+      const props = Object.getOwnPropertyNames(couldNotRespondErr);
+      const errObj = {};
+      for (const prop of props) {
+        errObj[prop] = couldNotRespondErr[prop];
       }
-    } catch (err) {
-      // TODO something with the error
-      // eslint-disable-next-line no-console
-      console.log(err);
+      ws.send(serialize({
+        id,
+        err: errObj,
+      }));
     }
   };
 

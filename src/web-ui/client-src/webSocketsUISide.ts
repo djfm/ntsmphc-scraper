@@ -10,6 +10,11 @@ import {
   objectToMap,
 } from '../../util/functional';
 
+import {
+  serialize,
+  deserialize,
+} from '../../util/serialization';
+
 type ResolveCallback = (data: any) => any;
 type RejectCallback = (reason: any) => any;
 type OnInfoCallback = (data: Map<string, any>) => any;
@@ -46,14 +51,15 @@ const createNewSocket = async (): Promise<WebSocket> => {
   });
 };
 
-const resolveRequest = (data: Map<string, any>): boolean => {
-  const id = data.get('id');
+// TODO some type checking, any is bad
+const resolveRequest = (data: any): boolean => {
+  const { id } = data;
   if (pendingRequests.has(id)) {
     const { resolve, reject } = pendingRequests.get(id);
-    if (data.has('err')) {
-      reject(data.get('err'));
+    if (data.err) {
+      reject(data.err);
     } else {
-      resolve(data.get('response'));
+      resolve(data.response);
     }
     pendingRequests.delete(id);
     // eslint-disable-next-line no-console
@@ -74,35 +80,27 @@ const handleInfoReceivedFromServer = (payload: Map<string, any>) => {
 
 const setupEventListeners = (s: WebSocket) => {
   s.addEventListener('message', (event: MessageEvent) => {
-    try {
-      const data = objectToMap(tryToParseJSON(event.data));
-      // TODO find a better way to encode the fact that this
-      // is a response to a request
-      if (data.has('id')) {
-        resolveRequest(data);
-      } else if (data.has('payload')) {
-        // when we get a message we didn't ask for
-        const payloadReceived = data.get('payload');
+    console.log('[̣̣§§§] Data received by UI:', event.data);
+    const data = deserialize(event.data);
+    console.log('[̣̣%%%] Data parsed on UI:', data);
 
-        if (typeof payloadReceived !== 'object') {
-          throw new Error('The "payload" should be an object.');
-        }
+    if (Object.prototype.hasOwnProperty.call(data, 'id')) {
+      resolveRequest(data);
+    } else if (data.payload) {
+      // when we get a message we didn't ask for
+      const payloadReceived = data.payload;
 
-        if (payloadReceived instanceof Array) {
-          throw new Error('Received an array as "payload".');
-        }
-
-        const payload = objectToMap(payloadReceived);
-
-        handleInfoReceivedFromServer(payload);
-      }
-    } catch (err) {
-      if (!(err instanceof JSONParseError)) {
-        throw err;
+      if (typeof payloadReceived !== 'object') {
+        throw new Error('The "payload" should be an object.');
       }
 
-      // eslint-disable-next-line no-console
-      console.error(err);
+      if (payloadReceived instanceof Array) {
+        throw new Error('Received an array as "payload".');
+      }
+
+      const payload = objectToMap(payloadReceived);
+
+      handleInfoReceivedFromServer(payload);
     }
   });
 };
@@ -141,7 +139,7 @@ export const askServer = async (action: string, params: object) => {
     params,
   };
 
-  s.send(JSON.stringify(request));
+  s.send(serialize(request));
 
   let resolver: PromiseSettler;
 

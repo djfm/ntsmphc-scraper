@@ -9,6 +9,10 @@ import webpack from 'webpack';
 import webpackConfig from '../../webpack.config';
 import messageReceived from './server-src/webSocketsServerSide';
 
+import {
+  serialize,
+} from '../util/serialization';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const app = express();
@@ -46,15 +50,7 @@ const wss = new WebSocket.Server({
 
 const sendPayloadToUI = (ws: WebSocket) =>
   async (payload: object) => {
-    if (payload instanceof Array) {
-      throw new Error([
-        'Sending an array payload to the UI is not supported.',
-        'The payload must be a Plain Old Data Object.',
-        'Not even a literal value. An object that is serializable to JSON.',
-      ].join(' '));
-    }
-
-    ws.send(JSON.stringify({
+    ws.send(serialize({
       type: 'payloadFromServer',
       payload,
     }));
@@ -62,6 +58,8 @@ const sendPayloadToUI = (ws: WebSocket) =>
 
 wss.on('connection', (ws: WebSocket) => {
   ws.on('message', (message: any) => {
+    // TODO rename messageReceived to something like handleMessageReceived
+    // because it took me 5 minutes to grasp what this line meant
     messageReceived(ws, sendPayloadToUI(ws))(message);
   });
 
