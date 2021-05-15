@@ -39,7 +39,7 @@ if (!startURL) {
 
 const parsedStartURL = new URL(startURL);
 
-const { normalizeURL, shouldScrapeURL } = makeURLHelpers(parsedStartURL);
+const { normalizeURL, shouldScrapeURL } = makeURLHelpers(startURL);
 
 if (!parsedStartURL.protocol) {
   console.error('Please include the protocol in the start URL.');

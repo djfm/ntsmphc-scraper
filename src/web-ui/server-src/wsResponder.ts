@@ -28,6 +28,7 @@ import {
 
 import {
   ScrapingTaskParams,
+  startScraping,
 } from '../../scraper/scraper';
 
 interface WithURL {
@@ -113,6 +114,8 @@ export const respond = (sendPayload: SendPayloadFunc) =>
           message: `Starting scraping from "${params.startURL}"...`,
         }),
       });
+
+      startScraping(params);
 
       return true;
     }

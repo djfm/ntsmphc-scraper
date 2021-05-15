@@ -2,6 +2,11 @@ import { URL } from 'url';
 
 import fetch from 'node-fetch';
 
+export type urlString = string;
+export type canonicalUrlString = string;
+
+export type URLPredicate = (url: urlString) => boolean;
+
 export const isValidURL = (url: string) => {
   try {
     // Sorry eslint, but I'm ONLY interested
@@ -18,10 +23,24 @@ export const isValidURL = (url: string) => {
   }
 };
 
+export const isParsable = (url: urlString): (false | URL) => {
+  try {
+    return new URL(url);
+  } catch (err) {
+    return false;
+  }
+};
+
 // Generates the functions we need to interact with URLs.
 // parsedStartURL is the result of URL.parse called
 // on the URL given to the program.
-const makeURLHelpers = (parsedStartURL: URL) => {
+export const makeURLHelpers = (startURL: urlString) => {
+  const parsedStartURL = new URL(startURL);
+  // It's important to use 'hostname' and not 'host'
+  // because hostname doesn't include the port if there is one.
+  const isInternalURL: URLPredicate = (url: urlString) =>
+    new URL(url).hostname === parsedStartURL.hostname;
+
   // Normalizes URLs to avoid scraping the same URL twice
   // because of subtle variations in the URL string.
   // Will remove leading and trailing whitespace,
@@ -88,7 +107,7 @@ const makeURLHelpers = (parsedStartURL: URL) => {
     return true;
   };
 
-  return { normalizeURL, shouldScrapeURL };
+  return { normalizeURL, shouldScrapeURL, isInternalURL };
 };
 
 export const isRespondingHTTP = async (url: string): Promise<boolean> => {
