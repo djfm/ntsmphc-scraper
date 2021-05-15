@@ -78,10 +78,7 @@ const OneScrapingProject = () => {
       startURL: project.startURL,
     };
 
-    askServer('startScraping', scrapingParams).then(
-      (res: any) => {
-
-      },
+    askServer('startScraping', scrapingParams).catch(
       (err: Error) => dispatch(addNotificationAction({
         message: err.message,
         severity: 'error',
