@@ -72,7 +72,7 @@ type ChromeDOM = {
   // the nodeId in the returned object will be 0 if the selector doesn't match
   querySelector: (options: QuerySelectorOptions) => Promise<JustTheNodeId>;
   getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes[]>;
-  describeNode: (options: DescribeNodeOptions) => Promise<ChromeNode>;
+  describeNode: (options: DescribeNodeOptions) => Promise<{ node: ChromeNode }>;
 };
 
 export type ChromeProtocol = {

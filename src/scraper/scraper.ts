@@ -70,7 +70,7 @@ const scrapeURL = (
           depth: -1,
         });
 
-        result.title = titleDesc.children[0].nodeValue;
+        result.title = titleDesc.node.children[0].nodeValue;
 
         const allFlatNodes = flattenNodeTree(doc.root);
 
