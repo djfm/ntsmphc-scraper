@@ -69,10 +69,9 @@ const extractCanonical = async (
 };
 
 const scrapeURL = (
-  protocol: ChromeProtocol,
   isInternalURL: URLPredicate,
   normalizeURL: StrToStrFunc,
-) =>
+) => (protocol: ChromeProtocol) =>
   async (nonNormalizedURL: urlString): Promise<ScrapeResult> =>
     new Promise((resolve, reject) => {
       const url = normalizeURL(nonNormalizedURL);
@@ -213,13 +212,11 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       normalizeURL,
     } = makeURLHelpers(params.startURL);
 
+    const scrape = scrapeURL(isInternalURL, normalizeURL);
+
     const protocol = await chromeProvider();
 
-    const result = await scrapeURL(
-      protocol,
-      isInternalURL,
-      normalizeURL,
-    )(params.startURL);
+    const result = await scrape(protocol)(params.startURL);
     notifiers.notifyPageScraped(result);
 
     return result;
