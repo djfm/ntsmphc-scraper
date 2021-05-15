@@ -1,12 +1,4 @@
 import {
-  JSONParseError,
-} from '../../errors';
-
-import {
-  tryToParseJSON,
-} from '../../util/json';
-
-import {
   objectToMap,
 } from '../../util/functional';
 
@@ -80,9 +72,7 @@ const handleInfoReceivedFromServer = (payload: Map<string, any>) => {
 
 const setupEventListeners = (s: WebSocket) => {
   s.addEventListener('message', (event: MessageEvent) => {
-    console.log('[̣̣§§§] Data received by UI:', event.data);
     const data = deserialize(event.data);
-    console.log('[̣̣%%%] Data parsed on UI:', data);
 
     if (Object.prototype.hasOwnProperty.call(data, 'id')) {
       resolveRequest(data);
