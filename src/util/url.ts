@@ -68,11 +68,14 @@ export const makeURLHelpers = (startURL: urlString) => {
     return sanitizedURL;
   };
 
-  // Determines if a URL should be scraped.
-  // It should be scraped if it's not a javascript:void() or something link,
-  // and of course if it is on the same domain as the domain
-  // we started scraping from.
-  // attrs is a Map of all attributes found on the link.
+  /**
+   * Determines if a URL should be scraped.
+   *
+   * @deprecated do it another way
+   *
+   * @param url   - url to check
+   * @param attrs - attributes maybe present on the link where the URL was found
+   */
   const shouldScrapeURL = (url: string, attrs: Map<string, any>) => {
     if (attrs && attrs.get('rel') === 'nofollow') {
       return false;
