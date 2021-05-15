@@ -87,14 +87,20 @@ const scrapeURL = (
       }
     });
 
-export const startScraping = async (params: ScrapingTaskParams) => {
-  const {
-    isInternalURL,
-  } = makeURLHelpers(params.startURL);
-
-  const protocol = await chromeProvider();
-
-  const result = scrapeURL(protocol, isInternalURL)(params.startURL);
-
-  return result;
+export type ScraperNotifiers = {
+  notifyPageScraped: (result: ScrapeResult) => any;
 };
+
+export const startScraping = (notifiers: ScraperNotifiers) =>
+  async (params: ScrapingTaskParams) => {
+    const {
+      isInternalURL,
+    } = makeURLHelpers(params.startURL);
+
+    const protocol = await chromeProvider();
+
+    const result = await scrapeURL(protocol, isInternalURL)(params.startURL);
+    notifiers.notifyPageScraped(result);
+
+    return result;
+  };

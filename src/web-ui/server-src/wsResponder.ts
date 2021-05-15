@@ -8,6 +8,7 @@ import {
 
 import {
   addNotificationAction,
+  notifyPageScrapedAction,
 } from '../client-src/redux/actions';
 
 import {
@@ -27,6 +28,7 @@ import {
 } from '../../constants';
 
 import {
+  ScrapeResult,
   ScrapingTaskParams,
   startScraping,
 } from '../../scraper/scraper';
@@ -115,7 +117,14 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         }),
       });
 
-      startScraping(params);
+      const notifyPageScraped = (result: ScrapeResult) => {
+        sendPayload({
+          type: PAYLOAD_TYPE_REDUX_ACTION,
+          action: notifyPageScrapedAction(params.projectId, result),
+        });
+      };
+
+      startScraping({ notifyPageScraped })(params);
 
       return true;
     }

@@ -57,6 +57,7 @@
     "implicit-arrow-linebreak": 0,
     "no-restricted-syntax": 0,
     "global-require": 0,
-    "node/no-missing-require": 0
+    "node/no-missing-require": 0,
+    "operator-linebreak": ["warn", "after"]
   }
 }

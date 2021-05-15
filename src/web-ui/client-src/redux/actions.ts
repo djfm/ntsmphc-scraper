@@ -7,12 +7,18 @@ import {
   Notification,
 } from './reducers/notifications';
 
+import {
+  ScrapeResult,
+} from '../../../scraper/scraper';
+
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 
 export const SET_PROJECTS = 'SET_PROJECTS';
 export const DELETE_PROJECT = 'DELETE_PROJECT';
 export const ADD_PROJECT = 'ADD_PROJECT';
+
+export const NOTIFY_PAGE_SCRAPED = 'NOTIFY_PAGE_SCRAPED';
 
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
@@ -54,3 +60,16 @@ export const addProjectAction = (project: any) => ({
   type: ADD_PROJECT,
   project,
 });
+
+export type PageScrapedAction = {
+  type: typeof NOTIFY_PAGE_SCRAPED;
+  projectId: number;
+  result: ScrapeResult;
+};
+
+export const notifyPageScrapedAction =
+  (projectId: number, result: ScrapeResult): PageScrapedAction => ({
+    type: NOTIFY_PAGE_SCRAPED,
+    projectId,
+    result,
+  });
