@@ -260,7 +260,8 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
             const chromesStarted = [];
             while (nChromesRunning < params.nParallel && nChromesRunning < urlsRemaining.size) {
               // wait a bit in order not to overload chrome
-              waitMs(500);
+              // eslint-disable-next-line no-await-in-loop
+              await waitMs(1000);
               console.log('Starting a chrome!');
               chromesStarted.push(startAChrome());
             }
