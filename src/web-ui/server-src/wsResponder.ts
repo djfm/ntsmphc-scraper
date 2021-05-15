@@ -26,21 +26,16 @@ import {
   PAYLOAD_TYPE_REDUX_ACTION,
 } from '../../constants';
 
+import {
+  ScrapingTaskParams,
+} from '../../scraper/scraper';
+
 interface WithURL {
   url: string;
 }
 
 interface WithProjectId {
   projectId: number;
-}
-
-type ScrapingTaskParams = {
-  projectId: number;
-  startURL: string;
-  /**
-   * How many headless chrome instances to launch.
-   */
-  nParallel: number;
 }
 
 const hasURLParam = (params: object): params is WithURL =>
