@@ -39,12 +39,17 @@ export type ScrapeResult = {
   problematicURLs: Map<urlString, URLProblem[]>;
 };
 
+type StrToStrFunc = (input: string) => string;
+
 const scrapeURL = (
   protocol: ChromeProtocol,
   isInternalURL: URLPredicate,
+  normalizeURL: StrToStrFunc,
 ) =>
-  async (url: urlString): Promise<ScrapeResult> =>
+  async (nonNormalizedURL: urlString): Promise<ScrapeResult> =>
     new Promise((resolve, reject) => {
+      const url = normalizeURL(nonNormalizedURL);
+
       const result: ScrapeResult = {
         url,
         title: undefined,
@@ -52,6 +57,13 @@ const scrapeURL = (
         internalURLs: new Map<urlString, canonicalUrlString>(),
         externalURLs: new Map<urlString, canonicalUrlString>(),
         problematicURLs: new Map<urlString, URLProblem[]>(),
+      };
+
+      const addURLProblem = (oops: URLProblem) => {
+        if (!result.problematicURLs.has(url)) {
+          result.problematicURLs.set(url, []);
+        }
+        result.problematicURLs.get(url).push(oops);
       };
 
       protocol.Page.loadEventFired(async () => {
@@ -62,25 +74,52 @@ const scrapeURL = (
 
         const titleRef = await protocol.DOM.querySelector({
           nodeId: doc.root.nodeId,
-          selector: 'title',
+          selector: 'head title',
         });
 
-        const titleDesc = await protocol.DOM.describeNode({
-          nodeId: titleRef.nodeId,
-          depth: -1,
-        });
+        if (titleRef.nodeId === 0) {
+          const oops: URLProblem = {
+            url,
+            isValid: true,
+            message: 'Page has no title tag in <head>.',
+            // TODO determine status
+            // probably using Network.LoaderId
+            // that is MAYBE returned by Page.navigate
+            // and then using the Network API
+            // see: https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-navigate
+            statusCode: 0,
+          };
 
-        result.title = titleDesc.node.children[0].nodeValue;
+          addURLProblem(oops);
+        } else {
+          const titleDesc = await protocol.DOM.describeNode({
+            nodeId: titleRef.nodeId,
+            depth: -1,
+          });
+
+          result.title = titleDesc.node.children[0].nodeValue;
+        }
 
         const allFlatNodes = flattenNodeTree(doc.root);
 
         resolve(result);
       });
+
       try {
         protocol.Page.navigate({ url });
       } catch (e) {
         if (e?.response?.code === -32000) {
           // This error is: "Cannot navigate to invalid URL".
+          // This should happen rarely as we won't try to
+          // navigate to "javascript:" URLs, but we record the
+          // issue if it happens.
+          const oops: URLProblem = {
+            url,
+            isValid: false,
+            message: 'Invalid URL found.',
+            statusCode: -1,
+          };
+          addURLProblem(oops);
         } else {
           reject(e);
         }
@@ -95,11 +134,16 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
   async (params: ScrapingTaskParams) => {
     const {
       isInternalURL,
+      normalizeURL,
     } = makeURLHelpers(params.startURL);
 
     const protocol = await chromeProvider();
 
-    const result = await scrapeURL(protocol, isInternalURL)(params.startURL);
+    const result = await scrapeURL(
+      protocol,
+      isInternalURL,
+      normalizeURL,
+    )(params.startURL);
     notifiers.notifyPageScraped(result);
 
     return result;
