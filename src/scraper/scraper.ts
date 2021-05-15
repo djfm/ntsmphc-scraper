@@ -6,10 +6,6 @@ import {
 } from '../util/url';
 
 import {
-  flattenNodeTree,
-} from '../util/tree';
-
-import {
   keyValueArrayToMap,
 } from '../util/functional';
 
@@ -134,8 +130,6 @@ const scrapeURL = (
 
           result.title = titleDesc.node.children[0].nodeValue;
         }
-
-        const allFlatNodes = flattenNodeTree(doc.root);
 
         resolve(result);
       });
