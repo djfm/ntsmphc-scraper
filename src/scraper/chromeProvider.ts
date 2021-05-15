@@ -67,11 +67,11 @@ export type JustRawAttributes = {
   attributes: string[];
 };
 
-type ChromeDOM = {
+export type ChromeDOM = {
   getDocument: (options: GetDocumentOptions) => Promise<ChromeDocument>;
   // the nodeId in the returned object will be 0 if the selector doesn't match
   querySelector: (options: QuerySelectorOptions) => Promise<JustTheNodeId>;
-  getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes[]>;
+  getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes>;
   describeNode: (options: DescribeNodeOptions) => Promise<{ node: ChromeNode }>;
 };
 

@@ -10,7 +10,12 @@ import {
 } from '../util/tree';
 
 import {
+  keyValueArrayToMap,
+} from '../util/functional';
+
+import {
   ChromeProtocol,
+  ChromeDOM,
   chromeProvider,
 } from './chromeProvider';
 
@@ -40,6 +45,27 @@ export type ScrapeResult = {
 };
 
 type StrToStrFunc = (input: string) => string;
+
+const extractCanonical = async (
+  rootNodeId: number,
+  DOM: ChromeDOM,
+): Promise<urlString | undefined> => {
+  const link = await DOM.querySelector({
+    nodeId: rootNodeId,
+    selector: 'head link[rel=canonical]',
+  });
+
+  if (link.nodeId === 0) {
+    return undefined;
+  }
+
+  const { attributes } = await DOM.getAttributes({
+    nodeId: link.nodeId,
+  });
+
+  const attributesMap = keyValueArrayToMap(attributes);
+  return attributesMap.get('href');
+};
 
 const scrapeURL = (
   protocol: ChromeProtocol,
@@ -71,6 +97,15 @@ const scrapeURL = (
           // retrieve the full DOM tree, we'll need it
           depth: -1,
         });
+
+        const maybeCanonical = await extractCanonical(
+          doc.root.nodeId,
+          protocol.DOM,
+        );
+
+        if (maybeCanonical !== undefined) {
+          result.canonical = normalizeURL(maybeCanonical);
+        }
 
         const titleRef = await protocol.DOM.querySelector({
           nodeId: doc.root.nodeId,
