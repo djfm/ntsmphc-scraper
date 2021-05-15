@@ -31,6 +31,15 @@ export const isParsable = (url: urlString): (false | URL) => {
   }
 };
 
+export const isJavascriptURL = (url: urlString) => {
+  const parsed = isParsable(url);
+  if (parsed !== false) {
+    // eslint-disable-next-line no-script-url
+    return parsed.protocol === 'javascript:';
+  }
+  return false;
+};
+
 // Generates the functions we need to interact with URLs.
 // parsedStartURL is the result of URL.parse called
 // on the URL given to the program.

@@ -73,6 +73,7 @@ export type ChromeDOM = {
   querySelector: (options: QuerySelectorOptions) => Promise<JustTheNodeId>;
   getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes>;
   describeNode: (options: DescribeNodeOptions) => Promise<{ node: ChromeNode }>;
+  querySelectorAll: (options: QuerySelectorOptions) => Promise<{nodeIds: number[]}>
 };
 
 export type ChromeProtocol = {

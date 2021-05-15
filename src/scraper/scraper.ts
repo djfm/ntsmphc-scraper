@@ -3,6 +3,7 @@ import {
   urlString,
   canonicalUrlString,
   URLPredicate,
+  isJavascriptURL,
 } from '../util/url';
 
 import {
@@ -129,6 +130,52 @@ const scrapeURL = (
           });
 
           result.title = titleDesc.node.children[0].nodeValue;
+        }
+
+        // now for the fun part, getting ready to recurse
+        const links = await protocol.DOM.querySelectorAll({
+          nodeId: doc.root.nodeId,
+          selector: 'a',
+        });
+
+        const linksAttributes = await Promise.all(
+          links.nodeIds.map(
+            (nodeId) => protocol.DOM.getAttributes({ nodeId }),
+          ),
+        );
+
+        for (const link of linksAttributes) {
+          const attrsMap = keyValueArrayToMap(
+            link.attributes,
+          );
+
+          const linkCanonical = normalizeURL(attrsMap.get('canonical'));
+          const href = normalizeURL(attrsMap.get('href'));
+
+          const to = linkCanonical || href;
+
+          // eslint-disable-next-line no-console
+          console.log(`Looking at link: ${to}...`);
+
+          if (!to) {
+            // TODO handle this case properly
+            // dunno what it means...
+            // eslint-disable-next-line no-console
+            console.log(`[!!!] Link with no URL found on page ${url}, dunno if bad or not.`);
+          } else if (isJavascriptURL(to)) {
+            // TODO handle javascript URLs
+            // we have chrome, we can click on them!
+            // but I wanna get the base scenario running
+            // before tackling that issue
+            // eslint-disable-next-line no-console
+            console.log(`[###] Javascript link found on page ${url}: ${to}`);
+          } else {
+            const targetMap = isInternalURL(to) ?
+              result.internalURLs :
+              result.externalURLs;
+
+            targetMap.set(href, linkCanonical);
+          }
         }
 
         resolve(result);
