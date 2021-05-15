@@ -10,40 +10,69 @@ type QuerySelectorOptions = {
   selector: string,
 }
 
-export type ChromeBaseNode = {
-  frameId?: number;
-  backendNodeId: number;
-  localName: string;
+export type DescribeNodeOptions = {
   nodeId: number;
-  nodeName: string;
-  nodeType: number;
-  nodeValue: string;
-  children?: ChromeChildNode[];
+  /**
+   * The depth at which to retrieve nodes.
+   * Use -1 for the entire subtree.
+   */
+  depth: number;
 };
 
-export type ChromeChildNode = ChromeBaseNode & {
-  parentId: number;
-}
+export type NodeAttributes = string[];
 
-export type ChromeRootNode = ChromeBaseNode & {
-  baseURL: string;
-  childNodeCount: number;
-  documentURL: string;
-  xmlVersion: string;
+// Taken from the definition of `Node` in
+// https://github.com/cyrus-and/chrome-remote-interface/blob/master/lib/protocol.json
+// TODO should automate the creation of the correct TypeScript types for this lib
+export type ChromeNode = {
+  nodeId: number;
+  parentId?: number;
+  backendNodeId: number;
+  nodeType: number;
+  nodeName: string;
+  localName: string;
+  nodeValue: string;
+  childNodeCount?: number;
+  children?: ChromeNode[];
+  attributes?: NodeAttributes[];
+  documentURL?: string;
+  baseURL?: string;
+  publicId?: string;
+  systemId?: string;
+  internalSubset?: string;
+  xmlVersion?: string;
+  name?: string;
+  value?: string;
+  pseudoType?: any;
+  shadowRootType?: any;
+  frameId?: any;
+  contentDocument?: ChromeNode;
+  shadowRoots?: ChromeNode[];
+  templateContent?: ChromeNode;
+  pseudoElements?: ChromeNode[];
+  importedDocument?: ChromeNode;
+  distributedNodes?: any[];
+  isSVG?: boolean;
 };
 
 export type ChromeDocument = {
-  root: ChromeRootNode;
+  root: ChromeNode;
 };
 
 export type JustTheNodeId = {
   nodeId: number;
 };
 
+export type JustRawAttributes = {
+  attributes: string[];
+};
+
 type ChromeDOM = {
   getDocument: (options: GetDocumentOptions) => Promise<ChromeDocument>;
   // the nodeId in the returned object will be 0 if the selector doesn't match
   querySelector: (options: QuerySelectorOptions) => Promise<JustTheNodeId>;
+  getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes[]>;
+  describeNode: (options: DescribeNodeOptions) => Promise<ChromeNode>;
 };
 
 export type ChromeProtocol = {

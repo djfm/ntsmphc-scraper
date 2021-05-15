@@ -1,9 +1,13 @@
 // Flatten an array of nodes, returning all nodes
 // of the tree without their children.
-const flattenNodeTree = (node) => {
+export const flattenNodeTree = (node: any) => {
   const { children, ...otherProps } = node;
 
-  if (!children) {
+  const hasChildrenProp = Object.prototype.hasOwnProperty.call(node, 'children');
+  const childrenIsArray = hasChildrenProp && (node.children instanceof Array);
+  const childrenIsNotEmpty = childrenIsArray && (node.children.length > 0);
+
+  if (!childrenIsNotEmpty) {
     return [{ ...otherProps }];
   }
 

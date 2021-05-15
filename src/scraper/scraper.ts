@@ -6,6 +6,10 @@ import {
 } from '../util/url';
 
 import {
+  flattenNodeTree,
+} from '../util/tree';
+
+import {
   ChromeProtocol,
   chromeProvider,
 } from './chromeProvider';
@@ -56,10 +60,19 @@ const scrapeURL = (
           depth: -1,
         });
 
-        const titleNode = await protocol.DOM.querySelector({
+        const titleRef = await protocol.DOM.querySelector({
           nodeId: doc.root.nodeId,
           selector: 'title',
         });
+
+        const titleDesc = await protocol.DOM.describeNode({
+          nodeId: titleRef.nodeId,
+          depth: -1,
+        });
+
+        result.title = titleDesc.children[0].nodeValue;
+
+        const allFlatNodes = flattenNodeTree(doc.root);
 
         resolve(result);
       });
