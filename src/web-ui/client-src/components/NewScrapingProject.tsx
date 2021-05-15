@@ -122,19 +122,22 @@ const NewScrapingProject = () => {
   });
 
   useEffect(() => {
-    setStartURLResponding(undefined);
-    let updateIsStartURLResponding = true;
+    if (isStartURLValid) {
+      setStartURLResponding(undefined);
+      let updateIsStartURLResponding = true;
 
-    askServer('isRespondingHTTP', { url: startURL }).then((isResponding) => {
-      if (updateIsStartURLResponding) {
-        setStartURLResponding(isResponding);
-      }
-    });
+      askServer('isRespondingHTTP', { url: startURL }).then((isResponding) => {
+        if (updateIsStartURLResponding) {
+          setStartURLResponding(isResponding);
+        }
+      });
 
-    return () => {
-      updateIsStartURLResponding = false;
-    };
-  }, [startURL]);
+      return () => {
+        updateIsStartURLResponding = false;
+      };
+    }
+    return null;
+  }, [startURL, isStartURLValid]);
 
   const startURLFeedback = [];
 
