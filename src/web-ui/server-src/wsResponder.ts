@@ -21,6 +21,7 @@ import {
   createProject,
   listProjects,
   deleteProject,
+  storeResults,
 } from '../../db';
 
 import {
@@ -65,6 +66,12 @@ const isScrapingTaskParams = (params: object): params is ScrapingTaskParams =>
 
 export const respond = (sendPayload: SendPayloadFunc) =>
   async (action: string, params: object): Promise<any> => {
+    const sendUINotification = (data: object) =>
+      sendPayload({
+        type: PAYLOAD_TYPE_REDUX_ACTION,
+        action: addNotificationAction(data),
+      });
+
     if (action === 'isRespondingHTTP') {
       if (!hasURLParam(params)) {
         throw new Error('Missing "url" param in "params" provided to action "isRespondingHTTP"');
@@ -139,9 +146,31 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
         // eslint-disable-next-line no-console
         console.log(`\n[DONE] Scraped ${result.nPagesScraped} URLs total in ${timeTaken}!`);
+
+        storeResults(params.projectId, result).then(() => {
+          sendUINotification({
+            message: `Successfully scraped project #${params.projectId} in ${timeTaken}.`,
+            severity: 'success',
+          });
+        }, (err) => {
+          // eslint-disable-next-line no-console
+          console.error(err);
+          storeResults(params.projectId, result).then(() => {
+            sendUINotification({
+              message: 'Something bad happened while storing the results, sorry.',
+              severity: 'error',
+            });
+          });
+        });
+
+        return true;
       }, (err) => {
         // eslint-disable-next-line no-console
-        console.error('\n[DONE] With error: ', err);
+        console.error('Could not scrape: ', err);
+        sendUINotification({
+          message: 'Something bad happened while scraping, sorry.',
+          severity: 'error',
+        });
       });
 
       return true;

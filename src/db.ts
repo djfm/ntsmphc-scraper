@@ -21,6 +21,10 @@ import {
   writeJSONFileFromMapObject,
 } from './util/fs';
 
+import {
+  ProjectScrapeResult,
+} from './scraper/scraper';
+
 export interface CreateProjectParams {
   startURL: string;
   projectName: string;
@@ -185,3 +189,13 @@ export const deleteProject = async (projectId: number): Promise<MaybeError> =>
 
     return true;
   });
+
+export const storeResults = (projectId: number, result: ProjectScrapeResult) => {
+  const time = Date.now();
+  const internalResponsesPath = path.join(dbRootPath, `#${projectId}-${time}-internalResponses.json`);
+  const externalResponsesPath = path.join(dbRootPath, `#${projectId}-${time}-externalResponses.json`);
+  return Promise.all([
+    writeFile(internalResponsesPath, JSON.stringify(result.internalResponses, null, 2)),
+    writeFile(externalResponsesPath, JSON.stringify(result.externalResponses, null, 2)),
+  ]);
+};
