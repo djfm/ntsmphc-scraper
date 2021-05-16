@@ -51,9 +51,9 @@ export const setProjectsAction = (projects: object[]) => ({
   projects,
 });
 
-export const deleteProjectAction = (id: number) => ({
+export const deleteProjectAction = ({ projectId }) => ({
   type: DELETE_PROJECT,
-  id,
+  projectId,
 });
 
 export const addProjectAction = (project: any) => ({

@@ -27,6 +27,7 @@ import {
 import {
   addNotificationAction,
   setProjectsAction,
+  deleteProjectAction,
 } from '../redux/actions';
 
 import {
@@ -80,6 +81,7 @@ const OneScrapingProject = () => {
     event.preventDefault();
     askServer('deleteProject', ({ projectId })).then(
       () => {
+        dispatch(deleteProjectAction({ projectId }));
         dispatch(addNotificationAction({
           message: `Successfully deleted project "${project.projectName}".`,
           severity: 'success',
