@@ -27,12 +27,10 @@ import {
 
 const ScrapingProjects = () => {
   const dispatch = useDispatch();
-  const [projectsFetchedFromDisk, setProjectsFetchFromDisk] = useState(false);
   const projects = useSelector(getAllProjects);
 
   useEffect(() => {
-    if (!projectsFetchedFromDisk) {
-      setProjectsFetchFromDisk(true);
+    if (projects.length === 0) {
       askServer('listProjects', {}).then(
         (projectsFromDisk: object[]) => {
           dispatch(setProjectsAction(projectsFromDisk));
@@ -45,12 +43,7 @@ const ScrapingProjects = () => {
         },
       );
     }
-  // I know what I'm doing: my dependencies are hidden behind
-  // the `if`, and the rule is not smart enough to detect it.
-  // So the only real dependency here is `projectsFetchedFromDisk`.
-  //
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectsFetchedFromDisk]);
+  });
 
   return (
     <main>
