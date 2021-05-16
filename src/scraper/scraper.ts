@@ -127,6 +127,8 @@ const scrapeURL = (
 
     // TODO set a max time to wait?
     await protocol.Page.loadEventFired();
+    // eslint-disable-next-line no-console
+    console.log(`[Load fired event for ${url}]`);
 
     const doc = await protocol.DOM.getDocument({
       // retrieve the full DOM tree, we'll need it
@@ -201,7 +203,7 @@ const scrapeURL = (
         // TODO handle this case properly
         // dunno what it means...
         // eslint-disable-next-line no-console
-        console.log(`[!!!] Link with no URL found on page ${url}, dunno if bad or not.`);
+        console.log(`[!!!] Link with no URL found on page ${url}, dunno if bad or not: ${to}.`);
       } else if (isJavascriptURL(to)) {
         // TODO handle javascript URLs
         // we have chrome, we can click on them!

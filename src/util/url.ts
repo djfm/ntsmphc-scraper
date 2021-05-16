@@ -69,6 +69,10 @@ export const makeURLHelpers = (startURL: urlString) => {
       return normalizeURL(`${parsedStartURL.protocol}${sanitizedURL}`);
     }
 
+    if (sanitizedURL.startsWith('/')) {
+      return normalizeURL(`${parsedStartURL.protocol}//${parsedStartURL.host}${sanitizedURL}`);
+    }
+
     if (sanitizedURL.endsWith('/')) {
       // Removes the last character if it's a forward slash.
       return normalizeURL(sanitizedURL.slice(0, -1));
