@@ -33,6 +33,8 @@ import {
   wrapFeedback,
 } from '../util';
 
+import Confirmator from './common/Confirmator';
+
 type SetterFunction<T> = React.Dispatch<T>;
 
 const passValueTo = (setter: SetterFunction<any>) =>
@@ -161,11 +163,13 @@ const OneScrapingProject = () => {
           </p>
         </li>
         <li>
-          <p>
-            <button type="button" onClick={handleProjectDeletion(id)}>
-              Delete Project
-            </button>
-          </p>
+          <Confirmator action={handleProjectDeletion(id)}>
+            <p>
+              <button type="button">
+                Delete Project
+              </button>
+            </p>
+          </Confirmator>
         </li>
       </ul>
     </main>
