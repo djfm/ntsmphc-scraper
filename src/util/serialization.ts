@@ -1,10 +1,13 @@
-// TODO Unit-test all this shit
+const TagTypes = [
+  'map',
+  'array',
+  'object',
+  'scalar',
+] as const;
 
 type Tag = {
-  type: 'map' | 'array' | 'object' | 'scalar';
+  type: typeof TagTypes[number];
   value: Array<Tag> | object | string | number;
-  mapKeyExample?: any,
-  mapValueExample?: any,
 };
 
 export const preSerialize = (input: any): Tag => {
@@ -25,15 +28,17 @@ export const preSerialize = (input: any): Tag => {
         };
       }
 
-      const [mapKeyExample, mapValueExample] = input.entries().next().value;
-
       return {
         type: 'map',
-        value: [...input.entries()].map(
-          ([key, value]) => [preSerialize(key), preSerialize(value)],
-        ),
-        mapKeyExample: preSerialize(mapKeyExample),
-        mapValueExample: preSerialize(mapValueExample),
+        value: {
+          type: 'array',
+          value: [...input.entries()].map(
+            ([key, value]) => ({
+              type: 'array',
+              value: [preSerialize(key), preSerialize(value)],
+            }),
+          ),
+        },
       };
     }
 
@@ -77,18 +82,14 @@ export const preSerialize = (input: any): Tag => {
 };
 
 const isTag = (maybeTag: any): maybeTag is Tag =>
-  (typeof maybeTag === 'object') && Object.prototype.hasOwnProperty.call(maybeTag, 'type');
+  (typeof maybeTag === 'object') &&
+  Object.prototype.hasOwnProperty.call(maybeTag, 'type') &&
+  TagTypes.includes(maybeTag.type);
 
 export const serialize = (input: any): string =>
   JSON.stringify(preSerialize(input));
 
-const unPack = (maybeTag: any) => {
-  if (!isTag(maybeTag)) {
-    return maybeTag;
-  }
-
-  const tag: Tag = maybeTag;
-
+const unPack = (tag: Tag) => {
   if (tag.type === 'scalar') {
     return tag.value;
   }
@@ -112,21 +113,18 @@ const unPack = (maybeTag: any) => {
   }
 
   if (tag.type === 'map') {
-    const keyExample = unPack(tag.mapKeyExample);
-    const valueExample = unPack(tag.mapValueExample);
-
-    const packedMap = tag.value as Map<typeof keyExample, typeof valueExample>;
-
-    const unPacked = new Map<typeof keyExample, typeof valueExample>();
-
-    for (const [key, value] of packedMap.entries()) {
-      unPacked.set(unPack(key), unPack(value));
+    if (!isTag(tag.value)) {
+      throw new Error('Map value is not a Tag');
     }
+
+    const entries = unPack(tag.value);
+
+    const unPacked = new Map(entries);
 
     return unPacked;
   }
 
-  throw new Error('We should never get there.');
+  throw new Error('If code execution reaches here, then I messed up.');
 };
 
 export const deserialize = (input: string) => {
