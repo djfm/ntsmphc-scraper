@@ -7,7 +7,8 @@ const roundTrip = (testValue: any) => deserialize(serialize(testValue));
 
 describe('The serialization lib serializes data to text and back.', () => {
   describe('It serializes / deserializes scalars.', () => {
-    const scalars = [1, 2, false, true, 'hello'];
+    const scalars = [1, 2, false, true, 'hello', undefined];
+
     for (const scalar of scalars) {
       // eslint-disable-next-line no-loop-func
       test(`a "${typeof scalar}": ${scalar}`, () => {
