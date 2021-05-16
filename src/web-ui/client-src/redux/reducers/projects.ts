@@ -30,7 +30,6 @@ const projectsReducer = (state: Project[] = initialState, action: AnyAction) => 
       return [action.project, ...projectsWithoutThisOne];
     }
 
-
     case DELETE_PROJECT: {
       return state.filter(({ id }) => id !== action.projectId);
     }
