@@ -71,7 +71,7 @@ export const preSerialize = (input: any): Tag => {
     for (const T of typesNotHandled) {
       if (input instanceof T) {
         const t = T.prototype.constructor.name;
-        throw new Error(`Type ${t} is not handled (yet?) by this (de)serialization library.`);
+        throw new Error(`I don't think type ${t} can be serialized generically.`);
       }
     }
 
