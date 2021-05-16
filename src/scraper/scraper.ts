@@ -94,6 +94,7 @@ const scrapeURL = (
 
     try {
       const loadingResult = await protocol.Page.navigate({ url });
+      // eslint-disable-next-line no-console
       console.log(`[OK] loaded page "${url}" with result: `, loadingResult);
     } catch (err: any) {
       if (err?.response?.code === -32000) {
@@ -113,6 +114,7 @@ const scrapeURL = (
       throw err;
     }
 
+    // TODO set a max time to wait?
     await protocol.Page.loadEventFired();
 
     const doc = await protocol.DOM.getDocument({
@@ -233,15 +235,22 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
         const protocol = await chromeProvider();
 
+        const killChrome = () => {
+          nChromesRunning -= 1;
+          protocol.terminate();
+          // eslint-disable-next-line no-console
+          console.log(`Killed a chrome! Remaining: ${nChromesRunning}.`);
+        };
+
         const processOneURL = async (): Promise<number> => {
           if (urlsRemaining.size === 0) {
-            console.log('Killing a chrome!');
-            protocol.terminate();
+            killChrome();
             return urlsScrapedCount;
           }
 
           const { value: nextURL } = urlsRemaining.values().next();
 
+          // eslint-disable-next-line no-console
           console.log(`Now scraping URL: ${nextURL} and there remain ${urlsRemaining.size}...`);
 
           urlsRemaining.delete(nextURL);
@@ -263,23 +272,20 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
           // seen by the same browser
 
           if (urlsRemaining.size > 0) {
-            processOneURL();
-            const chromesStarted = [];
+            const urlsScrapedPromises = [processOneURL()];
             while (nChromesRunning < params.nParallel && nChromesRunning < urlsRemaining.size) {
               // wait a bit in order not to overload chrome
               // eslint-disable-next-line no-await-in-loop
               await waitMs(1000);
+              // eslint-disable-next-line no-console
               console.log('Starting a chrome!');
-              chromesStarted.push(startAChrome());
+              urlsScrapedPromises.push(startAChrome());
             }
-            return Promise.all(chromesStarted).then(
+            return Promise.all(urlsScrapedPromises).then(
               (counts) => counts.reduce((total, current) => total + current, 0),
             );
           }
-          protocol.terminate(() => {
-            console.log('Killing a chrome!');
-          });
-          nChromesRunning -= 1;
+          killChrome();
           return urlsScrapedCount;
         };
 

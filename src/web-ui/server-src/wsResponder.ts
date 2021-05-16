@@ -124,10 +124,12 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         });
       };
 
-      startScraping({ notifyPageScraped })(params).then((nScraped: number) => {
+      const scraping = startScraping({ notifyPageScraped })(params);
+
+      scraping.then((nScraped: number) => {
         console.log(`\n[DONE] Scraped ${nScraped} URLs total!`);
       }, (err) => {
-        console.error(err);
+        console.error('\n[DONE] With error: ', err);
       });
 
       return true;
