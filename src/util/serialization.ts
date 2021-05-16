@@ -1,4 +1,4 @@
-const TagTypes = [
+export const TagTypes = [
   'date',
   'set',
   'map',
