@@ -174,6 +174,11 @@ const scrapeURL = (
         link.attributes,
       );
 
+      if (attrsMap.get('rel') === 'nofollow') {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
       const linkCanonical = normalizeURL(attrsMap.get('canonical'));
       const href = normalizeURL(attrsMap.get('href'));
 
