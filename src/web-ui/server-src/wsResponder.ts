@@ -127,8 +127,10 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       const scraping = startScraping({ notifyPageScraped })(params);
 
       scraping.then((nScraped: number) => {
+        // eslint-disable-next-line no-console
         console.log(`\n[DONE] Scraped ${nScraped} URLs total!`);
       }, (err) => {
+        // eslint-disable-next-line no-console
         console.error('\n[DONE] With error: ', err);
       });
 
