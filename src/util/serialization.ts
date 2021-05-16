@@ -9,6 +9,13 @@ type Tag = {
 
 export const preSerialize = (input: any): Tag => {
   if (typeof input === 'object') {
+    if (input === null) {
+      return {
+        type: 'object',
+        value: null,
+      };
+    }
+
     if (input instanceof Map) {
       // we cannot do black sorcery if the map is empty, sorry
       if (input.size === 0) {
@@ -87,6 +94,10 @@ const unPack = (maybeTag: any) => {
   }
 
   if (tag.type === 'object') {
+    if (tag.value === null) {
+      return null;
+    }
+
     const object = {};
 
     for (const [key, value] of Object.entries(tag.value)) {
