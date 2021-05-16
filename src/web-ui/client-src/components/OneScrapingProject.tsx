@@ -1,6 +1,7 @@
 import React, {
   BaseSyntheticEvent,
   useState,
+  useEffect,
 } from 'react';
 
 // TODO lots of factorization in this file
@@ -25,6 +26,7 @@ import {
 
 import {
   addNotificationAction,
+  setProjectsAction,
 } from '../redux/actions';
 
 import {
@@ -51,6 +53,26 @@ const OneScrapingProject = () => {
   if (nParallel <= 0) {
     nParallelFeedback.push('This value must be strictly greater than 0. ✘');
   }
+
+  useEffect(() => {
+    if (!project) {
+      // If the project we want isn't here, it probably means
+      // the projects haven't been loaded from disk yet.
+      // The way the DB is made, it's as cheap to load
+      // all the projects so that's what we do here.
+      askServer('listProjects', {}).then(
+        (projectsFromDisk: object[]) => {
+          dispatch(setProjectsAction(projectsFromDisk));
+        },
+        (err: Error) => {
+          dispatch(addNotificationAction({
+            message: err.message,
+            severity: 'error',
+          }));
+        },
+      );
+    }
+  });
 
   const handleProjectDeletion = (projectId: number) => (event: BaseSyntheticEvent) => {
     event.preventDefault();
