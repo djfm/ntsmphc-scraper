@@ -122,11 +122,8 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         throw new Error('Error: invalid params provided to `startScraping`.');
       }
 
-      sendPayload({
-        type: PAYLOAD_TYPE_REDUX_ACTION,
-        action: addNotificationAction({
-          message: `Starting scraping from "${params.startURL}"...`,
-        }),
+      sendUINotification({
+        message: `Starting scraping from "${params.startURL}"...`,
       });
 
       const notifyPageScraped = (result: ScrapeResult) => {
