@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-// TODO this file should be unit-tested lol
+// TODO this file should be unit-tested
 
 import path from 'path';
 
@@ -30,19 +30,7 @@ export interface CreateProjectParams {
   projectName: string;
 }
 
-export type ErrorMessage = string;
-
-export type MaybeError = true | ErrorMessage | object | number
-
-export const isError = (dunnoWhat: MaybeError): dunnoWhat is ErrorMessage => {
-  if (typeof dunnoWhat === 'string') {
-    return true;
-  }
-
-  return false;
-};
-
-type RunWithLockedFileFunction = (lockedFilePath?: string) => MaybeError | Promise<MaybeError>;
+type RunWithLockedFileFunction = (lockedFilePath?: string) => any;
 
 export const isSafeKeyForObjectMap = (keyName: string) => {
   const forbiddenKeys = Object.getOwnPropertyNames(Object.prototype);
@@ -55,11 +43,9 @@ const projectsFilePath = path.join(dbRootPath, 'projects.json');
 const maxUIDFilePath = path.join(dbRootPath, 'maxUID.json');
 
 const lockAndUse = (fileToUsePath: string) =>
-  async (fnToRun: RunWithLockedFileFunction): Promise<MaybeError> => {
+  async (fnToRun: RunWithLockedFileFunction) => {
     const lockFilePath = `${fileToUsePath}.lock`;
     const lockFileData = `locked by process "${process.pid}" on "${(new Date()).toISOString()}"`;
-
-    let fnResult: MaybeError = "Err: Something bad happened at the storage level. I don't know what.";
 
     try {
       // write to the lock file,
@@ -69,7 +55,8 @@ const lockAndUse = (fileToUsePath: string) =>
       });
 
       try {
-        fnResult = await fnToRun(fileToUsePath);
+        const result = await fnToRun(fileToUsePath);
+        return result;
       } catch (err) {
         console.error(`Error while using locked file "${fileToUsePath}"`, err);
       } finally {
@@ -85,7 +72,7 @@ const lockAndUse = (fileToUsePath: string) =>
 
         // TODO check if this can get us into infinite loops
         // and handle the case
-        return new Promise<MaybeError>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           const watcher = chokidar.watch(lockFilePath);
 
           watcher.on('unlink', () => {
@@ -101,25 +88,27 @@ const lockAndUse = (fileToUsePath: string) =>
       throw err;
     }
 
-    return fnResult;
+    return true;
   };
 
-const getUID = () => lockAndUse(maxUIDFilePath)(async (dbPath: string): Promise <MaybeError> => {
-  try {
-    const contents = await readFile(dbPath);
-    const maxId = parseFloat(contents.toString());
-    const newMaxId = maxId + 1;
-    await writeFile(dbPath, `${newMaxId}`);
-    return newMaxId;
-  } catch (err) {
-    const maxId = 1;
-    await writeFile(dbPath, `${maxId}`);
-    return maxId;
-  }
-});
+const getUID = () => lockAndUse(maxUIDFilePath)(
+  async (dbPath): Promise<number> => {
+    try {
+      const contents = await readFile(dbPath);
+      const maxId = parseFloat(contents.toString());
+      const newMaxId = maxId + 1;
+      await writeFile(dbPath, `${newMaxId}`);
+      return newMaxId;
+    } catch (err) {
+      const maxId = 1;
+      await writeFile(dbPath, `${maxId}`);
+      return maxId;
+    }
+  },
+);
 
 const createProjectInMemory = (params: CreateProjectParams, id: number) =>
-  (storage: GenericMap): MaybeError => {
+  (storage: GenericMap) => {
     const { projectName } = params;
 
     if (!isSafeKeyForObjectMap(projectName)) {
@@ -150,26 +139,13 @@ const obtainProjectsStore = async () => {
   return createMapObjectFromJSONFilePath(projectsFilePath);
 };
 
-export const createProject = async (params: CreateProjectParams): Promise<MaybeError> =>
-  lockAndUse(projectsFilePath)(async (): Promise<MaybeError> => {
+export const createProject = async (params: CreateProjectParams) =>
+  lockAndUse(projectsFilePath)(async () => {
     const store: GenericMap = await obtainProjectsStore();
     const id = await getUID();
-
-    if (isError(id)) {
-      throw new Error('Error: unable to get UID.');
-    }
-
-    if (typeof id !== 'number') {
-      throw new Error('Error: unexpected uid type.');
-    }
-
-    const created = createProjectInMemory(params, id)(store);
-
-    if (!isError(created)) {
-      await writeJSONFileFromMapObject(projectsFilePath)(store);
-    }
-
-    return created;
+    const projectMetaData = createProjectInMemory(params, id)(store);
+    await writeJSONFileFromMapObject(projectsFilePath)(store);
+    return projectMetaData;
   });
 
 export const listProjects = async () => {
@@ -177,8 +153,8 @@ export const listProjects = async () => {
   return projectsMap.values();
 };
 
-export const deleteProject = async (projectId: number): Promise<MaybeError> =>
-  lockAndUse(projectsFilePath)(async (): Promise<MaybeError> => {
+export const deleteProject = async (projectId: number) =>
+  lockAndUse(projectsFilePath)(async () => {
     const store: GenericMap = await obtainProjectsStore();
     for (const [key, value] of store.entries()) {
       if (value.id === projectId) {

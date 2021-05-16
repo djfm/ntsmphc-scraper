@@ -17,7 +17,6 @@ import {
 
 import {
   CreateProjectParams,
-  isError,
   createProject,
   listProjects,
   deleteProject,
@@ -83,24 +82,11 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       if (!isCreateProjectParams(params)) {
         throw new Error('Missing properties to qualify as a "params" for "createProject"');
       }
-      const creationResult = await createProject(params);
-
-      if (isError(creationResult)) {
-        throw new Error(creationResult);
-      }
-
-      return creationResult;
+      return createProject(params);
     }
 
     if (action === 'listProjects') {
       const projects = await listProjects();
-
-      if (isError(projects)) {
-        throw new Error(projects);
-      }
-
-      // quick & dirty way to convert iterator
-      // to plain old Array
       return [...projects];
     }
 
@@ -109,12 +95,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         throw new Error('Error: params provided to "deleteProject" miss property "projectId"');
       }
 
-      const deleted = await deleteProject(params.projectId);
-      if (isError(deleted)) {
-        throw new Error(deleted);
-      }
-
-      return deleted;
+      return deleteProject(params.projectId);
     }
 
     if (action === 'startScraping') {
