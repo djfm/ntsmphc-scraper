@@ -1,4 +1,5 @@
 const TagTypes = [
+  'date',
   'set',
   'map',
   'array',
@@ -54,17 +55,23 @@ export const preSerialize = (input: any): Tag => {
       };
     }
 
+    if (input instanceof Date) {
+      return {
+        type: 'date',
+        value: input.getTime(),
+      };
+    }
+
     const typesNotHandled = [
       WeakMap,
       WeakSet,
-      Date,
       Function,
     ];
 
     for (const T of typesNotHandled) {
       if (input instanceof T) {
         const t = T.prototype.constructor.name;
-        throw new Error(`Type ${t} is not handled (yet?) by my quick and dirty serialization lib`);
+        throw new Error(`Type ${t} is not handled (yet?) by this (de)serialization library.`);
       }
     }
 
@@ -125,6 +132,13 @@ const unPack = (tag: Tag) => {
 
   if (tag.type === 'set') {
     return new Set((tag.value as any[]).map(unPack));
+  }
+
+  if (tag.type === 'date') {
+    if (typeof tag.value !== 'number') {
+      throw new Error('date should be stored as time, i.e. a number');
+    }
+    return new Date(tag.value);
   }
 
   throw new Error('If code execution reaches here, then I messed up.');

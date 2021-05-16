@@ -28,6 +28,7 @@ describe('The serialization lib serializes data to text and back.', () => {
       [1, null, 'a', { hello: ['world'] }],
       new Map([['a', 'A'], ['b', 'B']]),
       new Set([1, 2, 3]),
+      new Date(Date.now()),
     ];
 
     for (const [id, object] of objects.entries()) {
