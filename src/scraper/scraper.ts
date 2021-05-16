@@ -15,6 +15,7 @@ import {
   ChromeProtocol,
   ChromeDOM,
   chromeProvider,
+  NetworkResponse,
 } from './chromeProvider';
 
 export type ScrapingTaskParams = {
@@ -40,6 +41,12 @@ export type ScrapeResult = {
   internalURLs: Map<urlString, canonicalUrlString>;
   externalURLs: Map<urlString, canonicalUrlString>;
   problematicURLs: Map<urlString, URLProblem[]>;
+};
+
+export type ProjectScrapeResult = {
+  internalResponses: NetworkResponse[],
+  externalResponses: NetworkResponse[],
+  nPagesScraped: number,
 };
 
 export type ScraperNotifiers = {
@@ -214,7 +221,7 @@ export const waitMs = async (milliseconds: number) => new Promise((resolve) => {
 });
 
 export const startScraping = (notifiers: ScraperNotifiers) =>
-  async (params: ScrapingTaskParams) : Promise<number> => {
+  async (params: ScrapingTaskParams) : Promise<ProjectScrapeResult> => {
     const {
       isInternalURL,
       normalizeURL,
@@ -226,6 +233,10 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     const urlsSeen = new Set();
     let nChromesRunning = 0;
 
+    const internalResponses: NetworkResponse[] = [];
+    const externalResponses: NetworkResponse[] = [];
+    const responsesSeen = new Set<string>();
+
     urlsRemaining.add(params.startURL);
 
     const startAChrome = async (): Promise<number> => {
@@ -234,6 +245,29 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         nChromesRunning += 1;
 
         const protocol = await chromeProvider();
+
+        protocol.Network.responseReceived(({ response }) => {
+          const { status } = response;
+          const url = normalizeURL(response.url);
+          const referer = response?.requestHeaders?.Referer || '';
+
+          const uid = [status, url, referer].join('¤');
+
+          const resp: NetworkResponse = {
+            url,
+            referer: referer ? normalizeURL(response.referer) : undefined,
+            status,
+          };
+
+          if (!responsesSeen.has(uid)) {
+            responsesSeen.add(uid);
+            const storage = isInternalURL(url) ? internalResponses : externalResponses;
+            storage.push(resp);
+
+            // eslint-disable-next-line no-console
+            console.log('[NNN] Got network response:', resp);
+          }
+        });
 
         const killChrome = () => {
           nChromesRunning -= 1;
@@ -295,5 +329,15 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       return urlsScrapedCount;
     };
 
-    return startAChrome();
+    return startAChrome().then((
+      (nPagesScraped: number) => {
+        const result: ProjectScrapeResult = {
+          internalResponses,
+          externalResponses,
+          nPagesScraped,
+        };
+
+        return result;
+      }
+    ));
   };

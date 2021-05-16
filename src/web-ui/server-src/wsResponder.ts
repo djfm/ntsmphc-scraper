@@ -3,6 +3,10 @@ import {
 } from '../../util/url';
 
 import {
+  humanDuration,
+} from '../../util/humanDuration';
+
+import {
   hasAllOwnProperties,
 } from '../../util/functional';
 
@@ -31,6 +35,7 @@ import {
   ScrapeResult,
   ScrapingTaskParams,
   startScraping,
+  ProjectScrapeResult,
 } from '../../scraper/scraper';
 
 interface WithURL {
@@ -124,11 +129,16 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         });
       };
 
+      const startedAt = Date.now();
+
       const scraping = startScraping({ notifyPageScraped })(params);
 
-      scraping.then((nScraped: number) => {
+      scraping.then((result: ProjectScrapeResult) => {
+        const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
+        const timeTaken = humanDuration(timeTakenSeconds);
+
         // eslint-disable-next-line no-console
-        console.log(`\n[DONE] Scraped ${nScraped} URLs total!`);
+        console.log(`\n[DONE] Scraped ${result.nPagesScraped} URLs total in ${timeTaken}!`);
       }, (err) => {
         // eslint-disable-next-line no-console
         console.error('\n[DONE] With error: ', err);

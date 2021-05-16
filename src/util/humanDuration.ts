@@ -69,7 +69,7 @@ const divideTime = (
 // string expressing that duration in appropriate units.
 // E.g. 65 yields "1 minute and 5 seconds".
 // This function is unit-tested, see the test file for more examples.
-const humanDuration = (seconds: number) => {
+export const humanDuration = (seconds: number) => {
   const divisors = [60, 60, 24, 7, 4, 12, 5, 2, 10, 10];
 
   if (seconds === 0) {
