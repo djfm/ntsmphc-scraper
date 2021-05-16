@@ -1,4 +1,5 @@
 const TagTypes = [
+  'set',
   'map',
   'array',
   'object',
@@ -7,8 +8,13 @@ const TagTypes = [
 
 type Tag = {
   type: typeof TagTypes[number];
-  value: Array<Tag> | object | string | number;
+  value: Array<Tag> | object | string | number | null;
 };
+
+const isTag = (maybeTag: any): maybeTag is Tag =>
+  (typeof maybeTag === 'object') &&
+  Object.prototype.hasOwnProperty.call(maybeTag, 'type') &&
+  TagTypes.includes(maybeTag.type);
 
 export const preSerialize = (input: any): Tag => {
   if (typeof input === 'object') {
@@ -41,8 +47,14 @@ export const preSerialize = (input: any): Tag => {
       };
     }
 
+    if (input instanceof Set) {
+      return {
+        type: 'set',
+        value: [...input.values()].map(preSerialize),
+      };
+    }
+
     const typesNotHandled = [
-      Set,
       WeakMap,
       WeakSet,
       Date,
@@ -72,11 +84,6 @@ export const preSerialize = (input: any): Tag => {
     value: input,
   };
 };
-
-const isTag = (maybeTag: any): maybeTag is Tag =>
-  (typeof maybeTag === 'object') &&
-  Object.prototype.hasOwnProperty.call(maybeTag, 'type') &&
-  TagTypes.includes(maybeTag.type);
 
 export const serialize = (input: any): string =>
   JSON.stringify(preSerialize(input));
@@ -114,6 +121,10 @@ const unPack = (tag: Tag) => {
     const unPacked = new Map(entries);
 
     return unPacked;
+  }
+
+  if (tag.type === 'set') {
+    return new Set((tag.value as any[]).map(unPack));
   }
 
   throw new Error('If code execution reaches here, then I messed up.');
