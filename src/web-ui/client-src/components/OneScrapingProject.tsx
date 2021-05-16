@@ -132,7 +132,7 @@ const OneScrapingProject = () => {
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
       <section>
         <p>
-          <strong>Here is some basic info about this project</strong>:
+          <h1>Here is some basic info about this project:</h1>
         </p>
         <dl>
           <dt><strong>Start URL</strong>:</dt>

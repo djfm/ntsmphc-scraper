@@ -10,9 +10,9 @@ type Props = {
 
 const ScrapingFeedback = ({ state }: Props) => (
   <section>
-    <h1>Scraping in Progress</h1>
+    <h1>Scraping is currently in progress:</h1>
     <p>
-      <dt><strong>URLs scraped so far:</strong></dt>
+      <dt>URLs scraped so far:</dt>
       <dd>{state.totalURLsScraped}</dd>
     </p>
     <section>
