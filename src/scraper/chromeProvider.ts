@@ -103,20 +103,26 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     DOM,
   } = protocol;
 
-  protocol.terminate = (onTerminate?: ByeFunction) => {
-    if (onTerminate) {
-      onTerminate();
-    }
-
-    protocol.close();
-    chrome.kill();
+  // don't wanna expose too much stuff inadvertently
+  const myProtocol = {
+    Network,
+    Page,
+    Runtime,
+    DOM,
+    terminate: (onTerminate?: ByeFunction) => {
+      if (onTerminate) {
+        onTerminate();
+      }
+      protocol.close();
+      chrome.kill();
+    },
   };
 
   // Apparently this needs to be done before starting to use
   // the APIs.
   await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()]);
 
-  return protocol;
+  return myProtocol;
 };
 
 export default chromeProvider;
