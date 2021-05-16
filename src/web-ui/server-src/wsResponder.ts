@@ -126,6 +126,8 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
       startScraping({ notifyPageScraped })(params).then((nScraped: number) => {
         console.log(`\n[DONE] Scraped ${nScraped} URLs total!`);
+      }, (err) => {
+        console.error(err);
       });
 
       return true;

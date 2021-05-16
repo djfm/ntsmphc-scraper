@@ -108,9 +108,9 @@ const scrapeURL = (
           statusCode: -1,
         };
         addURLProblem(oops);
-      } else {
-        throw err;
+        return result;
       }
+      throw err;
     }
 
     await protocol.Page.loadEventFired();
@@ -235,6 +235,8 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
         const processOneURL = async (): Promise<number> => {
           if (urlsRemaining.size === 0) {
+            console.log('Killing a chrome!');
+            protocol.terminate();
             return urlsScrapedCount;
           }
 
