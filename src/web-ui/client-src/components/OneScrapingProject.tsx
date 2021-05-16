@@ -31,7 +31,7 @@ import {
 
 import {
   wrapFeedback,
-} from '../util';
+} from './common/util';
 
 import Confirmator from './common/Confirmator';
 

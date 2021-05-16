@@ -34,7 +34,7 @@ import {
 
 import {
   wrapFeedback,
-} from '../util';
+} from './common/util';
 
 const isValidURL = (url: string) => {
   try {
