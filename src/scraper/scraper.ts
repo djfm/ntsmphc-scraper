@@ -4,6 +4,7 @@ import {
   canonicalUrlString,
   URLPredicate,
   isJavascriptURL,
+  isParsable,
 } from '../util/url';
 
 import {
@@ -178,7 +179,7 @@ const scrapeURL = (
 
       const to = linkCanonical || href;
 
-      if (!to) {
+      if (!to || isParsable(to) === false) {
         // TODO handle this case properly
         // dunno what it means...
         // eslint-disable-next-line no-console
