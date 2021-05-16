@@ -20,14 +20,6 @@ export const preSerialize = (input: any): Tag => {
     }
 
     if (input instanceof Map) {
-      // we cannot do black sorcery if the map is empty, sorry
-      if (input.size === 0) {
-        return {
-          type: 'scalar',
-          value: null,
-        };
-      }
-
       return {
         type: 'map',
         value: {
