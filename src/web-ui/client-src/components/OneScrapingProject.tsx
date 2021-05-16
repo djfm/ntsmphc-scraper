@@ -135,15 +135,15 @@ const OneScrapingProject = () => {
           <h1>Here is some basic info about this project:</h1>
         </p>
         <dl>
-          <dt><strong>Start URL</strong>:</dt>
+          <dt>Start URL:</dt>
           <dd>{project.startURL}</dd>
-          <dt><strong>Creation date</strong>:</dt>
+          <dt>Creation date:</dt>
           <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
         </dl>
         <ul>
           <li>
             <label>
-              <strong>Number of parallel Chrome instances</strong>
+              <span>Number of parallel Chrome instances</span>
               <p>
                 <i>
                   To make things faster, I&apos;m gonna start many<br />
