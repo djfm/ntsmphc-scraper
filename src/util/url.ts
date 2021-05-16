@@ -77,49 +77,10 @@ export const makeURLHelpers = (startURL: urlString) => {
     return sanitizedURL;
   };
 
-  /**
-   * Determines if a URL should be scraped.
-   *
-   * @deprecated do it another way
-   *
-   * @param url   - url to check
-   * @param attrs - attributes maybe present on the link where the URL was found
-   */
-  const shouldScrapeURL = (url: string, attrs: Map<string, any>) => {
-    if (attrs && attrs.get('rel') === 'nofollow') {
-      return false;
-    }
-
-    try {
-      const parsedURL = new URL(url);
-
-      // eslint-disable-next-line no-script-url
-      if (parsedURL.protocol === 'javascript:') {
-        return false;
-      }
-
-      // It's important to use 'hostname' and not 'host'
-      // because hostname doesn't include the port if there is one.
-      if (parsedURL.hostname !== parsedStartURL.hostname) {
-        return false;
-      }
-    } catch (err) {
-      if (err.code === 'ERR_INVALID_URL') {
-        // TODO This error should be logged.
-        //
-        // So probably just let the caller catch the error.
-        //
-        // Right now I just want to make things work.
-        return false;
-      }
-
-      throw err;
-    }
-
-    return true;
+  return {
+    isInternalURL,
+    normalizeURL,
   };
-
-  return { normalizeURL, shouldScrapeURL, isInternalURL };
 };
 
 export const isRespondingHTTP = async (url: string): Promise<boolean> => {
