@@ -55,6 +55,10 @@ export type ScraperNotifiers = {
 
 type StrToStrFunc = (input: string) => string;
 
+const waitMs = async (milliseconds: number) => new Promise((resolve) => {
+  setTimeout(resolve, milliseconds);
+});
+
 const extractCanonical = async (
   rootNodeId: number,
   DOM: ChromeDOM,
@@ -215,10 +219,6 @@ const scrapeURL = (
     }
     return result;
   };
-
-export const waitMs = async (milliseconds: number) => new Promise((resolve) => {
-  setTimeout(resolve, milliseconds);
-});
 
 export const startScraping = (notifiers: ScraperNotifiers) =>
   async (params: ScrapingTaskParams) : Promise<ProjectScrapeResult> => {
