@@ -32,20 +32,24 @@ const generateRandomWeirdObject = (complexity: number) => {
 
   const nextC8y = reduceComplexity(complexity);
 
-  const genKeyValue = () => [
-    randomString(16),
-    generateRandomWeirdObject(nextC8y),
-  ];
-
   const tagType = pickAtRandom(TagTypes);
+
+  const maybeRound = pickAtRandom([
+    (x: number) => x,
+    (x: number) => Math.round(x),
+  ]);
 
   switch (tagType) {
     case 'object': {
       const obj = {};
 
+      const genKey = () => (Math.random() < 0.5 ?
+        randomString(16) :
+        maybeRound(Math.random() * 1000));
+
       for (let i = 0; i < nextC8y; i += 1) {
-        const [key, value] = genKeyValue();
-        obj[key] = value;
+        const key = genKey();
+        obj[key] = generateRandomWeirdObject(nextC8y);
       }
 
       return obj;
@@ -70,8 +74,10 @@ const generateRandomWeirdObject = (complexity: number) => {
     case 'map': {
       const map = new Map();
       for (let i = 0; i < complexity; i += 1) {
-        const [key, value] = genKeyValue();
-        map.set(key, value);
+        map.set(
+          generateRandomWeirdObject(nextC8y),
+          generateRandomWeirdObject(nextC8y),
+        );
       }
       return map;
     }
@@ -95,10 +101,6 @@ const generateRandomWeirdObject = (complexity: number) => {
         return randomString(complexity);
       }
 
-      const maybeRound = pickAtRandom([
-        (x: number) => x,
-        (x: number) => Math.round(x),
-      ]);
       return maybeRound((100 * Math.random() * complexity));
     }
 
