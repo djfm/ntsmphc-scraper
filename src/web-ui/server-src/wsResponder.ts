@@ -124,7 +124,9 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         });
       };
 
-      startScraping({ notifyPageScraped })(params);
+      startScraping({ notifyPageScraped })(params).then((nScraped: number) => {
+        console.log(`\n[DONE] Scraped ${nScraped} URLs total!`);
+      });
 
       return true;
     }

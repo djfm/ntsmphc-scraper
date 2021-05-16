@@ -206,7 +206,7 @@ export const waitMs = async (milliseconds: number) => new Promise((resolve) => {
 });
 
 export const startScraping = (notifiers: ScraperNotifiers) =>
-  async (params: ScrapingTaskParams) => {
+  async (params: ScrapingTaskParams) : Promise<number> => {
     const {
       isInternalURL,
       normalizeURL,
@@ -239,7 +239,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
           urlsRemaining.delete(nextURL);
           urlsSeen.add(normalizeURL(nextURL));
 
-          const result = await scrape(protocol)(params.startURL);
+          const result = await scrape(protocol)(nextURL);
 
           for (const [url, canonical] of result.internalURLs.entries()) {
             const toScrape = canonical || url;
