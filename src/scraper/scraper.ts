@@ -101,17 +101,22 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     const processNextURLs = async (): Promise<ScrapingProgress> => {
       const scrapingProgresses: Promise<ScrapingProgress>[] = [];
 
+      const processWithChrome = () => {
+        chromeProvider().then((chrome: ChromeProtocol) => {
+          nChromesRunning += 1;
+          // eslint-disable-next-line no-console
+          console.log(`Created a chrome (now ${nChromesRunning} running)`);
+          scrapingProgresses.push(
+            processNextURLandGoOn(chrome),
+          );
+        });
+      };
+
       while (remainingURLs.size > 0 && nChromesRunning < params.nParallel) {
+        // I really don't understand why this makes a difference...
         // eslint-disable-next-line no-await-in-loop
-        const chrome = await chromeProvider();
-        // eslint-disable-next-line no-await-in-loop
-        await waitMs(1000);
-        nChromesRunning += 1;
-        // eslint-disable-next-line no-console
-        console.log(`Created a chrome (now ${nChromesRunning} running)`);
-        scrapingProgresses.push(
-          processNextURLandGoOn(chrome),
-        );
+        await waitMs(500);
+        processWithChrome();
       }
 
       return Promise.all(scrapingProgresses)

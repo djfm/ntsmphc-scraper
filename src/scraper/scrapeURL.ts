@@ -237,9 +237,6 @@ export const scrapeURL = (
 
         targetMap.set(href, linkCanonical);
       }
-
-      console.log(`Internal URLs found on page ${currentURL}:`, result.internalURLs);
-      console.log(`External URLs found on page ${currentURL}:`, result.externalURLs);
     }
 
     return result;
