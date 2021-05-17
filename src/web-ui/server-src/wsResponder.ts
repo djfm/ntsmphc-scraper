@@ -32,11 +32,14 @@ import {
 } from '../../constants';
 
 import {
-  ScrapeResult,
   ScrapingTaskParams,
   startScraping,
   ProjectScrapeResult,
 } from '../../scraper/scraper';
+
+import {
+  ScrapeResult,
+} from '../../scraper/scrapeURL';
 
 interface WithURL {
   url: string;
