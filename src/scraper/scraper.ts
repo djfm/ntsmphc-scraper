@@ -123,7 +123,10 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         .then(reduceScrapingProgresses)
         .then((progress) => {
           if (remainingURLs.size > 0) {
-            return processNextURLs();
+            return processNextURLs().then((nextProgress) => ({
+              nURLsScraped: progress.nURLsScraped + nextProgress.nURLsScraped,
+              results: progress.results.concat(...nextProgress.results),
+            }));
           }
           return progress;
         });
