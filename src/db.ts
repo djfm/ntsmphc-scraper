@@ -22,8 +22,12 @@ import {
 } from './util/fs';
 
 import {
-  ProjectScrapeResult,
+  ScrapingProgress,
 } from './scraper/scraper';
+
+import {
+  ScrapeResult,
+} from './scraper/scrapeURL';
 
 export interface CreateProjectParams {
   startURL: string;
@@ -166,12 +170,16 @@ export const deleteProject = async (projectId: number) =>
     return true;
   });
 
-export const storeResults = (projectId: number, result: ProjectScrapeResult) => {
+const generateURLReport = (progress: ScrapingProgress) =>
+  progress.results.map((result: ScrapeResult) => ({
+    url: result.url,
+    status: result.status,
+  }));
+
+export const storeResults = (projectId: number, progress: ScrapingProgress) => {
   const time = Date.now();
-  const internalResponsesPath = path.join(dbRootPath, `#${projectId}-${time}-internalResponses.json`);
-  const externalResponsesPath = path.join(dbRootPath, `#${projectId}-${time}-externalResponses.json`);
+  const internalURLsPath = path.join(dbRootPath, `#${projectId}-${time}-internalURLs.json`);
   return Promise.all([
-    writeFile(internalResponsesPath, JSON.stringify(result.internalResponses, null, 2)),
-    writeFile(externalResponsesPath, JSON.stringify(result.externalResponses, null, 2)),
+    writeFile(internalURLsPath, JSON.stringify(generateURLReport(progress), null, 2)),
   ]);
 };

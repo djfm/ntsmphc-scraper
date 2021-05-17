@@ -15,20 +15,31 @@ import {
   ChromeDOM,
 } from './chromeProvider';
 
-export type ScrapeResult = {
-  url: urlString;
-  title: string;
-  canonical: urlString;
-  internalURLs: Map<urlString, canonicalUrlString>;
-  externalURLs: Map<urlString, canonicalUrlString>;
-  problematicURLs: Map<urlString, URLProblem[]>;
-};
-
 export type URLProblem = {
   url: urlString;
   isValid: boolean;
   statusCode: number;
   message: string;
+  referer: string;
+};
+
+export type NetworkResponse = {
+  url: string,
+  referer?: string,
+  status: number,
+};
+
+// TODO rename to URLScrapeResult
+export type ScrapeResult = {
+  url: urlString;
+  status: number;
+  title: string;
+  canonical: urlString;
+  internalURLs: Map<urlString, canonicalUrlString>;
+  externalURLs: Map<urlString, canonicalUrlString>;
+  internalResources: Map<urlString, NetworkResponse>;
+  externalResources: Map<urlString, NetworkResponse>;
+  problematicURLs: Map<urlString, URLProblem[]>;
 };
 
 export type StrToStrFunc = (input: string) => string;
@@ -59,28 +70,56 @@ export const scrapeURL = (
   normalizeURL: StrToStrFunc,
 ) => (protocol: ChromeProtocol) =>
   async (nonNormalizedURL: urlString): Promise<ScrapeResult> => {
-    const url = normalizeURL(nonNormalizedURL);
+    const currentURL = normalizeURL(nonNormalizedURL);
 
     const result: ScrapeResult = {
-      url,
+      url: currentURL,
+      status: 0,
       title: undefined,
       canonical: undefined,
-      internalURLs: new Map<urlString, canonicalUrlString>(),
-      externalURLs: new Map<urlString, canonicalUrlString>(),
-      problematicURLs: new Map<urlString, URLProblem[]>(),
+      internalURLs: new Map(),
+      externalURLs: new Map(),
+      internalResources: new Map(),
+      externalResources: new Map(),
+      problematicURLs: new Map(),
     };
 
-    const addURLProblem = (oops: URLProblem) => {
-      if (!result.problematicURLs.has(url)) {
-        result.problematicURLs.set(url, []);
+    protocol.Network.responseReceived(({ response }) => {
+      const { status } = response;
+      const responseURL = normalizeURL(response.url);
+      const referer = response?.requestHeaders?.Referer;
+
+      if (currentURL === responseURL) {
+        // TODO add here any relevant info
+        // that would be available only on the response
+        // of the Network protocol
+        result.status = status;
+        return;
       }
-      result.problematicURLs.get(url).push(oops);
+
+      const resp: NetworkResponse = {
+        url: currentURL,
+        referer: referer ? normalizeURL(response.referer) : undefined,
+        status,
+      };
+
+      const storage = isInternalURL(responseURL) ?
+        result.internalResources : result.externalResources;
+
+      storage[responseURL] = resp;
+    });
+
+    const addURLProblem = (oops: URLProblem) => {
+      if (!result.problematicURLs.has(currentURL)) {
+        result.problematicURLs.set(currentURL, []);
+      }
+      result.problematicURLs.get(currentURL).push(oops);
     };
 
     try {
-      const loadingResult = await protocol.Page.navigate({ url });
+      const loadingResult = await protocol.Page.navigate({ url: currentURL });
       // eslint-disable-next-line no-console
-      console.log(`[OK] loaded page "${url}" with result: `, loadingResult);
+      console.log(`[OK] loaded page "${currentURL}" with result: `, loadingResult);
     } catch (err: any) {
       if (err?.response?.code === -32000) {
         // This error is: "Cannot navigate to invalid URL".
@@ -88,10 +127,11 @@ export const scrapeURL = (
         // navigate to "javascript:" URLs, but we record the
         // issue if it happens.
         const oops: URLProblem = {
-          url,
+          url: currentURL,
           isValid: false,
           message: 'Invalid URL found.',
           statusCode: -1,
+          referer: currentURL,
         };
         addURLProblem(oops);
         return result;
@@ -99,10 +139,9 @@ export const scrapeURL = (
       throw err;
     }
 
-    // TODO set a max time to wait?
     await protocol.Page.loadEventFired();
     // eslint-disable-next-line no-console
-    console.log(`[Load fired event for ${url}]`);
+    console.log(`[Load fired event for ${currentURL}]`);
 
     const doc = await protocol.DOM.getDocument({
       // retrieve the full DOM tree, we'll need it
@@ -125,7 +164,7 @@ export const scrapeURL = (
 
     if (titleRef.nodeId === 0) {
       const oops: URLProblem = {
-        url,
+        url: currentURL,
         isValid: true,
         message: 'Page has no title tag in <head>.',
         // TODO determine status
@@ -134,6 +173,7 @@ export const scrapeURL = (
         // and then using the Network API
         // see: https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-navigate
         statusCode: 0,
+        referer: currentURL,
       };
 
       addURLProblem(oops);
@@ -177,19 +217,19 @@ export const scrapeURL = (
 
       if (isStyleSheet) {
         // eslint-disable-next-line no-console
-        console.log(`[iii] Ignoring status link found on ${url}: ${to}.`);
+        console.log(`[iii] Ignoring status link found on ${currentURL}: ${to}.`);
       } else if (!to || isParsable(to) === false) {
         // TODO handle this case properly
         // dunno what it means...
         // eslint-disable-next-line no-console
-        console.log(`[!!!] Link with no URL found on page ${url}, dunno if bad or not: ${to}.`);
+        console.log(`[!!!] Link with no URL found on page ${currentURL}, dunno if bad or not: ${to}.`);
       } else if (isJavascriptURL(to)) {
         // TODO handle javascript URLs
         // we have chrome, we can click on them!
         // but I wanna get the base scenario running
         // before tackling that issue
         // eslint-disable-next-line no-console
-        console.log(`[###] Javascript link found on page ${url}: ${to}`);
+        console.log(`[###] Javascript link found on page ${currentURL}: ${to}`);
       } else {
         const targetMap = isInternalURL(to) ?
           result.internalURLs :

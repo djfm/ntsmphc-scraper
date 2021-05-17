@@ -34,7 +34,7 @@ import {
 import {
   ScrapingTaskParams,
   startScraping,
-  ProjectScrapeResult,
+  ScrapingProgress,
 } from '../../scraper/scraper';
 
 import {
@@ -121,12 +121,12 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
       const scraping = startScraping({ notifyPageScraped })(params);
 
-      scraping.then((result: ProjectScrapeResult) => {
+      scraping.then((result: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
         const timeTaken = humanDuration(timeTakenSeconds);
 
         // eslint-disable-next-line no-console
-        console.log(`\n[DONE] Scraped ${result.nPagesScraped} URLs total in ${timeTaken}!`);
+        console.log(`\n[DONE] Scraped ${result.nURLsScraped} URLs total in ${timeTaken}!`);
 
         storeResults(params.projectId, result).then(() => {
           sendUINotification({

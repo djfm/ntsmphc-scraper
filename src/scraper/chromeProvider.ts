@@ -76,12 +76,6 @@ export type ChromeDOM = {
   querySelectorAll: (options: QuerySelectorOptions) => Promise<{nodeIds: number[]}>
 };
 
-export type NetworkResponse = {
-  url: string,
-  referer?: string,
-  status: number,
-};
-
 type ByeFunction = () => any;
 
 export type ChromeProtocol = {
