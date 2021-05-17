@@ -4,6 +4,7 @@ import {
 
 import {
   chromeProvider,
+  ChromeProtocol,
 } from './chromeProvider';
 
 import {
@@ -57,87 +58,71 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     const scrape = scrapeURL(isInternalURL, normalizeURL);
 
-    const urlsRemaining = new Set();
-    const urlsSeen = new Set();
+    const remainingURLs = new Set();
+    const seenURLs = new Set();
     let nChromesRunning = 0;
 
-    urlsRemaining.add(params.startURL);
+    remainingURLs.add(params.startURL);
 
-    const startAChrome = async (): Promise<ScrapingProgress> => {
-      let nURLsScraped = 0;
-      const protocol = await chromeProvider();
+    const processNextURLandGoOn = async (chrome: ChromeProtocol): Promise<ScrapingProgress> => {
+      const nextURL = remainingURLs.values().next().value;
+      remainingURLs.delete(nextURL);
+      seenURLs.add(normalizeURL(nextURL));
 
-      const killChrome = () => {
-        nChromesRunning -= 1;
-        protocol.terminate();
-        // eslint-disable-next-line no-console
-        console.log(`Killed a chrome! Remaining: ${nChromesRunning}.`);
-      };
+      const result = await scrape(chrome)(nextURL);
 
-      const bail = () => {
-        killChrome();
-        return {
-          nURLsScraped,
-          results: [],
-        };
-      };
+      notifiers.notifyPageScraped(result);
 
-      if (urlsRemaining.size > 0 && nChromesRunning < params.nParallel) {
-        nChromesRunning += 1;
-
-        const processOneURL = async (): Promise<ScrapingProgress> => {
-          if (urlsRemaining.size === 0) {
-            return bail();
-          }
-
-          const { value: nextURL } = urlsRemaining.values().next();
-
-          // eslint-disable-next-line no-console
-          console.log(`Now scraping URL: ${nextURL} and there remain ${urlsRemaining.size}...`);
-
-          urlsRemaining.delete(nextURL);
-          urlsSeen.add(normalizeURL(nextURL));
-
-          const result = await scrape(protocol)(nextURL);
-
-          notifiers.notifyPageScraped(result);
-
-          for (const [url, canonical] of result.internalURLs.entries()) {
-            const toScrape = canonical || url;
-            if (toScrape && !urlsSeen.has(toScrape)) {
-              urlsRemaining.add(toScrape);
-            }
-          }
-
-          notifiers.notifyPageScraped(result);
-          nURLsScraped += 1;
-
-          // TODO clear cookies if wanted, between two pages
-          // seen by the same browser
-
-          if (urlsRemaining.size > 0) {
-            const urlsScrapedPromises: Promise<ScrapingProgress>[] = [Promise.resolve({
-              nURLsScraped,
-              results: [result],
-            })];
-            while (nChromesRunning < params.nParallel && nChromesRunning < urlsRemaining.size) {
-              // wait a bit in order not to overload chrome
-              // eslint-disable-next-line no-await-in-loop
-              await waitMs(1000);
-              // eslint-disable-next-line no-console
-              console.log('Starting a chrome!');
-              urlsScrapedPromises.push(startAChrome());
-            }
-            return Promise.all(urlsScrapedPromises).then(reduceScrapingProgresses);
-          }
-
-          return bail();
-        };
-        return processOneURL();
+      for (const [regularURL, canonicalURL] of result.internalURLs.entries()) {
+        const url = normalizeURL(canonicalURL || regularURL);
+        if (!seenURLs.has(url)) {
+          remainingURLs.add(url);
+        }
       }
 
-      return bail();
+      if (remainingURLs.size > 0) {
+        return processNextURLandGoOn(chrome).then((progress) => ({
+          nURLsScraped: progress.nURLsScraped + 1,
+          results: progress.results.concat(result),
+        }));
+      }
+
+      chrome.terminate();
+      nChromesRunning -= 1;
+      // eslint-disable-next-line no-console
+      console.log(`Killed a chrome! Now ${nChromesRunning} remaining.`);
+
+      return {
+        nURLsScraped: 1,
+        results: [result],
+      };
     };
 
-    return startAChrome();
+    const processNextURLs = async (): Promise<ScrapingProgress> => {
+      const scrapingProgresses: Promise<ScrapingProgress>[] = [];
+
+      while (remainingURLs.size > 0 && nChromesRunning < params.nParallel) {
+        // eslint-disable-next-line no-await-in-loop
+        const chrome = await chromeProvider();
+        // eslint-disable-next-line no-await-in-loop
+        await waitMs(1000);
+        nChromesRunning += 1;
+        // eslint-disable-next-line no-console
+        console.log(`Created a chrome (now ${nChromesRunning} running)`);
+        scrapingProgresses.push(
+          processNextURLandGoOn(chrome),
+        );
+      }
+
+      return Promise.all(scrapingProgresses)
+        .then(reduceScrapingProgresses)
+        .then((progress) => {
+          if (remainingURLs.size > 0) {
+            return processNextURLs();
+          }
+          return progress;
+        });
+    };
+
+    return processNextURLs();
   };
