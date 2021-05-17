@@ -171,9 +171,14 @@ export const scrapeURL = (
       const linkCanonical = normalizeURL(attrsMap.get('canonical'));
       const href = normalizeURL(attrsMap.get('href'));
 
+      const isStyleSheet = attrsMap.get('rel') === 'stylesheet';
+
       const to = linkCanonical || href;
 
-      if (!to || isParsable(to) === false) {
+      if (isStyleSheet) {
+        // eslint-disable-next-line no-console
+        console.log(`[iii] Ignoring status link found on ${url}: ${to}.`);
+      } else if (!to || isParsable(to) === false) {
         // TODO handle this case properly
         // dunno what it means...
         // eslint-disable-next-line no-console
@@ -193,6 +198,7 @@ export const scrapeURL = (
         targetMap.set(href, linkCanonical);
       }
     }
+
     return result;
   };
 
