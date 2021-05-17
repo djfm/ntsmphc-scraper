@@ -9,7 +9,7 @@ import {
 
 import {
   ScrapeResult,
-} from '../../../scraper/scraper';
+} from '../../../scraper/scrapeURL';
 
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
