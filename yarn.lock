@@ -1968,6 +1968,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/object-hash@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@types/object-hash@npm:2.1.0"
+  checksum: 276948b96fff4f3ddbb37a566401fbdcd68ffac16267e464bf73b3448d3a7f8b2876be39c8a731478710d5b5a01dc4a61d927b12babfbf02e4acba6a3d8a0a42
+  languageName: node
+  linkType: hard
+
 "@types/prettier@npm:^2.0.0":
   version: 2.2.3
   resolution: "@types/prettier@npm:2.2.3"
@@ -8496,6 +8503,7 @@ fsevents@^1.2.7:
     "@types/minimist": ^1.2.1
     "@types/node": ^15.0.2
     "@types/node-fetch": ^2.5.10
+    "@types/object-hash": ^2.1.0
     "@types/react": ^17.0.5
     "@types/react-dom": ^17.0.3
     "@types/react-redux": ^7.1.16
@@ -8530,6 +8538,7 @@ fsevents@^1.2.7:
     lodash: ^4.17.21
     minimist: ^1.2.5
     node-fetch: ^2.6.1
+    object-hash: ^2.1.1
     react: ^17.0.2
     react-dom: ^17.0.2
     react-redux: ^7.2.4
@@ -8588,6 +8597,13 @@ fsevents@^1.2.7:
     define-property: ^0.2.5
     kind-of: ^3.0.3
   checksum: d91d46e54297cad0544f04e4dff4694f92aca9661f59ad7e803a1ba94a2bb24b38ca4fd59ea827d24c9bdc6f7148d5c838287ee4b2b9c5df9b445b1c0d7a066c
+  languageName: node
+  linkType: hard
+
+"object-hash@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "object-hash@npm:2.1.1"
+  checksum: fe49a0864cba7ac4055c604295692ae75f5f4d22ba929aaaa987469809d17ab030d1111e8f0d425a070fa4a78b8021b55260e26e98b66b59e0f7be2bd9069fb8
   languageName: node
   linkType: hard
 

@@ -23,6 +23,8 @@ import {
   addNotificationAction,
 } from '../redux/actions';
 
+import OneProjectReport from './OneProjectReport';
+
 const ProjectReports = () => {
   const dispatch = useDispatch();
   const routerParams = useRouterParams() as any;
@@ -55,7 +57,7 @@ const ProjectReports = () => {
         <div>
           <Switch>
             <Route path={`${path}/:reportId`}>
-              Project Report!
+              <OneProjectReport />
             </Route>
             <Route exact path={path}>
               <ul>

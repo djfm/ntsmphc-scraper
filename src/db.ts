@@ -278,3 +278,17 @@ export const loadReports = async (projectId: number) => {
 
   return reports;
 };
+
+export const loadReport = async (reportId: string) => {
+  const dirEntries = await readdir(dbRootPath);
+  const findExp = new RegExp(`^${reportId}`);
+  const reportEntry = dirEntries.find((entry) => findExp.test(entry));
+
+  if (!reportEntry) {
+    throw new Error(`Could not find report with id "${reportId}".`);
+  }
+
+  const reportDataString = await readFile(path.join(dbRootPath, reportEntry));
+  const reportData = JSON.parse(reportDataString.toString());
+  return reportData;
+};

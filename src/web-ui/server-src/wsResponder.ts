@@ -23,6 +23,7 @@ import {
   deleteProject,
   storeResults,
   loadReports,
+  loadReport,
 } from '../../db';
 
 import {
@@ -53,11 +54,18 @@ interface WithProjectId {
   projectId: number;
 }
 
+interface WithReportId {
+  reportId: string;
+}
+
 const hasURLParam = (params: object): params is WithURL =>
   Object.prototype.hasOwnProperty.call(params, 'url');
 
 const hasProjectId = (params: object): params is WithProjectId =>
   hasAllOwnProperties(['projectId'])(params);
+
+const hasReportId = (params: object): params is WithReportId =>
+  hasAllOwnProperties(['reportId'])(params);
 
 const isCreateProjectParams = (params: object): params is CreateProjectParams =>
   hasAllOwnProperties(['startURL', 'projectName'])(params);
@@ -176,6 +184,13 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         throw new Error('Error: params provided to "loadReports" miss property "projectId"');
       }
       return loadReports(params.projectId);
+    }
+
+    if (action === 'loadReport') {
+      if (!hasReportId(params)) {
+        throw new Error('Error: params provided to "loadReport" miss property "reportId"');
+      }
+      return loadReport(params.reportId);
     }
 
     throw new Error(`WebSocket: unknown server action "${action}"`);
