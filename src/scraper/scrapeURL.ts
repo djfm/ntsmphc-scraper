@@ -29,8 +29,7 @@ export type NetworkResponse = {
   status: number,
 };
 
-// TODO rename to URLScrapeResult
-export type ScrapeResult = {
+export type URLScrapingResult = {
   url: urlString;
   status: number;
   title: string;
@@ -69,10 +68,10 @@ export const scrapeURL = (
   isInternalURL: URLPredicate,
   normalizeURL: StrToStrFunc,
 ) => (protocol: ChromeProtocol) =>
-  async (nonNormalizedURL: urlString): Promise<ScrapeResult> => {
+  async (nonNormalizedURL: urlString): Promise<URLScrapingResult> => {
     const currentURL = normalizeURL(nonNormalizedURL);
 
-    const result: ScrapeResult = {
+    const result: URLScrapingResult = {
       url: currentURL,
       status: 0,
       title: undefined,

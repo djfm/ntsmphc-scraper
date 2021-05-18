@@ -8,7 +8,7 @@ import {
 } from './reducers/notifications';
 
 import {
-  ScrapeResult,
+  URLScrapingResult,
 } from '../../../scraper/scrapeURL';
 
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
@@ -64,11 +64,11 @@ export const addProjectAction = (project: any) => ({
 export type PageScrapedAction = {
   type: typeof NOTIFY_PAGE_SCRAPED;
   projectId: number;
-  result: ScrapeResult;
+  result: URLScrapingResult;
 };
 
 export const notifyPageScrapedAction =
-  (projectId: number, result: ScrapeResult): PageScrapedAction => ({
+  (projectId: number, result: URLScrapingResult): PageScrapedAction => ({
     type: NOTIFY_PAGE_SCRAPED,
     projectId,
     result,

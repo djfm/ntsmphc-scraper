@@ -38,7 +38,7 @@ import {
 } from '../../scraper/scraper';
 
 import {
-  ScrapeResult,
+  URLScrapingResult,
 } from '../../scraper/scrapeURL';
 
 interface WithURL {
@@ -110,7 +110,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         message: `Starting scraping from "${params.startURL}"...`,
       });
 
-      const notifyPageScraped = (result: ScrapeResult) => {
+      const notifyPageScraped = (result: URLScrapingResult) => {
         sendPayload({
           type: PAYLOAD_TYPE_REDUX_ACTION,
           action: notifyPageScrapedAction(params.projectId, result),
@@ -121,14 +121,14 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
       const scraping = startScraping({ notifyPageScraped })(params);
 
-      scraping.then((result: ScrapingProgress) => {
+      scraping.then((progress: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
         const timeTaken = humanDuration(timeTakenSeconds);
 
         // eslint-disable-next-line no-console
-        console.log(`\n[DONE] Scraped ${result.nURLsScraped} URLs total in ${timeTaken}!`);
+        console.log(`\n[DONE] Scraped ${progress.nURLsScraped} URLs total in ${timeTaken}!`);
 
-        storeResults(params.projectId, result).then(() => {
+        storeResults(params.projectId, progress).then(() => {
           sendUINotification({
             message: `Successfully scraped project #${params.projectId} in ${timeTaken}.`,
             severity: 'success',
@@ -136,7 +136,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         }, (err) => {
           // eslint-disable-next-line no-console
           console.error(err);
-          storeResults(params.projectId, result).then(() => {
+          storeResults(params.projectId, progress).then(() => {
             sendUINotification({
               message: 'Something bad happened while storing the results, sorry.',
               severity: 'error',

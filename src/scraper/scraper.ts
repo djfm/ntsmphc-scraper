@@ -7,7 +7,7 @@ import {
 } from './chromeProvider';
 
 import {
-  ScrapeResult,
+  URLScrapingResult,
   scrapeURL,
 } from './scrapeURL';
 
@@ -22,11 +22,11 @@ export type ScrapingTaskParams = {
 
 export type ScrapingProgress = {
   nURLsScraped: number,
-  results: ScrapeResult[],
+  results: URLScrapingResult[],
 }
 
 export type ScraperNotifiers = {
-  notifyPageScraped: (result: ScrapeResult) => any;
+  notifyPageScraped: (result: URLScrapingResult) => any;
 };
 
 const scrapingProgressesReducer = (
@@ -59,7 +59,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     remainingURLs.add(params.startURL);
 
-    const addNewURLSFromResult = (result: ScrapeResult) => {
+    const addNewURLSFromResult = (result: URLScrapingResult) => {
       for (const [regularURL, canonicalURL] of result.internalURLs.entries()) {
         const url = normalizeURL(canonicalURL || regularURL);
         if (!seenURLs.has(url)) {
