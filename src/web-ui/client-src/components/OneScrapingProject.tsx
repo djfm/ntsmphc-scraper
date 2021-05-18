@@ -78,7 +78,8 @@ const OneScrapingProject = () => {
         },
       );
     }
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project]);
 
   const handleProjectDeletion = (projectId: number) => (event: BaseSyntheticEvent) => {
     event.preventDefault();
