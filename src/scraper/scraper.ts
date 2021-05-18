@@ -89,7 +89,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     };
 
     const processNextURLs = async (): Promise<ScrapingProgress> => {
-      const scrapingProgresses: Promise<ScrapingProgress>[] = [];
+      const progresses: Promise<ScrapingProgress>[] = [];
 
       if (remainingURLs.size === 0) {
         return {
@@ -105,14 +105,16 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
         const next = scrapeWithChrome(nextURL);
 
-        scrapingProgresses.push(next);
-
-        next.then(() => {
-          scrapingProgresses.push(processNextURLs());
-        });
+        progresses.push(next);
       }
 
-      return Promise.all(scrapingProgresses).then(reduceScrapingProgresses);
+      const reducedProgresses = Promise.all(progresses).then(reduceScrapingProgresses);
+
+      return reducedProgresses.then(async (settledProgresses) => {
+        const processed = await processNextURLs();
+
+        return reduceScrapingProgresses([settledProgresses, processed]);
+      });
     };
 
     return processNextURLs();
