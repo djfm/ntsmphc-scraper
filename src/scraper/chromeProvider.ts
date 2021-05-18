@@ -96,7 +96,7 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     // see if that increases speed,
     // default value is 500 ms according to
     // https://github.com/GoogleChrome/chrome-launcher
-    connectionPollInterval: 100,
+    connectionPollInterval: 500,
   });
 
   const protocol = await CDP({ port: chrome.port });
