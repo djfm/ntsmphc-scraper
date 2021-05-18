@@ -45,10 +45,6 @@ const reduceScrapingProgresses = (progresses: ScrapingProgress[]): ScrapingProgr
     results: [],
   });
 
-const waitMs = async (milliseconds: number) => new Promise((resolve) => {
-  setTimeout(resolve, milliseconds);
-});
-
 export const startScraping = (notifiers: ScraperNotifiers) =>
   async (params: ScrapingTaskParams) : Promise<ScrapingProgress> => {
     const {
