@@ -79,7 +79,7 @@ const App = () => (
     <Notifications />
 
     <div>
-      <nav>
+      <nav id="main-nav">
         <ul>
           <li>
             <Link to="/">Home</Link>
