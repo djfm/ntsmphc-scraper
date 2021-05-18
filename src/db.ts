@@ -34,6 +34,13 @@ export interface CreateProjectParams {
   projectName: string;
 }
 
+export type ProjectMetaData = {
+  id: number;
+  projectName: string;
+  startURL: string;
+  createdAt: number;
+};
+
 type RunWithLockedFileFunction = (lockedFilePath?: string) => any;
 
 export const isSafeKeyForObjectMap = (keyName: string) => {
@@ -152,9 +159,14 @@ export const createProject = async (params: CreateProjectParams) =>
     return projectMetaData;
   });
 
-export const listProjects = async () => {
+export const listProjects = async (): Promise<ProjectMetaData[]> => {
   const projectsMap = await createMapObjectFromJSONFilePath(projectsFilePath);
-  return projectsMap.values();
+  return [...projectsMap.values()];
+};
+
+export const findProjectById = async (id: number): Promise<ProjectMetaData> => {
+  const projects = await listProjects();
+  return projects.find((project) => project.id === id);
 };
 
 export const deleteProject = async (projectId: number) =>
@@ -176,9 +188,14 @@ const generateURLReport = (progress: ScrapingProgress) =>
     status: result.status,
   }));
 
-export const storeResults = (projectId: number, progress: ScrapingProgress) => {
-  const time = Date.now();
-  const internalURLsPath = path.join(dbRootPath, `#${projectId}-${time}-internalURLs.json`);
+export const storeResults = async (projectId: number, progress: ScrapingProgress) => {
+  const project = await findProjectById(projectId);
+  const { projectName } = project;
+  const date = new Date();
+  const humanDate = date.toLocaleString();
+  const time = date.getTime();
+  const fileName = `${projectId}-${time}-internalURLs[${projectName} @ ${humanDate}].json`.replace(/\//g, '.');
+  const internalURLsPath = path.join(dbRootPath, fileName);
   return Promise.all([
     writeFile(internalURLsPath, JSON.stringify(generateURLReport(progress), null, 2)),
   ]);
