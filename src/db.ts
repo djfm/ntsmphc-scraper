@@ -273,7 +273,7 @@ export const loadReports = async (projectId: number) => {
     if (a.reportType !== b.reportType) {
       return (a.reportType > b.reportType) ? 1 : -1;
     }
-    return a.time - b.time;
+    return b.time - a.time;
   });
 
   return reports;
