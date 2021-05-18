@@ -6,6 +6,8 @@ import App from './components/App';
 
 import store from './redux/store';
 
+import './style/index.sass';
+
 import {
   addOnInfoCallback,
   clearOnInfoCallbacks,
