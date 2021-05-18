@@ -67,6 +67,16 @@ const makeReadable = (key: string, value: any) => {
   return value;
 };
 
+const maybeLinkTo = (str: string) => {
+  try {
+    // eslint-disable-next-line no-new
+    new URL(str);
+    return (<a rel="noreferrer" target="_blank" href={str}>{str}</a>);
+  } catch (err) {
+    return str;
+  }
+};
+
 const OneProjectReport = () => {
   const routerParams = useRouterParams() as any;
   const { reportId } = routerParams;
@@ -107,7 +117,7 @@ const OneProjectReport = () => {
               }) => (
                 <div key={key}>
                   <dt><strong>{name}:</strong></dt>
-                  <dd>{makeReadable(key, line[key])}</dd>
+                  <dd>{maybeLinkTo(makeReadable(key, line[key]))}</dd>
                 </div>
               ))}
             </article>
