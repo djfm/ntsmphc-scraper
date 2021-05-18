@@ -119,7 +119,8 @@ export const scrapeURL = (
     };
 
     try {
-      const loadingResult = await protocol.Page.navigate({ url: currentURL });
+      await protocol.Page.navigate({ url: currentURL });
+      // TODO maybe exploit the loadingResult to get page status and mime type
       // console.log(`[EVENT] navigate to page "${currentURL}" with result: `, loadingResult);
     } catch (err: any) {
       if (err?.response?.code === -32000) {
