@@ -90,6 +90,9 @@ const App = () => (
           <li>
             <Link to="/projects">View all Scraping Projects</Link>
           </li>
+          <li>
+            <Link to="/a-404">A 404-error page, used for testing</Link>
+          </li>
         </ul>
       </nav>
 
