@@ -25,8 +25,15 @@ export type ScrapingProgress = {
   results: URLScrapingResult[],
 }
 
+export type ScrapingStatistics = {
+  nRemainingURLs: number;
+  nSeenURLs: number;
+  approximatePctComplete: number;
+};
+
 export type ScraperNotifiers = {
   notifyPageScraped: (result: URLScrapingResult) => any;
+  notifyStatistics: (statistics: ScrapingStatistics) => any;
 };
 
 const scrapingProgressesReducer = (
@@ -97,6 +104,17 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       }
 
       notifiers.notifyPageScraped(result);
+
+      notifiers.notifyStatistics({
+        nSeenURLs: seenURLs.size,
+        nRemainingURLs: remainingURLs.size,
+        // approximate because we discover more and more
+        // pages to scrape as we go...
+        approximatePctComplete: Math.round(
+          (100 * seenURLs.size) / (seenURLs.size + remainingURLs.size),
+        ),
+      });
+
       addNewURLSFromResult(result);
 
       killChrome();

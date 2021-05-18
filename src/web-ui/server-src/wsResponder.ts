@@ -13,6 +13,7 @@ import {
 import {
   addNotificationAction,
   notifyPageScrapedAction,
+  notifyScrapingStatisticsAction,
 } from '../client-src/redux/actions';
 
 import {
@@ -35,6 +36,8 @@ import {
   ScrapingTaskParams,
   startScraping,
   ScrapingProgress,
+  ScraperNotifiers,
+  ScrapingStatistics,
 } from '../../scraper/scraper';
 
 import {
@@ -110,16 +113,26 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         message: `Starting scraping from "${params.startURL}"...`,
       });
 
-      const notifyPageScraped = (result: URLScrapingResult) => {
+      const notifyPageScraped = (result: URLScrapingResult) =>
         sendPayload({
           type: PAYLOAD_TYPE_REDUX_ACTION,
           action: notifyPageScrapedAction(params.projectId, result),
         });
+
+      const notifyStatistics = (statistics: ScrapingStatistics) =>
+        sendPayload({
+          type: PAYLOAD_TYPE_REDUX_ACTION,
+          action: notifyScrapingStatisticsAction(params.projectId, statistics),
+        });
+
+      const notifiers: ScraperNotifiers = {
+        notifyPageScraped,
+        notifyStatistics,
       };
 
       const startedAt = Date.now();
 
-      const scraping = startScraping({ notifyPageScraped })(params);
+      const scraping = startScraping(notifiers)(params);
 
       scraping.then((progress: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);

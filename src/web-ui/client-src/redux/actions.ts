@@ -11,6 +11,10 @@ import {
   URLScrapingResult,
 } from '../../../scraper/scrapeURL';
 
+import {
+  ScrapingStatistics,
+} from '../../../scraper/scraper';
+
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 
@@ -19,6 +23,7 @@ export const DELETE_PROJECT = 'DELETE_PROJECT';
 export const ADD_PROJECT = 'ADD_PROJECT';
 
 export const NOTIFY_PAGE_SCRAPED = 'NOTIFY_PAGE_SCRAPED';
+export const NOTIFY_SCRAPING_STATISTICS = 'NOTIFY_SCRAPING_STATISTICS';
 
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
@@ -64,12 +69,23 @@ export const addProjectAction = (project: any) => ({
 export type PageScrapedAction = {
   type: typeof NOTIFY_PAGE_SCRAPED;
   projectId: number;
-  result: URLScrapingResult;
+  result: {
+    url: string;
+  };
 };
 
 export const notifyPageScrapedAction =
   (projectId: number, result: URLScrapingResult): PageScrapedAction => ({
     type: NOTIFY_PAGE_SCRAPED,
     projectId,
-    result,
+    result: {
+      url: result.url,
+    },
+  });
+
+export const notifyScrapingStatisticsAction =
+  (projectId: number, statistics: ScrapingStatistics) => ({
+    type: NOTIFY_SCRAPING_STATISTICS,
+    projectId,
+    statistics,
   });
