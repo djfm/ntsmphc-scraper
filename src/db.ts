@@ -188,15 +188,57 @@ const generateURLReport = (progress: ScrapingProgress) =>
     status: result.status,
   }));
 
+export type ProblematicURLsReportLine = {
+  foundOnPage: string;
+  referer: string;
+  problematicURL: string;
+  status: number;
+  isValid: boolean;
+  message: string;
+};
+
+export type ProblematicURLsReport = ProblematicURLsReportLine[];
+
+const generateProblematicURLsReport = (progress: ScrapingProgress): ProblematicURLsReport =>
+  [].concat(
+    ...progress.results.map(
+      (result) =>
+        [].concat(
+          ...result.problematicURLs.map(
+            (oops) => ({
+              foundOnPage: result.url,
+              referer: oops.referer,
+              problematicURL: oops.url,
+              status: oops.status,
+              isValid: oops.isValid,
+              message: oops.message,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const storeResults = async (projectId: number, progress: ScrapingProgress) => {
   const project = await findProjectById(projectId);
   const { projectName } = project;
   const date = new Date();
   const humanDate = date.toLocaleString();
   const time = date.getTime();
-  const fileName = `${projectId}-${time}-internalURLs[${projectName} @ ${humanDate}].json`.replace(/\//g, '.');
-  const internalURLsPath = path.join(dbRootPath, fileName);
+
+  const internalURLsFileName = `${projectId}-${time}-internalURLs[${projectName} @ ${humanDate}].json`.replace(/\//g, '.');
+  const internalURLsPath = path.join(dbRootPath, internalURLsFileName);
+
+  const problematicURLsFileName = `${projectId}-${time}-problematicURLs[${projectName} @ ${humanDate}].json`.replace(/\//g, '.');
+  const problematicURLsFilePath = path.join(dbRootPath, problematicURLsFileName);
+
   return Promise.all([
-    writeFile(internalURLsPath, JSON.stringify(generateURLReport(progress), null, 2)),
+    writeFile(
+      internalURLsPath,
+      JSON.stringify(generateURLReport(progress), null, 2),
+    ),
+    writeFile(
+      problematicURLsFilePath,
+      JSON.stringify(generateProblematicURLsReport(progress), null, 2),
+    ),
   ]);
 };

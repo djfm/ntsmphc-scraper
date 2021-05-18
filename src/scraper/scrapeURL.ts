@@ -18,7 +18,7 @@ import {
 export type URLProblem = {
   url: urlString;
   isValid: boolean;
-  statusCode: number;
+  status: number;
   message: string;
   referer: string;
 };
@@ -38,7 +38,7 @@ export type URLScrapingResult = {
   externalURLs: Map<urlString, canonicalUrlString>;
   internalResources: Map<urlString, NetworkResponse>;
   externalResources: Map<urlString, NetworkResponse>;
-  problematicURLs: Map<urlString, URLProblem[]>;
+  problematicURLs: URLProblem[];
 };
 
 export type StrToStrFunc = (input: string) => string;
@@ -80,7 +80,12 @@ export const scrapeURL = (
       externalURLs: new Map(),
       internalResources: new Map(),
       externalResources: new Map(),
-      problematicURLs: new Map(),
+      problematicURLs: [],
+    };
+
+    const addURLProblem = (oops: URLProblem) => {
+      result.problematicURLs.push(oops);
+      console.log(oops);
     };
 
     protocol.Network.responseReceived(({ response }) => {
@@ -89,6 +94,18 @@ export const scrapeURL = (
       const referer = response?.requestHeaders?.Referer || currentURL;
       // console.log(`[EVENT] response for ${responseURL}
       // from ${ referer } received with status ${ status }.`);
+
+      if (response.status >= 400) {
+        const oops: URLProblem = {
+          url: currentURL,
+          isValid: true,
+          status: response.status,
+          message: 'Page has an error status code (>= 400).',
+          referer,
+        };
+
+        addURLProblem(oops);
+      }
 
       if (currentURL === responseURL) {
         // TODO add here any relevant info
@@ -110,17 +127,8 @@ export const scrapeURL = (
       storage[responseURL] = resp;
     });
 
-    const addURLProblem = (oops: URLProblem) => {
-      if (!result.problematicURLs.has(currentURL)) {
-        result.problematicURLs.set(currentURL, []);
-      }
-      result.problematicURLs.get(currentURL).push(oops);
-    };
-
     try {
       await protocol.Page.navigate({ url: currentURL });
-      // TODO maybe exploit the loadingResult to get page status and mime type
-      // console.log(`[EVENT] navigate to page "${currentURL}" with result: `, loadingResult);
     } catch (err: any) {
       if (err?.response?.code === -32000) {
         // This error is: "Cannot navigate to invalid URL".
@@ -131,7 +139,7 @@ export const scrapeURL = (
           url: currentURL,
           isValid: false,
           message: 'Invalid URL found.',
-          statusCode: -1,
+          status: -1,
           referer: currentURL,
         };
         addURLProblem(oops);
@@ -172,7 +180,7 @@ export const scrapeURL = (
         // that is MAYBE returned by Page.navigate
         // and then using the Network API
         // see: https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-navigate
-        statusCode: 0,
+        status: 0,
         referer: currentURL,
       };
 

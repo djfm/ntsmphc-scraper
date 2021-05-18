@@ -34,6 +34,16 @@ if (isDevelopment) {
 
 app.use(express.static(path.resolve(__dirname, 'public')));
 
+app.get('/a-404', (req, res) => {
+  res.status(404);
+  res.send('This is a 404 error');
+});
+
+app.get('/a-500', (req, res) => {
+  res.status(500);
+  res.send('This is a 500 error');
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
