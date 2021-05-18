@@ -106,7 +106,7 @@ const OneProjectReport = () => {
                 name,
               }) => (
                 <div key={key}>
-                  <dt><strong>{name}</strong></dt>
+                  <dt><strong>{name}:</strong></dt>
                   <dd>{makeReadable(key, line[key])}</dd>
                 </div>
               ))}
