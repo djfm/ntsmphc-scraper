@@ -131,9 +131,7 @@ const OneScrapingProject = () => {
     <main>
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
       <section>
-        <p>
-          <h1>Here is some basic info about this project:</h1>
-        </p>
+        <h1>Here is some basic info about this project:</h1>
         <dl>
           <dt>Start URL:</dt>
           <dd>{project.startURL}</dd>
