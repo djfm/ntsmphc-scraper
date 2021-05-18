@@ -9,6 +9,8 @@ const pickAtRandom = (array: readonly any[]) => {
   return array[index];
 };
 
+const randInt = (maxExcluded: number) => Math.floor(maxExcluded * Math.random());
+
 const reduceComplexity = (complexity: number) =>
   complexity / 2;
 
@@ -82,6 +84,18 @@ const generateRandomWeirdObject = (complexity: number) => {
       return map;
     }
 
+    case 'regexp': {
+      const flag = pickAtRandom(['g', 'i', 'm', 'u']);
+      const nCaptureGroups = Math.floor(4 * Math.random());
+      const bits = [];
+      for (let c = 0; c < nCaptureGroups; c += 1) {
+        bits.push(randomString(randInt(5)));
+        bits.push(`(${randomString(1 + randInt(5))})`);
+      }
+      const source = bits.join('');
+      return new RegExp(source, flag);
+    }
+
     case 'date': {
       return new Date(Date.now() + Math.random() * Date.now());
     }
@@ -136,6 +150,7 @@ describe('The serialization lib serializes data to text and back.', () => {
       new Map([['a', 'A'], ['b', 'B']]),
       new Set([1, 2, 3]),
       new Date(Date.now()),
+      /te(st)$/mgi,
     ];
 
     for (const [id, object] of objects.entries()) {

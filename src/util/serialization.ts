@@ -5,6 +5,7 @@ export const TagTypes = [
   'array',
   'object',
   'scalar',
+  'regexp',
 ] as const;
 
 type Tag = {
@@ -59,6 +60,16 @@ export const preSerialize = (input: any): Tag => {
       return {
         type: 'date',
         value: input.getTime(),
+      };
+    }
+
+    if (input instanceof RegExp) {
+      return {
+        type: 'regexp',
+        value: {
+          source: input.source,
+          flags: input.flags,
+        },
       };
     }
 
@@ -139,6 +150,14 @@ const unPack = (tag: Tag) => {
       throw new Error('date should be stored as time, i.e. a number');
     }
     return new Date(tag.value);
+  }
+
+  if (tag.type === 'regexp') {
+    const value = tag.value as {
+      source: string,
+      flags: string,
+    };
+    return new RegExp(value.source, value.flags);
   }
 
   throw new Error('If code execution reaches here, then I messed up.');
