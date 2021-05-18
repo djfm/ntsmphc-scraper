@@ -26,7 +26,7 @@ import {
 } from './scraper/scraper';
 
 import {
-  ScrapeResult,
+  URLScrapingResult,
 } from './scraper/scrapeURL';
 
 export interface CreateProjectParams {
@@ -171,7 +171,7 @@ export const deleteProject = async (projectId: number) =>
   });
 
 const generateURLReport = (progress: ScrapingProgress) =>
-  progress.results.map((result: ScrapeResult) => ({
+  progress.results.map((result: URLScrapingResult) => ({
     url: result.url,
     status: result.status,
   }));
