@@ -42,6 +42,26 @@
       }
     },
     {
+      "name": "Scraper Server Production",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--nolazy",
+        "-r",
+        "ts-node/register"
+      ],
+      "program": "${workspaceFolder}/src/web-ui/server.ts",
+      "skipFiles": [
+        "<node_internals>/**",
+        "node_modules/**"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "8090"
+      }
+    },
+    {
       "name": "Experimental Live-Reload Debugging",
       "type": "node",
       "request": "launch",
