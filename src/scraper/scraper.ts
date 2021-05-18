@@ -89,8 +89,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
       chrome.terminate();
       nChromesRunning -= 1;
-      // eslint-disable-next-line no-console
-      console.log(`Killed a chrome! Now ${nChromesRunning} remaining.`);
+      // console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
 
       return {
         nURLsScraped: 1,
@@ -101,35 +100,28 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     const processNextURLs = async (): Promise<ScrapingProgress> => {
       const scrapingProgresses: Promise<ScrapingProgress>[] = [];
 
-      const processWithChrome = () => {
-        chromeProvider().then((chrome: ChromeProtocol) => {
-          nChromesRunning += 1;
-          // eslint-disable-next-line no-console
-          console.log(`Created a chrome (now ${nChromesRunning} running)`);
-          scrapingProgresses.push(
-            processNextURLandGoOn(chrome),
-          );
-        });
+      const processWithChrome = async () => {
+        nChromesRunning += 1;
+        const chrome = await chromeProvider();
+        // console.log(`[!!!] Created a chrome (now ${nChromesRunning} running)`);
+        return processNextURLandGoOn(chrome);
       };
 
       while (remainingURLs.size > 0 && nChromesRunning < params.nParallel) {
-        // I really don't understand why this makes a difference...
-        // eslint-disable-next-line no-await-in-loop
-        await waitMs(500);
-        processWithChrome();
+        scrapingProgresses.push(processWithChrome());
       }
 
-      return Promise.all(scrapingProgresses)
-        .then(reduceScrapingProgresses)
-        .then((progress) => {
-          if (remainingURLs.size > 0) {
-            return processNextURLs().then((nextProgress) => ({
-              nURLsScraped: progress.nURLsScraped + nextProgress.nURLsScraped,
-              results: progress.results.concat(...nextProgress.results),
-            }));
-          }
-          return progress;
-        });
+      const progresses = await Promise.all(scrapingProgresses);
+      const summary = reduceScrapingProgresses(progresses);
+
+      if (remainingURLs.size > 0) {
+        return processNextURLs().then((nextProgress) => ({
+          nURLsScraped: summary.nURLsScraped + nextProgress.nURLsScraped,
+          results: summary.results.concat(...nextProgress.results),
+        }));
+      }
+
+      return summary;
     };
 
     return processNextURLs();

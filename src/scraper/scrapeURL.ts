@@ -87,7 +87,9 @@ export const scrapeURL = (
     protocol.Network.responseReceived(({ response }) => {
       const { status } = response;
       const responseURL = normalizeURL(response.url);
-      const referer = response?.requestHeaders?.Referer;
+      const referer = response?.requestHeaders?.Referer || currentURL;
+      // console.log(`[EVENT] response for ${responseURL}
+      // from ${ referer } received with status ${ status }.`);
 
       if (currentURL === responseURL) {
         // TODO add here any relevant info
@@ -118,8 +120,7 @@ export const scrapeURL = (
 
     try {
       const loadingResult = await protocol.Page.navigate({ url: currentURL });
-      // eslint-disable-next-line no-console
-      console.log(`[OK] loaded page "${currentURL}" with result: `, loadingResult);
+      // console.log(`[EVENT] navigate to page "${currentURL}" with result: `, loadingResult);
     } catch (err: any) {
       if (err?.response?.code === -32000) {
         // This error is: "Cannot navigate to invalid URL".
@@ -140,8 +141,7 @@ export const scrapeURL = (
     }
 
     await protocol.Page.loadEventFired();
-    // eslint-disable-next-line no-console
-    console.log(`[Load fired event for ${currentURL}]`);
+    // console.log(`[EVENT] Load fired event for ${currentURL}`);
 
     const doc = await protocol.DOM.getDocument({
       // retrieve the full DOM tree, we'll need it
@@ -211,26 +211,9 @@ export const scrapeURL = (
       const linkCanonical = normalizeURL(attrsMap.get('canonical'));
       const href = normalizeURL(attrsMap.get('href'));
 
-      const isStyleSheet = attrsMap.get('rel') === 'stylesheet';
-
       const to = linkCanonical || href;
 
-      if (isStyleSheet) {
-        // eslint-disable-next-line no-console
-        console.log(`[iii] Ignoring status link found on ${currentURL}: ${to}.`);
-      } else if (!to || isParsable(to) === false) {
-        // TODO handle this case properly
-        // dunno what it means...
-        // eslint-disable-next-line no-console
-        console.log(`[!!!] Link with no URL found on page ${currentURL}, dunno if bad or not: ${to}.`);
-      } else if (isJavascriptURL(to)) {
-        // TODO handle javascript URLs
-        // we have chrome, we can click on them!
-        // but I wanna get the base scenario running
-        // before tackling that issue
-        // eslint-disable-next-line no-console
-        console.log(`[###] Javascript link found on page ${currentURL}: ${to}`);
-      } else {
+      if (to && isParsable(to) && !isJavascriptURL(to)) {
         const targetMap = isInternalURL(to) ?
           result.internalURLs :
           result.externalURLs;
