@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "215eec289965592cf118";
+/******/ 	var hotCurrentHash = "0726ca7533edaafbe390";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -14392,6 +14392,151 @@ __webpack_require__(/*! ../modules/web.immediate */ "./node_modules/core-js/modu
 __webpack_require__(/*! ../modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 module.exports = __webpack_require__(/*! ../modules/_core */ "./node_modules/core-js/modules/_core.js");
 
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/web-ui/client-src/style/index.sass":
+/*!*****************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/web-ui/client-src/style/index.sass ***!
+  \*****************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default.a);
+// Module
+___CSS_LOADER_EXPORT___.push([module.i, "body {\n  padding-left: 5px;\n  padding-right: 5px;\n}\n\ndd {\n  margin-left: 10px;\n  margin-bottom: 5px;\n}\n\nli {\n  margin-bottom: 5px;\n}\n\nnav {\n  background-color: #888;\n  color: white;\n}\nnav a {\n  color: white;\n}\nnav a:visited {\n  color: #2d00a8;\n}\nnav ul {\n  display: flex;\n  flex-direction: row;\n}\nnav ul li {\n  list-style: none;\n  margin: 10px;\n}\n\n#main-nav {\n  background-color: #444;\n  color: #fff;\n}\n#main-nav a {\n  color: #fff;\n}\n#main-nav a:visited {\n  color: #ffcc00;\n}\n\n.report-container {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n}\n\n.report-entry {\n  border: 1px solid #ccc;\n  border-radius: 2px;\n  flex-basis: 300px;\n  margin: 5px;\n  padding: 5px;\n}\n\n.notification {\n  border: 1px solid #ccc;\n  padding: 5px;\n  border-radius: 2px;\n}\n\n.notification-success {\n  background-color: #9f9;\n}", "",{"version":3,"sources":["webpack://./src/web-ui/client-src/style/index.sass"],"names":[],"mappings":"AAYA;EACE,iBAbgB;EAchB,kBAdgB;AAGlB;;AAaA;EACE,iBAAA;EACA,kBAlBgB;AAQlB;;AAYA;EACE,kBArBgB;AAYlB;;AAWA;EACE,sBAjBe;EAkBf,YAjBiB;AASnB;AASE;EACE,YAnBe;AAYnB;AAQE;EACE,cApBiB;AAcrB;AAOE;EACE,aAAA;EACA,mBAAA;AALJ;AAMI;EACE,gBAAA;EACA,YAAA;AAJN;;AAMA;EACE,sBAlCW;EAmCX,WAlCa;AA+Bf;AAIE;EACE,WApCW;AAkCf;AAGE;EACE,cArCa;AAoCjB;;AAGA;EACE,aAAA;EACA,mBAAA;EACA,eAAA;AAAF;;AAEA;EACE,sBAAA;EACA,kBAnDc;EAoDd,iBA3CmB;EA4CnB,WAtDgB;EAuDhB,YAvDgB;AAwDlB;;AACA;EACE,sBAAA;EACA,YA3DgB;EA4DhB,kBA3Dc;AA6DhB;;AAAA;EACE,sBA5DS;AA+DX","sourcesContent":["$default-spacing: 5px\n$border-radius: 2px\n$border-color: #ccc\n$ok-green: #9f9\n$dark-color: #444\n$bright-color: #fff\n$bright-color-2: #ffcc00\n$dark-color-alt: #888\n$bright-color-alt: rgb(255, 255, 255)\n$bright-color-alt-2: #2d00a8\n$report-entry-width: 300px\n\nbody\n  padding-left: $default-spacing\n  padding-right: $default-spacing\n\ndd\n  margin-left: 2 * $default-spacing\n  margin-bottom: $default-spacing\n\nli\n  margin-bottom: $default-spacing\n\nnav\n  background-color: $dark-color-alt\n  color: $bright-color-alt\n  a\n    color: $bright-color-alt\n  a:visited\n    color: $bright-color-alt-2\n  ul\n    display: flex\n    flex-direction: row\n    li\n      list-style: none\n      margin: 2 * $default-spacing\n\n#main-nav\n  background-color: $dark-color\n  color: $bright-color\n  a\n    color: $bright-color\n  a:visited\n    color: $bright-color-2\n\n.report-container\n  display: flex\n  flex-direction: row\n  flex-wrap: wrap\n\n.report-entry\n  border: 1px solid $border-color\n  border-radius: $border-radius\n  flex-basis: $report-entry-width\n  margin: $default-spacing\n  padding: $default-spacing\n\n.notification\n  border: 1px solid $border-color\n  padding: $default-spacing\n  border-radius: $border-radius\n\n.notification-success\n  background-color: $ok-green"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+// eslint-disable-next-line func-names
+module.exports = function (cssWithMappingToString) {
+  var list = []; // return the list of modules as css string
+
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = cssWithMappingToString(item);
+
+      if (item[2]) {
+        return "@media ".concat(item[2], " {").concat(content, "}");
+      }
+
+      return content;
+    }).join("");
+  }; // import a list of modules into the list
+  // eslint-disable-next-line func-names
+
+
+  list.i = function (modules, mediaQuery, dedupe) {
+    if (typeof modules === "string") {
+      // eslint-disable-next-line no-param-reassign
+      modules = [[null, modules, ""]];
+    }
+
+    var alreadyImportedModules = {};
+
+    if (dedupe) {
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
+
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+
+    for (var _i = 0; _i < modules.length; _i++) {
+      var item = [].concat(modules[_i]);
+
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      if (mediaQuery) {
+        if (!item[2]) {
+          item[2] = mediaQuery;
+        } else {
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+        }
+      }
+
+      list.push(item);
+    }
+  };
+
+  return list;
+};
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/cssWithMappingToString.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+module.exports = function cssWithMappingToString(item) {
+  var _item = _slicedToArray(item, 4),
+      content = _item[1],
+      cssMapping = _item[3];
+
+  if (typeof btoa === "function") {
+    // eslint-disable-next-line no-undef
+    var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(cssMapping))));
+    var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
+    var sourceMapping = "/*# ".concat(data, " */");
+    var sourceURLs = cssMapping.sources.map(function (source) {
+      return "/*# sourceURL=".concat(cssMapping.sourceRoot || "").concat(source, " */");
+    });
+    return [content].concat(sourceURLs).concat([sourceMapping]).join("\n");
+  }
+
+  return [content].join("\n");
+};
 
 /***/ }),
 
@@ -77119,6 +77264,286 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isOldIE = function isOldIE() {
+  var memo;
+  return function memorize() {
+    if (typeof memo === 'undefined') {
+      // Test for IE <= 9 as proposed by Browserhacks
+      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+      // Tests for existence of standard globals is to allow style-loader
+      // to operate correctly into non-standard environments
+      // @see https://github.com/webpack-contrib/style-loader/issues/177
+      memo = Boolean(window && document && document.all && !window.atob);
+    }
+
+    return memo;
+  };
+}();
+
+var getTarget = function getTarget() {
+  var memo = {};
+  return function memorize(target) {
+    if (typeof memo[target] === 'undefined') {
+      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
+
+      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+        try {
+          // This will throw an exception if access to iframe is blocked
+          // due to cross-origin restrictions
+          styleTarget = styleTarget.contentDocument.head;
+        } catch (e) {
+          // istanbul ignore next
+          styleTarget = null;
+        }
+      }
+
+      memo[target] = styleTarget;
+    }
+
+    return memo[target];
+  };
+}();
+
+var stylesInDom = [];
+
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+
+  for (var i = 0; i < stylesInDom.length; i++) {
+    if (stylesInDom[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+
+  return result;
+}
+
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var index = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3]
+    };
+
+    if (index !== -1) {
+      stylesInDom[index].references++;
+      stylesInDom[index].updater(obj);
+    } else {
+      stylesInDom.push({
+        identifier: identifier,
+        updater: addStyle(obj, options),
+        references: 1
+      });
+    }
+
+    identifiers.push(identifier);
+  }
+
+  return identifiers;
+}
+
+function insertStyleElement(options) {
+  var style = document.createElement('style');
+  var attributes = options.attributes || {};
+
+  if (typeof attributes.nonce === 'undefined') {
+    var nonce =  true ? __webpack_require__.nc : undefined;
+
+    if (nonce) {
+      attributes.nonce = nonce;
+    }
+  }
+
+  Object.keys(attributes).forEach(function (key) {
+    style.setAttribute(key, attributes[key]);
+  });
+
+  if (typeof options.insert === 'function') {
+    options.insert(style);
+  } else {
+    var target = getTarget(options.insert || 'head');
+
+    if (!target) {
+      throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+    }
+
+    target.appendChild(style);
+  }
+
+  return style;
+}
+
+function removeStyleElement(style) {
+  // istanbul ignore if
+  if (style.parentNode === null) {
+    return false;
+  }
+
+  style.parentNode.removeChild(style);
+}
+/* istanbul ignore next  */
+
+
+var replaceText = function replaceText() {
+  var textStore = [];
+  return function replace(index, replacement) {
+    textStore[index] = replacement;
+    return textStore.filter(Boolean).join('\n');
+  };
+}();
+
+function applyToSingletonTag(style, index, remove, obj) {
+  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
+
+  /* istanbul ignore if  */
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = replaceText(index, css);
+  } else {
+    var cssNode = document.createTextNode(css);
+    var childNodes = style.childNodes;
+
+    if (childNodes[index]) {
+      style.removeChild(childNodes[index]);
+    }
+
+    if (childNodes.length) {
+      style.insertBefore(cssNode, childNodes[index]);
+    } else {
+      style.appendChild(cssNode);
+    }
+  }
+}
+
+function applyToTag(style, options, obj) {
+  var css = obj.css;
+  var media = obj.media;
+  var sourceMap = obj.sourceMap;
+
+  if (media) {
+    style.setAttribute('media', media);
+  } else {
+    style.removeAttribute('media');
+  }
+
+  if (sourceMap && typeof btoa !== 'undefined') {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  } // For old IE
+
+  /* istanbul ignore if  */
+
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    while (style.firstChild) {
+      style.removeChild(style.firstChild);
+    }
+
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var singleton = null;
+var singletonCounter = 0;
+
+function addStyle(obj, options) {
+  var style;
+  var update;
+  var remove;
+
+  if (options.singleton) {
+    var styleIndex = singletonCounter++;
+    style = singleton || (singleton = insertStyleElement(options));
+    update = applyToSingletonTag.bind(null, style, styleIndex, false);
+    remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+  } else {
+    style = insertStyleElement(options);
+    update = applyToTag.bind(null, style, options);
+
+    remove = function remove() {
+      removeStyleElement(style);
+    };
+  }
+
+  update(obj);
+  return function updateStyle(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
+        return;
+      }
+
+      update(obj = newObj);
+    } else {
+      remove();
+    }
+  };
+}
+
+module.exports = function (list, options) {
+  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+  // tags it will allow on a page
+
+  if (!options.singleton && typeof options.singleton !== 'boolean') {
+    options.singleton = isOldIE();
+  }
+
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+
+    if (Object.prototype.toString.call(newList) !== '[object Array]') {
+      return;
+    }
+
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDom[index].references--;
+    }
+
+    var newLastIdentifiers = modulesToDom(newList, options);
+
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+
+      var _index = getIndexByIdentifier(_identifier);
+
+      if (stylesInDom[_index].references === 0) {
+        stylesInDom[_index].updater();
+
+        stylesInDom.splice(_index, 1);
+      }
+    }
+
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
 /***/ "./node_modules/tiny-invariant/dist/tiny-invariant.esm.js":
 /*!****************************************************************!*\
   !*** ./node_modules/tiny-invariant/dist/tiny-invariant.esm.js ***!
@@ -82495,6 +82920,7 @@ var Notifications = function Notifications() {
 
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, notifications.map(function (notification) {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("aside", {
+      className: "notification notification-".concat(notification.severity),
       key: notification.id,
       role: "alert"
     }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "[", date(notification.createdAt), "] ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, notification.message)), maybeRenderDismissButton(notification));
@@ -82508,7 +82934,9 @@ _s(Notifications, "ZQd8t5kPJrpvLmrfmgHat8y0qNA=", false, function () {
 _c = Notifications;
 
 var App = function App() {
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["BrowserRouter"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Notifications, null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("nav", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["BrowserRouter"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Notifications, null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("nav", {
+    id: "main-nav"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
     to: "/"
   }, "Home")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
     to: "/new-scraping-project"
@@ -83062,6 +83490,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+var keyNames = {
+  isValid: 'URL is valid',
+  status: 'HTTP status of page',
+  problematicURL: "URL that's causing problems",
+  foundOnPage: 'Page the issue was found on',
+  referer: 'HTTP referer',
+  message: 'Why this is reported',
+  url: 'URL of scraped page'
+};
 
 var extractColumns = function extractColumns(data) {
   var keysSeen = new Set();
@@ -83087,9 +83524,43 @@ var extractColumns = function extractColumns(data) {
   return _toConsumableArray(keysSeen.values()).map(function (key) {
     return {
       key: key,
-      name: key
+      name: keyNames[key] || key
     };
   });
+};
+
+var makeReadable = function makeReadable(key, value) {
+  if (value === undefined) {
+    return 'undefined';
+  }
+
+  if (value === false) {
+    return 'no';
+  }
+
+  if (value === true) {
+    return 'yes';
+  }
+
+  if (value === null) {
+    return 'undefined';
+  }
+
+  return value;
+};
+
+var maybeLinkTo = function maybeLinkTo(str) {
+  try {
+    // eslint-disable-next-line no-new
+    new URL(str);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+      rel: "noreferrer",
+      target: "_blank",
+      href: str
+    }, str);
+  } catch (err) {
+    return str;
+  }
 };
 
 var OneProjectReport = function OneProjectReport() {
@@ -83128,15 +83599,18 @@ var OneProjectReport = function OneProjectReport() {
   }, [reportId, reportData, dispatch]);
 
   var ui = function ui() {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("section", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Report ", reportId), reportData === undefined && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Loading report, please wait..."), reportData && reportData.length === 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Looks like an empty report, sorry..."), reportData && reportData.length > 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, reportData.map(function (line) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("section", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Report ", reportId), reportData === undefined && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Loading report, please wait..."), reportData && reportData.length === 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Looks like an empty report, sorry..."), reportData && reportData.length > 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "report-container"
+    }, reportData.map(function (line) {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("article", {
+        className: "report-entry",
         key: object_hash__WEBPACK_IMPORTED_MODULE_3___default()(line)
       }, columns.map(function (_ref) {
         var key = _ref.key,
             name = _ref.name;
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           key: key
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, line[key]));
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, name, ":")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, maybeLinkTo(makeReadable(key, line[key]))));
       }));
     })));
   };
@@ -84420,10 +84894,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _components_App__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/App */ "./src/web-ui/client-src/components/App.tsx");
 /* harmony import */ var _redux_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./redux/store */ "./src/web-ui/client-src/redux/store.ts");
-/* harmony import */ var _webSocketsUISide__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./webSocketsUISide */ "./src/web-ui/client-src/webSocketsUISide.ts");
-/* harmony import */ var _handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts");
+/* harmony import */ var _style_index_sass__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./style/index.sass */ "./src/web-ui/client-src/style/index.sass");
+/* harmony import */ var _webSocketsUISide__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./webSocketsUISide */ "./src/web-ui/client-src/webSocketsUISide.ts");
+/* harmony import */ var _handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts");
 __webpack_require__.$Refresh$.runtime = __webpack_require__(/*! ./node_modules/react-refresh/runtime.js */ "./node_modules/react-refresh/runtime.js");
 __webpack_require__.$Refresh$.setup(module.i);
+
 
 
 
@@ -84446,14 +84922,14 @@ var render = function render() {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ReduxApp, null), rootElement);
 };
 
-Object(_webSocketsUISide__WEBPACK_IMPORTED_MODULE_5__["addOnInfoCallback"])(Object(_handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_6__["default"])(_redux_store__WEBPACK_IMPORTED_MODULE_4__["default"]));
+Object(_webSocketsUISide__WEBPACK_IMPORTED_MODULE_6__["addOnInfoCallback"])(Object(_handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_7__["default"])(_redux_store__WEBPACK_IMPORTED_MODULE_4__["default"]));
 
 if (true) {
-  module.hot.accept(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts", function(__WEBPACK_OUTDATED_DEPENDENCIES__) { /* harmony import */ _handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts");
+  module.hot.accept(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts", function(__WEBPACK_OUTDATED_DEPENDENCIES__) { /* harmony import */ _handlePayloadFromServer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./handlePayloadFromServer */ "./src/web-ui/client-src/handlePayloadFromServer.ts");
 (function () {
     // eslint-disable-next-line no-console
     console.log('[HMR] Attempting to hot-reload on-info callbacks...');
-    Object(_webSocketsUISide__WEBPACK_IMPORTED_MODULE_5__["clearOnInfoCallbacks"])();
+    Object(_webSocketsUISide__WEBPACK_IMPORTED_MODULE_6__["clearOnInfoCallbacks"])();
 
     var next = __webpack_require__(/*! ./webSocketsUISide */ "./src/web-ui/client-src/webSocketsUISide.ts");
 
@@ -85500,6 +85976,90 @@ if (true) {
   }
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js */ "./node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js"), __webpack_require__(/*! ./node_modules/@pmmmwh/react-refresh-webpack-plugin/overlay/index.js */ "./node_modules/@pmmmwh/react-refresh-webpack-plugin/overlay/index.js")))
+
+/***/ }),
+
+/***/ "./src/web-ui/client-src/style/index.sass":
+/*!************************************************!*\
+  !*** ./src/web-ui/client-src/style/index.sass ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./index.sass */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/web-ui/client-src/style/index.sass");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+if (true) {
+  if (!_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"].locals || module.hot.invalidate) {
+    var isEqualLocals = function isEqualLocals(a, b, isNamedExport) {
+  if (!a && b || a && !b) {
+    return false;
+  }
+
+  var p;
+
+  for (p in a) {
+    if (isNamedExport && p === 'default') {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    if (a[p] !== b[p]) {
+      return false;
+    }
+  }
+
+  for (p in b) {
+    if (isNamedExport && p === 'default') {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    if (!a[p]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+    var oldLocals = _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"].locals;
+
+    module.hot.accept(
+      /*! !../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./index.sass */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/web-ui/client-src/style/index.sass",
+      function(__WEBPACK_OUTDATED_DEPENDENCIES__) { /* harmony import */ _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./index.sass */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/web-ui/client-src/style/index.sass");
+(function () {
+        if (!isEqualLocals(oldLocals, _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"].locals, undefined)) {
+                module.hot.invalidate();
+
+                return;
+              }
+
+              oldLocals = _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"].locals;
+
+              update(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"]);
+      })(__WEBPACK_OUTDATED_DEPENDENCIES__); }.bind(this)
+    )
+  }
+
+  module.hot.dispose(function() {
+    update();
+  });
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_sass__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
