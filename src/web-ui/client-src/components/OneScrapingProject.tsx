@@ -127,7 +127,6 @@ const OneScrapingProject = () => {
 
   const createdDate = new Date(project.createdAt);
 
-  // TODO Add confirmation on Delete
   return (
     <main>
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
