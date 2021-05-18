@@ -8,6 +8,7 @@ import {
   writeFile,
   unlink,
   readFile,
+  readdir,
 } from 'fs/promises';
 
 // for watching files, see:
@@ -40,6 +41,17 @@ export type ProjectMetaData = {
   startURL: string;
   createdAt: number;
 };
+
+export type ProblematicURLsReportLine = {
+  foundOnPage: string;
+  referer: string;
+  problematicURL: string;
+  status: number;
+  isValid: boolean;
+  message: string;
+};
+
+export type ProblematicURLsReport = ProblematicURLsReportLine[];
 
 type RunWithLockedFileFunction = (lockedFilePath?: string) => any;
 
@@ -188,17 +200,6 @@ const generateURLReport = (progress: ScrapingProgress) =>
     status: result.status,
   }));
 
-export type ProblematicURLsReportLine = {
-  foundOnPage: string;
-  referer: string;
-  problematicURL: string;
-  status: number;
-  isValid: boolean;
-  message: string;
-};
-
-export type ProblematicURLsReport = ProblematicURLsReportLine[];
-
 const generateProblematicURLsReport = (progress: ScrapingProgress): ProblematicURLsReport =>
   [].concat(
     ...progress.results.map(
@@ -241,4 +242,39 @@ export const storeResults = async (projectId: number, progress: ScrapingProgress
       JSON.stringify(generateProblematicURLsReport(progress), null, 2),
     ),
   ]);
+};
+
+export const loadReports = async (projectId: number) => {
+  const dirEntries = await readdir(dbRootPath);
+
+  const filterExp = new RegExp(`^${projectId}-`);
+
+  const reportFiles = dirEntries
+    .filter((entry) => filterExp.test(entry));
+
+  const reports = [];
+
+  reportFiles.forEach((file) => {
+    const info = file.match(/^\d+-(\d+)-(\w+)\[/);
+    if (info) {
+      const time = parseFloat(info[1]);
+      const type = info[2];
+
+      reports.push({
+        reportType: type,
+        date: new Date(time).toLocaleString(),
+        time,
+        fileName: file,
+      });
+    }
+  });
+
+  reports.sort((a, b) => {
+    if (a.reportType !== b.reportType) {
+      return (a.reportType > b.reportType) ? 1 : -1;
+    }
+    return a.time - b.time;
+  });
+
+  return reports;
 };

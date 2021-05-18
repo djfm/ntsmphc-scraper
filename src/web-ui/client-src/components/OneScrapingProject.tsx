@@ -12,7 +12,11 @@ import {
 } from 'react-redux';
 
 import {
+  Link,
+  Switch,
+  Route,
   useHistory,
+  useRouteMatch,
   useParams as useRouterParams,
 } from 'react-router-dom';
 
@@ -37,6 +41,7 @@ import {
 
 import Confirmator from './common/Confirmator';
 import ScrapingFeedback from './ScrapingFeedback';
+import ProjectReports from './ProjectReports';
 
 type SetterFunction<T> = React.Dispatch<T>;
 
@@ -51,6 +56,7 @@ const OneScrapingProject = () => {
   const history = useHistory();
   const [nParallel, setNParallel] = useState(3);
   const scrapingState = useSelector(getProjectScrapingState(id));
+  const { path, url } = useRouteMatch();
 
   const dispatch = useDispatch();
 
@@ -78,7 +84,7 @@ const OneScrapingProject = () => {
         },
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
 
   const handleProjectDeletion = (projectId: number) => (event: BaseSyntheticEvent) => {
@@ -130,54 +136,74 @@ const OneScrapingProject = () => {
   return (
     <main>
       <h1>Scraping Project: &quot;{project.projectName}&quot; (#{id})</h1>
-      <section>
-        <h1>Here is some basic info about this project:</h1>
-        <dl>
-          <dt>Start URL:</dt>
-          <dd>{project.startURL}</dd>
-          <dt>Creation date:</dt>
-          <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
-        </dl>
-        <ul>
-          <li>
-            <label>
-              <span>Number of parallel Chrome instances</span>
-              <p>
-                <i>
-                  To make things faster, I&apos;m gonna start many<br />
-                  Chrome instances in parallel to do the scraping.<br />
-                  Tuning it to an appropriate value depends on both<br />
-                  the performance of the server doing the scraping,<br />
-                  and of that of the server receiving the requests.
-                </i>
-              </p>
-              <p>
-                <input
-                  type="number"
-                  value={nParallel}
-                  onChange={passValueTo(setNParallel)}
-                />
-                {wrapFeedback(nParallelFeedback)}
-              </p>
-            </label>
-            <p>
-              <button type="button" onClick={handleStartScraping}>
-                Start Scraping
-              </button>
-            </p>
-          </li>
-          <li>
-            <Confirmator action={handleProjectDeletion(id)}>
-              <p>
-                <button type="button">
-                  Delete Project
-                </button>
-              </p>
-            </Confirmator>
-          </li>
-        </ul>
-      </section>
-      {scrapingState && <ScrapingFeedback state={scrapingState} />}
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to={url}>Launch a Scrape</Link>
+            </li>
+            <li>
+              <Link to={`${url}/reports`}>View Reports</Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <Switch>
+        <Route path={`${path}/reports`}>
+          <ProjectReports />
+        </Route>
+        <Route exact path={path}>
+          <section>
+            <h1>Main project characteristics and actions:</h1>
+            <dl>
+              <dt>Start URL:</dt>
+              <dd>{project.startURL}</dd>
+              <dt>Creation date:</dt>
+              <dd>{createdDate.toLocaleDateString()} {createdDate.toLocaleTimeString()}</dd>
+            </dl>
+            <ul>
+              <li>
+                <label>
+                  <span>Number of parallel Chrome instances</span>
+                  <p>
+                    <i>
+                      To make things faster, I&apos;m gonna start many<br />
+                      Chrome instances in parallel to do the scraping.<br />
+                      Tuning it to an appropriate value depends on both<br />
+                      the performance of the server doing the scraping,<br />
+                      and of that of the server receiving the requests.
+                    </i>
+                  </p>
+                  <p>
+                    <input
+                      type="number"
+                      value={nParallel}
+                      onChange={passValueTo(setNParallel)}
+                    />
+                    {wrapFeedback(nParallelFeedback)}
+                  </p>
+                </label>
+                <p>
+                  <button type="button" onClick={handleStartScraping}>
+                    Start Scraping
+                  </button>
+                </p>
+              </li>
+              <li>
+                <Confirmator action={handleProjectDeletion(id)}>
+                  <p>
+                    <button type="button">
+                      Delete Project
+                    </button>
+                  </p>
+                </Confirmator>
+              </li>
+            </ul>
+          </section>
+          {scrapingState && <ScrapingFeedback state={scrapingState} />}
+        </Route>
+      </Switch>
     </main>
   );
 };

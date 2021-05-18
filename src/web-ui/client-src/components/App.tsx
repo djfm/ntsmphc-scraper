@@ -94,16 +94,16 @@ const App = () => (
       </nav>
 
       <Switch>
-        <Route exact path="/new-scraping-project">
+        <Route path="/new-scraping-project">
           <NewScrapingProject />
         </Route>
-        <Route exact path="/projects">
-          <ScrapingProjects />
-        </Route>
-        <Route exact path="/projects/:id">
+        <Route path="/projects/:id">
           <OneScrapingProject />
         </Route>
-        <Route exact path="/">
+        <Route path="/projects">
+          <ScrapingProjects />
+        </Route>
+        <Route path="/">
           <Home />
         </Route>
         <Route>

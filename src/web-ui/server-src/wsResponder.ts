@@ -22,6 +22,7 @@ import {
   listProjects,
   deleteProject,
   storeResults,
+  loadReports,
 } from '../../db';
 
 import {
@@ -168,6 +169,13 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       });
 
       return true;
+    }
+
+    if (action === 'loadReports') {
+      if (!hasProjectId(params)) {
+        throw new Error('Error: params provided to "loadReports" miss property "projectId"');
+      }
+      return loadReports(params.projectId);
     }
 
     throw new Error(`WebSocket: unknown server action "${action}"`);
