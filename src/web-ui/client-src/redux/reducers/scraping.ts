@@ -57,6 +57,9 @@ const scrapingReducer = (state: ScrapingState = initialState, action: AnyAction)
       const scrapedAction = action as PageScrapedAction;
       return mutateProjectState(action.projectId)((projectState) => {
         projectState.lastURLsScraped.unshift(scrapedAction.result.url);
+        if (projectState.lastURLsScraped.length > nLastURLsToDisplay) {
+          projectState.lastURLsScraped.pop();
+        }
         projectState.totalURLsScraped += 1;
       });
     }
