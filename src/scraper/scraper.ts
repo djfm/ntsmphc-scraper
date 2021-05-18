@@ -74,6 +74,12 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
       const chrome = await chromeProvider();
 
+      const killChrome = () => {
+        nChromesRunning -= 1;
+        chrome.terminate();
+        // console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
+      };
+
       let result: URLScrapingResult;
       try {
         result = await scrape(chrome)(nextURL);
@@ -83,6 +89,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         // eslint-disable-next-line no-console
         console.error(err);
 
+        killChrome();
         return {
           nURLsScraped: 0,
           results: [],
@@ -92,9 +99,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       notifiers.notifyPageScraped(result);
       addNewURLSFromResult(result);
 
-      nChromesRunning -= 1;
-      chrome.terminate();
-      // console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
+      killChrome();
 
       return {
         nURLsScraped: 1,
