@@ -45,6 +45,34 @@ const scrapingProgressesReducer = (
   return accumulator;
 };
 
+/**
+ * A dirty hack:
+ * Like promise.all except only successful promises
+ * are let through.
+ */
+const allFulfillingPromises = (promises: Promise<any>[]): Promise<any[]> =>
+  new Promise((resolve) => {
+    const resolved = [];
+    const rejected = [];
+
+    const maybeResolve = () => {
+      if (resolved.length + rejected.length === promises.length) {
+        resolve(resolved);
+      }
+    };
+
+    promises.forEach((promise) => {
+      promise.then((ok) => {
+        resolved.push(ok);
+        maybeResolve();
+      }, (ko) => {
+        rejected.push(ko);
+        console.error(ko);
+        maybeResolve();
+      });
+    });
+  });
+
 const reduceScrapingProgresses = (progresses: ScrapingProgress[]): ScrapingProgress =>
   progresses.reduce(scrapingProgressesReducer, {
     nURLsScraped: 0,
@@ -145,7 +173,9 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         progresses.push(next);
       }
 
-      const reducedProgresses = Promise.all(progresses).then(reduceScrapingProgresses);
+      // TODO dirty hack to resolve properly
+      // only makes things slightly better
+      const reducedProgresses = allFulfillingPromises(progresses).then(reduceScrapingProgresses);
 
       return reducedProgresses.then(async (settledProgresses) => {
         const processed = await processNextURLs();
