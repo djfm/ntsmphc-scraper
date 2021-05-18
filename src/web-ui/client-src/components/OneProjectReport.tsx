@@ -22,6 +22,16 @@ import {
   addNotificationAction,
 } from '../redux/actions';
 
+const keyNames = {
+  isValid: 'URL is valid',
+  status: 'HTTP status of page',
+  problematicURL: "URL that's causing problems",
+  foundOnPage: 'Page the issue was found on',
+  referer: 'HTTP referer',
+  message: 'Why this is reported',
+  url: 'URL of scraped page',
+};
+
 const extractColumns = (data: any[]) => {
   const keysSeen = new Set();
 
@@ -33,8 +43,28 @@ const extractColumns = (data: any[]) => {
 
   return [...keysSeen.values()].map((key: string) => ({
     key,
-    name: key,
+    name: keyNames[key] || key,
   }));
+};
+
+const makeReadable = (key: string, value: any) => {
+  if (value === undefined) {
+    return 'undefined';
+  }
+
+  if (value === false) {
+    return 'no';
+  }
+
+  if (value === true) {
+    return 'yes';
+  }
+
+  if (value === null) {
+    return 'undefined';
+  }
+
+  return value;
 };
 
 const OneProjectReport = () => {
@@ -77,7 +107,7 @@ const OneProjectReport = () => {
               }) => (
                 <div key={key}>
                   <dt><strong>{name}</strong></dt>
-                  <dd>{line[key]}</dd>
+                  <dd>{makeReadable(key, line[key])}</dd>
                 </div>
               ))}
             </article>
