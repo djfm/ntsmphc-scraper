@@ -73,7 +73,21 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       // console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
 
       const chrome = await chromeProvider();
-      const result = await scrape(chrome)(nextURL);
+
+      let result: URLScrapingResult;
+      try {
+        result = await scrape(chrome)(nextURL);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(`[OOPS] Encountered error while trying to scrape page "${nextURL}":`);
+        // eslint-disable-next-line no-console
+        console.error(err);
+
+        return {
+          nURLsScraped: 0,
+          results: [],
+        };
+      }
 
       notifiers.notifyPageScraped(result);
       addNewURLSFromResult(result);
