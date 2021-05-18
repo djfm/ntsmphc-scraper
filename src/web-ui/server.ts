@@ -48,7 +48,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
   console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
 });
