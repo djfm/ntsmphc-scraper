@@ -60,10 +60,45 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     remainingURLs.add(params.startURL);
 
-    const processNextURLandGoOn = async (chrome: ChromeProtocol): Promise<ScrapingProgress> => {
+    const processNextURLandGoOn = async (
+      maybeChrome?: ChromeProtocol,
+    ): Promise<ScrapingProgress> => {
+      if (remainingURLs.size === 0) {
+        if (maybeChrome) {
+          throw new Error('I don\'t think this can happen.');
+        }
+
+        return {
+          nURLsScraped: 0,
+          results: [],
+        };
+      }
+
       const nextURL = remainingURLs.values().next().value;
       remainingURLs.delete(nextURL);
       seenURLs.add(normalizeURL(nextURL));
+
+      const getChrome = async (): Promise<ChromeProtocol> => {
+        if (maybeChrome) {
+          return maybeChrome;
+        }
+
+        if (nChromesRunning >= params.nParallel) {
+          throw new Error('`processNextURLandGoOn` attempted to start too many chrome instances!');
+        }
+
+        nChromesRunning += 1;
+        console.log(`Started A chrome !! Now ${nChromesRunning} running.`);
+        return chromeProvider();
+      };
+
+      const chrome = await getChrome();
+
+      const killChrome = () => {
+        chrome.terminate();
+        nChromesRunning -= 1;
+        console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
+      };
 
       const result = await scrape(chrome)(nextURL);
 
@@ -83,9 +118,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         }));
       }
 
-      chrome.terminate();
-      nChromesRunning -= 1;
-      // console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
+      killChrome();
 
       return {
         nURLsScraped: 1,
@@ -96,15 +129,8 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     const processNextURLs = async (): Promise<ScrapingProgress> => {
       const scrapingProgresses: Promise<ScrapingProgress>[] = [];
 
-      const processWithChrome = async () => {
-        nChromesRunning += 1;
-        const chrome = await chromeProvider();
-        // console.log(`[!!!] Created a chrome (now ${nChromesRunning} running)`);
-        return processNextURLandGoOn(chrome);
-      };
-
       while (remainingURLs.size > 0 && nChromesRunning < params.nParallel) {
-        scrapingProgresses.push(processWithChrome());
+        scrapingProgresses.push(processNextURLandGoOn());
       }
 
       const progresses = await Promise.all(scrapingProgresses);
