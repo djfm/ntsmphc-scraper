@@ -1,13 +1,64 @@
 $default-spacing: 5px
+$border-radius: 2px
+$border-color: #ccc
+$ok-green: #9f9
+$dark-color: #444
+$bright-color: #fff
+$bright-color-2: #ffcc00
+$dark-color-alt: #888
+$bright-color-alt: rgb(255, 255, 255)
+$bright-color-alt-2: #2d00a8
+$report-entry-width: 300px
 
 body
   padding-left: $default-spacing
   padding-right: $default-spacing
 
-#main-nav
+dd
+  margin-left: 2 * $default-spacing
+  margin-bottom: $default-spacing
+
+li
+  margin-bottom: $default-spacing
+
+nav
+  background-color: $dark-color-alt
+  color: $bright-color-alt
+  a
+    color: $bright-color-alt
+  a:visited
+    color: $bright-color-alt-2
   ul
     display: flex
     flex-direction: row
     li
       list-style: none
       margin: 2 * $default-spacing
+
+#main-nav
+  background-color: $dark-color
+  color: $bright-color
+  a
+    color: $bright-color
+  a:visited
+    color: $bright-color-2
+
+.report-container
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+
+.report-entry
+  border: 1px solid $border-color
+  border-radius: $border-radius
+  flex-basis: $report-entry-width
+  margin: $default-spacing
+  padding: $default-spacing
+
+.notification
+  border: 1px solid $border-color
+  padding: $default-spacing
+  border-radius: $border-radius
+
+.notification-success
+  background-color: $ok-green

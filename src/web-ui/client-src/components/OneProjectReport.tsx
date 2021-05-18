@@ -68,9 +68,9 @@ const OneProjectReport = () => {
       {reportData === undefined && <p>Loading report, please wait...</p>}
       {reportData && reportData.length === 0 && <p>Looks like an empty report, sorry...</p>}
       {reportData && reportData.length > 0 && (
-        <div>
+        <div className="report-container">
           {reportData.map((line: any) => (
-            <article key={hash(line)}>
+            <article className="report-entry" key={hash(line)}>
               {columns.map(({
                 key,
                 name,
