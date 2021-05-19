@@ -186,7 +186,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
             );
           }
 
-          throw new Error(err);
+          throw err;
         });
 
         progresses.push(next);
