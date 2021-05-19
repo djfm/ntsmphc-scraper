@@ -63,7 +63,7 @@ export const makeURLHelpers = (startURL: urlString) => {
       return '';
     }
 
-    const sanitizedURL = url.toLowerCase().trim();
+    const sanitizedURL = url.trim();
 
     if (sanitizedURL.startsWith('//')) {
       return normalizeURL(`${parsedStartURL.protocol}${sanitizedURL}`);
