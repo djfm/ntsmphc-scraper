@@ -207,9 +207,12 @@ export const scrapeURL = (
         link.attributes,
       );
 
-      if (attrsMap.get('rel') === 'nofollow') {
-        // eslint-disable-next-line no-continue
-        continue;
+      if (attrsMap.has('rel')) {
+        const rel: string = attrsMap.get('rel');
+        if (rel.includes('nofollow')) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
       }
 
       const linkCanonical = normalizeURL(attrsMap.get('canonical'));
