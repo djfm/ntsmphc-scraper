@@ -85,7 +85,6 @@ export const scrapeURL = (
 
     const addURLProblem = (oops: URLProblem) => {
       result.problematicURLs.push(oops);
-      console.log(oops);
     };
 
     protocol.Network.responseReceived(({ response }) => {
