@@ -90,6 +90,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     const remainingURLs = new Set();
     const seenURLs = new Set();
+    const failedURLsRetries = new Map<string, number>();
     let nChromesRunning = 0;
 
     remainingURLs.add(params.startURL);
@@ -170,12 +171,31 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
         const next = scrapeWithChrome(nextURL);
 
+        // eslint-disable-next-line no-loop-func
+        next.catch((err) => {
+          const retried = failedURLsRetries.get(nextURL) || 0;
+
+          if (retried < 3) {
+            // eslint-disable-next-line no-console
+            console.error('Error on URL', nextURL, err);
+            seenURLs.delete(nextURL);
+            remainingURLs.add(nextURL);
+            failedURLsRetries.set(
+              nextURL,
+              retried + 1,
+            );
+          }
+
+          throw new Error(err);
+        });
+
         progresses.push(next);
       }
 
       // TODO dirty hack to resolve properly
       // only makes things slightly better
-      const reducedProgresses = allFulfillingPromises(progresses).then(reduceScrapingProgresses);
+      const reducedProgresses = allFulfillingPromises(progresses)
+        .then(reduceScrapingProgresses);
 
       return reducedProgresses.then(async (settledProgresses) => {
         const processed = await processNextURLs();
