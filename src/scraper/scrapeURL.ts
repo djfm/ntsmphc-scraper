@@ -96,7 +96,7 @@ export const scrapeURL = (
 
       if (response.status >= 400) {
         const oops: URLProblem = {
-          url: currentURL,
+          url: responseURL,
           isValid: true,
           status: response.status,
           message: 'Page has an error status code (>= 400).',
@@ -107,9 +107,6 @@ export const scrapeURL = (
       }
 
       if (currentURL === responseURL) {
-        // TODO add here any relevant info
-        // that would be available only on the response
-        // of the Network protocol
         result.status = status;
         return;
       }
