@@ -71,7 +71,7 @@ const maybeLinkTo = (str: string) => {
   try {
     // eslint-disable-next-line no-new
     new URL(str);
-    return (<a rel="noreferrer" target="_blank" href={str}>{str}</a>);
+    return (<a rel="noreferrer nofollow" target="_blank" href={str}>{str}</a>);
   } catch (err) {
     return str;
   }
