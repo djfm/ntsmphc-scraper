@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "1f69f86eb88fd7d1ca3e";
+/******/ 	var hotCurrentHash = "39e6dc20708d6294ef2b";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -83554,7 +83554,7 @@ var maybeLinkTo = function maybeLinkTo(str) {
     // eslint-disable-next-line no-new
     new URL(str);
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
-      rel: "noreferrer",
+      rel: "noreferrer nofollow",
       target: "_blank",
       href: str
     }, str);
@@ -86107,7 +86107,7 @@ var createNewSocket = /*#__PURE__*/function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            s = new WebSocket("ws://".concat(host, "/wss-internal"));
+            s = new WebSocket("wss://".concat(host, "/wss-internal"));
             return _context.abrupt("return", new Promise(function (resolve, reject) {
               if (s.readyState === 1) {
                 resolve(s);

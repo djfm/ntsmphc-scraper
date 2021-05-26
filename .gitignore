@@ -10,3 +10,6 @@ output/*
 !output/.gitkeep
 local-database/*
 !local-database/README.md
+.gitsecret/keys/random_seed
+keys/*
+!keys/README.md
