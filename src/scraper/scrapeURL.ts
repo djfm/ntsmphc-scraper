@@ -136,7 +136,7 @@ export const scrapeURL = (
           isValid: false,
           message: 'Invalid URL found.',
           status: -1,
-          referer: currentURL,
+          referer: undefined,
         };
         addURLProblem(oops);
         return result;
