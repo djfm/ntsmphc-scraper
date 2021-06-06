@@ -190,8 +190,6 @@ export const deleteProject = async (projectId: number) =>
       }
     }
     await writeJSONFileFromMapObject(projectsFilePath)(store);
-
-    return true;
   });
 
 const generateURLReport = (progress: ScrapingProgress) =>
