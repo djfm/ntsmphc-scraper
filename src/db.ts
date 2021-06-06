@@ -135,7 +135,7 @@ const createProjectInMemory = (params: CreateProjectParams, id: number) =>
     const { projectName } = params;
 
     if (!isSafeKeyForObjectMap(projectName)) {
-      return `Error: the name "${projectName}" cannot be used by storage engine.`;
+      throw new Error(`The project name "${projectName}" cannot be used by the storage engine.`);
     }
 
     if (storage.has(projectName)) {
