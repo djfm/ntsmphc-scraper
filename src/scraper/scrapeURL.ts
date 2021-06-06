@@ -148,7 +148,7 @@ export const scrapeURL = (
     // console.log(`[EVENT] Load fired event for ${currentURL}`);
 
     const doc = await protocol.DOM.getDocument({
-      // retrieve the full DOM tree, we'll need it
+      // retrieve the full DOM tree, we will need it at some point
       depth: -1,
     });
 
