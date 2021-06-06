@@ -76,14 +76,14 @@ export type ChromeDOM = {
   querySelectorAll: (options: QuerySelectorOptions) => Promise<{nodeIds: number[]}>
 };
 
-type ByeFunction = () => any;
+type ByeFunction = () => Promise<void>;
 
 export type ChromeProtocol = {
   Network: any;
   Page: any;
   Runtime: any;
   DOM: ChromeDOM;
-  terminate: (onTerminate?: ByeFunction) => void;
+  terminate: (onTerminate?: ByeFunction) => Promise<void>;
 };
 
 // TODO support specifying window size
@@ -113,12 +113,12 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     Page,
     Runtime,
     DOM,
-    terminate: (onTerminate?: ByeFunction) => {
+    terminate: async (onTerminate?: ByeFunction) => {
       if (onTerminate) {
-        onTerminate();
+        await onTerminate();
       }
-      protocol.close();
-      chrome.kill();
+      await protocol.close();
+      await chrome.kill();
     },
   };
 

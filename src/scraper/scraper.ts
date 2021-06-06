@@ -81,14 +81,13 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       tryCount: number = 0,
     ): Promise<ScrapingProgress> => {
       nChromesRunning += 1;
-      // console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
-
+      console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
       const chrome = await chromeProvider();
 
-      const killChrome = () => {
+      const killChrome = async () => {
+        await chrome.terminate();
         nChromesRunning -= 1;
-        chrome.terminate();
-        // console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
+        console.log(`[!!!] Killed a chrome! Now ${nChromesRunning} remaining.`);
       };
 
       let result: URLScrapingResult;
@@ -109,7 +108,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
           results: [],
         };
       } finally {
-        killChrome();
+        await killChrome();
       }
 
       notifiers.notifyPageScraped(result);
