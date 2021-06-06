@@ -59,7 +59,7 @@ interface WithReportId {
 }
 
 const hasURLParam = (params: object): params is WithURL =>
-  Object.prototype.hasOwnProperty.call(params, 'url');
+  hasAllOwnProperties(['url'])(params);
 
 const hasProjectId = (params: object): params is WithProjectId =>
   hasAllOwnProperties(['projectId'])(params);
