@@ -51,21 +51,23 @@ const ScrapingProjects = () => {
         You should find below the list of all <br />
         scraping projects that are known to this server.
       </p>
-      <div>
+      <ul>
         {projects.map((project: any) => (
-          <article key={project.id}>
-            <h2>
-              <Link to={`/projects/${project.id}`}>
-                {project.projectName}
-              </Link>
-            </h2>
-            <dl>
-              <dt><strong>Start URL</strong>:</dt>
-              <dd>{project.startURL}</dd>
-            </dl>
-          </article>
+          <li key={project.id}>
+            <article>
+              <h2>
+                <Link to={`/projects/${project.id}`}>
+                  {project.projectName}
+                </Link>
+              </h2>
+              <dl>
+                <dt><strong>Start URL</strong>:</dt>
+                <dd>{project.startURL}</dd>
+              </dl>
+            </article>
+          </li>
         ))}
-      </div>
+      </ul>
     </main>
   );
 };
