@@ -156,13 +156,9 @@ export const respond = (sendPayload: SendPayloadFunc) =>
             severity: 'success',
           });
         }, (err) => {
-          // eslint-disable-next-line no-console
-          console.error(err);
-          storeResults(params.projectId, progress).then(() => {
-            sendUINotification({
-              message: 'Something bad happened while storing the results, sorry.',
-              severity: 'error',
-            });
+          sendUINotification({
+            message: err.message || 'Something bad happened while storing the scraping results.',
+            severity: 'error',
           });
         });
 
