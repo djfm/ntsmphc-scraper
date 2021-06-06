@@ -139,7 +139,7 @@ const createProjectInMemory = (params: CreateProjectParams, id: number) =>
     }
 
     if (storage.has(projectName)) {
-      return `Error: project already exists. Project name: "${projectName}".`;
+      throw new Error(`Error: project "${projectName}" already exists.`);
     }
 
     const projectMetaData = {
