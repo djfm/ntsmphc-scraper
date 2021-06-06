@@ -38,15 +38,10 @@ export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
         id,
         response,
       }));
-    } catch (couldNotRespondErr) {
-      const props = Object.getOwnPropertyNames(couldNotRespondErr);
-      const errObj = {};
-      for (const prop of props) {
-        errObj[prop] = couldNotRespondErr[prop];
-      }
+    } catch (err) {
       ws.send(serialize({
         id,
-        err: errObj,
+        err,
       }));
     }
   };
