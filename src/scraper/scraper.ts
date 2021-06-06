@@ -36,42 +36,15 @@ export type ScraperNotifiers = {
   notifyStatistics: (statistics: ScrapingStatistics) => any;
 };
 
+const waitMs = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const scrapingProgressesReducer = (
   accumulator: ScrapingProgress,
   current: ScrapingProgress,
-): ScrapingProgress => {
-  accumulator.results.push(...current.results);
-  accumulator.nURLsScraped += current.nURLsScraped;
-  return accumulator;
-};
-
-/**
- * A dirty hack:
- * Like promise.all except only successful promises
- * are let through.
- */
-const allFulfillingPromises = (promises: Promise<any>[]): Promise<any[]> =>
-  new Promise((resolve) => {
-    const resolved = [];
-    const rejected = [];
-
-    const maybeResolve = () => {
-      if (resolved.length + rejected.length === promises.length) {
-        resolve(resolved);
-      }
-    };
-
-    promises.forEach((promise) => {
-      promise.then((ok) => {
-        resolved.push(ok);
-        maybeResolve();
-      }, (ko) => {
-        rejected.push(ko);
-        console.error(ko);
-        maybeResolve();
-      });
-    });
-  });
+): ScrapingProgress => ({
+  nURLsScraped: accumulator.nURLsScraped + current.nURLsScraped,
+  results: [...accumulator.results, ...current.results],
+});
 
 const reduceScrapingProgresses = (progresses: ScrapingProgress[]): ScrapingProgress =>
   progresses.reduce(scrapingProgressesReducer, {
@@ -90,7 +63,6 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     const remainingURLs = new Set();
     const seenURLs = new Set();
-    const failedURLsRetries = new Map<string, number>();
     let nChromesRunning = 0;
 
     remainingURLs.add(params.startURL);
@@ -104,7 +76,10 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       }
     };
 
-    const scrapeWithChrome = async (nextURL: string): Promise<ScrapingProgress> => {
+    const scrapeWithChrome = async (
+      nextURL: string,
+      tryCount: number = 0,
+    ): Promise<ScrapingProgress> => {
       nChromesRunning += 1;
       // console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
 
@@ -124,12 +99,17 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         console.log(`[OOPS] Encountered error while trying to scrape page "${nextURL}":`);
         // eslint-disable-next-line no-console
         console.error(err);
+        if (tryCount < 3) {
+          await waitMs(1000);
+          return scrapeWithChrome(nextURL, tryCount + 1);
+        }
 
-        killChrome();
         return {
           nURLsScraped: 0,
           results: [],
         };
+      } finally {
+        killChrome();
       }
 
       notifiers.notifyPageScraped(result);
@@ -169,39 +149,14 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         remainingURLs.delete(nextURL);
         seenURLs.add(normalizeURL(nextURL));
 
-        const next = scrapeWithChrome(nextURL);
-
-        // eslint-disable-next-line no-loop-func
-        next.catch((err) => {
-          const retried = failedURLsRetries.get(nextURL) || 0;
-
-          if (retried < 3) {
-            // eslint-disable-next-line no-console
-            console.error('Error on URL', nextURL, err);
-            seenURLs.delete(nextURL);
-            remainingURLs.add(nextURL);
-            failedURLsRetries.set(
-              nextURL,
-              retried + 1,
-            );
-          }
-
-          throw err;
-        });
+        const next = scrapeWithChrome(nextURL).then(
+          (p) => processNextURLs().then((ps) => reduceScrapingProgresses([p, ps])),
+        );
 
         progresses.push(next);
       }
 
-      // TODO dirty hack to resolve properly
-      // only makes things slightly better
-      const reducedProgresses = allFulfillingPromises(progresses)
-        .then(reduceScrapingProgresses);
-
-      return reducedProgresses.then(async (settledProgresses) => {
-        const processed = await processNextURLs();
-
-        return reduceScrapingProgresses([settledProgresses, processed]);
-      });
+      return Promise.all(progresses).then(reduceScrapingProgresses);
     };
 
     return processNextURLs();
