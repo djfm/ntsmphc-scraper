@@ -99,12 +99,7 @@ const lockAndUse = (fileToUsePath: string) =>
           const watcher = chokidar.watch(lockFilePath);
 
           watcher.on('unlink', () => {
-            try {
-              const res = lockAndUse(fileToUsePath)(fnToRun);
-              resolve(res);
-            } catch (newTryErr) {
-              reject(newTryErr);
-            }
+            lockAndUse(fileToUsePath)(fnToRun).then(resolve, reject);
           });
         });
       }
