@@ -2,7 +2,7 @@ import React from 'react';
 
 import {
   BrowserRouter as Router,
-  Link,
+  NavLink,
   Switch,
   Route,
 } from 'react-router-dom';
@@ -82,13 +82,13 @@ const App = () => (
       <nav id="main-nav">
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <NavLink activeClassName="active" exact to="/">Home</NavLink>
           </li>
           <li>
-            <Link to="/new-scraping-project">Create New Scraping Project</Link>
+            <NavLink activeClassName="active" to="/new-scraping-project">Create New Scraping Project</NavLink>
           </li>
           <li>
-            <Link to="/projects">View all Scraping Projects</Link>
+            <NavLink activeClassName="active" to="/projects">View all Scraping Projects</NavLink>
           </li>
         </ul>
       </nav>
@@ -103,7 +103,7 @@ const App = () => (
         <Route path="/projects">
           <ScrapingProjects />
         </Route>
-        <Route path="/">
+        <Route exact path="/">
           <Home />
         </Route>
         <Route>

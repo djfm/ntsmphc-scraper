@@ -12,7 +12,7 @@ import {
 } from 'react-redux';
 
 import {
-  Link,
+  NavLink,
   Switch,
   Route,
   useHistory,
@@ -140,10 +140,10 @@ const OneScrapingProject = () => {
         <nav>
           <ul>
             <li>
-              <Link to={url}>Launch a Scrape</Link>
+              <NavLink activeClassName="active" exact to={url}>Launch a Scrape</NavLink>
             </li>
             <li>
-              <Link to={`${url}/reports`}>View Reports</Link>
+              <NavLink activeClassName="active" exact to={`${url}/reports`}>View Reports</NavLink>
             </li>
           </ul>
         </nav>
