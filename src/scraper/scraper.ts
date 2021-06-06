@@ -92,7 +92,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
       let result: URLScrapingResult;
       try {
-        result = await scrape(chrome)(nextURL);
+        result = await (scrape(chrome)(nextURL));
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log(`[OOPS] Encountered error while trying to scrape page "${nextURL}":`);
@@ -100,7 +100,8 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
         console.error(err);
         if (tryCount < 3) {
           await waitMs(1000);
-          return scrapeWithChrome(nextURL, tryCount + 1);
+          const retry = await scrapeWithChrome(nextURL, tryCount + 1);
+          return retry;
         }
 
         return {
