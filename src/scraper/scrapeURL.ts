@@ -120,7 +120,7 @@ export const scrapeURL = (
       const storage = isInternalURL(responseURL) ?
         result.internalResources : result.externalResources;
 
-      storage[responseURL] = resp;
+      storage.set(responseURL, resp);
     });
 
     try {
