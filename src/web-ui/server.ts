@@ -2,21 +2,9 @@
 import path from 'path';
 import express from 'express';
 
-/*
-import https, {
-  ServerOptions,
-} from 'https';
-*/
-
-import http from 'http';
-
 import WebSocket from 'ws';
 
 import webpack from 'webpack';
-
-import {
-  readFile,
-} from 'fs/promises';
 
 import webpackConfig from '../../webpack.config';
 import messageReceived from './server-src/webSocketsServerSide';
@@ -61,22 +49,6 @@ app.get('*', (req, res) => {
 });
 
 const main = async () => {
-  // bit dirty I think, I'm using apache's keys...
-
-  /*
-  const [key, cert] = await Promise.all([
-    readFile(path.resolve(__dirname, '../../keys/key.pem'), 'utf8'),
-    readFile(path.resolve(__dirname, '../../keys/server.crt'), 'utf8'),
-  ]);
-
-  const serverOptions: ServerOptions = {
-    key,
-    cert,
-  };
-
-   const server = http.createServer(app);
-  */
-
   const port = process.env.PORT || 8080;
 
   const server = app.listen(port, () => {
