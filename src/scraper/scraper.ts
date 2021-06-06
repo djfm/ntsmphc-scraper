@@ -125,8 +125,6 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
       addNewURLSFromResult(result);
 
-      killChrome();
-
       return {
         nURLsScraped: 1,
         results: [result],
