@@ -143,7 +143,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
 
       const scraping = startScraping(notifiers)(params);
 
-      scraping.then((progress: ScrapingProgress) => {
+      return scraping.then((progress: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
         const timeTaken = humanDuration(timeTakenSeconds);
 
@@ -161,8 +161,6 @@ export const respond = (sendPayload: SendPayloadFunc) =>
             severity: 'error',
           });
         });
-
-        return true;
       }, (err) => {
         // eslint-disable-next-line no-console
         console.error('Could not scrape: ', err);
@@ -171,8 +169,6 @@ export const respond = (sendPayload: SendPayloadFunc) =>
           severity: 'error',
         });
       });
-
-      return true;
     }
 
     if (action === 'loadReports') {
