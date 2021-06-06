@@ -59,7 +59,7 @@ const generateRandomWeirdObject = (complexity: number) => {
 
     case 'array': {
       const arr = new Array(Math.floor(complexity));
-      for (let i = 0; i < complexity; i += 1) {
+      for (let i = 0; i < arr.length; i += 1) {
         arr[i] = generateRandomWeirdObject(nextC8y);
       }
       return arr;
