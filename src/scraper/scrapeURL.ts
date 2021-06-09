@@ -23,6 +23,14 @@ export type URLProblem = {
   referer: string;
 };
 
+export const createURLProblem = () => ({
+  url: '',
+  isValid: true,
+  status: -1,
+  message: '',
+  referer: '',
+});
+
 export type NetworkResponse = {
   url: string,
   referer?: string,
@@ -39,6 +47,22 @@ export type URLScrapingResult = {
   internalResources: Map<urlString, NetworkResponse>;
   externalResources: Map<urlString, NetworkResponse>;
   problematicURLs: URLProblem[];
+};
+
+export const createURLScrapingResult = () => ({
+  url: '',
+  status: 0,
+  title: '',
+  canonical: '',
+  internalURLs: new Map(),
+  externalURLs: new Map(),
+  internalResources: new Map(),
+  externalResources: new Map(),
+  problematicURLs: [],
+});
+
+export const addURLProblem = (result: URLScrapingResult) => (oops: URLProblem) => {
+  result.problematicURLs.push(oops);
 };
 
 export type StrToStrFunc = (input: string) => string;
@@ -68,42 +92,29 @@ export const scrapeURL = (
   isInternalURL: URLPredicate,
   normalizeURL: StrToStrFunc,
 ) => (protocol: ChromeProtocol) =>
-  async (nonNormalizedURL: urlString): Promise<URLScrapingResult> => {
+  async (nonNormalizedURL: urlString, foundOnURL: urlString): Promise<URLScrapingResult> => {
     const currentURL = normalizeURL(nonNormalizedURL);
 
     const result: URLScrapingResult = {
+      ...createURLScrapingResult(),
       url: currentURL,
-      status: 0,
-      title: undefined,
-      canonical: undefined,
-      internalURLs: new Map(),
-      externalURLs: new Map(),
-      internalResources: new Map(),
-      externalResources: new Map(),
-      problematicURLs: [],
-    };
-
-    const addURLProblem = (oops: URLProblem) => {
-      result.problematicURLs.push(oops);
     };
 
     protocol.Network.responseReceived(({ response }) => {
       const { status } = response;
       const responseURL = normalizeURL(response.url);
-      const referer = response?.requestHeaders?.Referer || currentURL;
+      const referer = response?.requestHeaders?.Referer || normalizeURL(foundOnURL);
       // console.log(`[EVENT] response for ${responseURL}
       // from ${ referer } received with status ${ status }.`);
 
       if (response.status >= 400) {
-        const oops: URLProblem = {
+        addURLProblem(result)({
+          ...createURLProblem(),
           url: responseURL,
-          isValid: true,
           status: response.status,
           message: 'Page has an error status code (>= 400).',
           referer,
-        };
-
-        addURLProblem(oops);
+        });
       }
 
       if (currentURL === responseURL) {
@@ -131,14 +142,13 @@ export const scrapeURL = (
         // This should happen rarely as we won't try to
         // navigate to "javascript:" URLs, but we record the
         // issue if it happens.
-        const oops: URLProblem = {
+        addURLProblem(result)({
+          ...createURLProblem(),
           url: currentURL,
           isValid: false,
           message: 'Invalid URL found.',
-          status: -1,
-          referer: undefined,
-        };
-        addURLProblem(oops);
+          referer: normalizeURL(foundOnURL),
+        });
         return result;
       }
       throw err;
@@ -167,20 +177,13 @@ export const scrapeURL = (
     });
 
     if (titleRef.nodeId === 0) {
-      const oops: URLProblem = {
+      addURLProblem(result)({
+        ...createURLProblem(),
         url: currentURL,
-        isValid: true,
         message: 'Page has no title tag in <head>.',
-        // TODO determine status
-        // probably using Network.LoaderId
-        // that is MAYBE returned by Page.navigate
-        // and then using the Network API
-        // see: https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-navigate
-        status: 0,
-        referer: currentURL,
-      };
-
-      addURLProblem(oops);
+        // TODO determine status of response
+        referer: normalizeURL(foundOnURL),
+      });
     } else {
       const titleDesc = await protocol.DOM.describeNode({
         nodeId: titleRef.nodeId,
