@@ -25,7 +25,7 @@ import { URL } from 'whatwg-url';
 
 import {
   askServer,
-} from '../webSocketsUISide';
+} from '../webSocketsIO';
 
 import {
   addNotificationAction,

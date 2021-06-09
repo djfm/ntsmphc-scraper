@@ -27,10 +27,6 @@ import {
 } from '../../db';
 
 import {
-  SendPayloadFunc,
-} from './webSocketsServerSide';
-
-import {
   PAYLOAD_TYPE_REDUX_ACTION,
 } from '../../constants';
 
@@ -58,6 +54,11 @@ interface WithReportId {
   reportId: string;
 }
 
+export type ServerToWebUIResponseMethods = {
+  respond: (serializableData: any) => any;
+  broadcast: (serializableData: any) => any;
+};
+
 const hasURLParam = (params: object): params is WithURL =>
   hasAllOwnProperties(['url'])(params);
 
@@ -78,10 +79,10 @@ const isCreateProjectParams = (params: object): params is CreateProjectParams =>
 const isScrapingTaskParams = (params: object): params is ScrapingTaskParams =>
   hasAllOwnProperties(['projectId', 'startURL', 'nParallel'])(params);
 
-export const respond = (sendPayload: SendPayloadFunc) =>
+export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) =>
   async (action: string, params: object): Promise<any> => {
     const sendUINotification = (data: object) =>
-      sendPayload({
+      responders.broadcast({
         type: PAYLOAD_TYPE_REDUX_ACTION,
         action: addNotificationAction(data),
       });
@@ -90,19 +91,19 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       if (!hasURLParam(params)) {
         throw new Error('Missing "url" param in "params" provided to action "isRespondingHTTP"');
       }
-      return isRespondingHTTP(params.url);
+      return isRespondingHTTP(params.url).then(responders.respond);
     }
 
     if (action === 'createProject') {
       if (!isCreateProjectParams(params)) {
         throw new Error('Missing properties to qualify as a "params" for "createProject"');
       }
-      return createProject(params);
+      return createProject(params).then(responders.respond);
     }
 
     if (action === 'listProjects') {
       const projects = await listProjects();
-      return [...projects];
+      return responders.respond([...projects]);
     }
 
     if (action === 'deleteProject') {
@@ -110,7 +111,7 @@ export const respond = (sendPayload: SendPayloadFunc) =>
         throw new Error('Error: params provided to "deleteProject" miss property "projectId"');
       }
 
-      return deleteProject(params.projectId);
+      return deleteProject(params.projectId).then(responders.respond);
     }
 
     if (action === 'startScraping') {
@@ -123,13 +124,13 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       });
 
       const notifyPageScraped = (result: URLScrapingResult) =>
-        sendPayload({
+        responders.broadcast({
           type: PAYLOAD_TYPE_REDUX_ACTION,
           action: notifyPageScrapedAction(params.projectId, result),
         });
 
       const notifyStatistics = (statistics: ScrapingStatistics) =>
-        sendPayload({
+        responders.broadcast({
           type: PAYLOAD_TYPE_REDUX_ACTION,
           action: notifyScrapingStatisticsAction(params.projectId, statistics),
         });
@@ -175,17 +176,17 @@ export const respond = (sendPayload: SendPayloadFunc) =>
       if (!hasProjectId(params)) {
         throw new Error('Error: params provided to "loadReports" miss property "projectId"');
       }
-      return loadReports(params.projectId);
+      return loadReports(params.projectId).then(responders.respond);
     }
 
     if (action === 'loadReport') {
       if (!hasReportId(params)) {
         throw new Error('Error: params provided to "loadReport" miss property "reportId"');
       }
-      return loadReport(params.reportId);
+      return loadReport(params.reportId).then(responders.respond);
     }
 
     throw new Error(`WebSocket: unknown server action "${action}"`);
   };
 
-export default respond;
+export default respondToWebUIRequest;

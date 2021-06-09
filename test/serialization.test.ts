@@ -143,6 +143,8 @@ describe('The serialization lib serializes data to text and back.', () => {
       null,
       {},
       { hello: 'world' },
+      { type: 'REDUX_ACTION' },
+      { payload: { type: 'REDUX_ACTION', action: { message: 'hello' } } },
       [],
       [1, null],
       [1, null, 'a', {}],

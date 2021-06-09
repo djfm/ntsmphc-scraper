@@ -158,7 +158,7 @@ const obtainProjectsStore = async () => {
 };
 
 export const createProject = async (params: CreateProjectParams) =>
-  lockAndUse(projectsFilePath)(async () => {
+  lockAndUse(projectsFilePath)(async (): Promise<ProjectMetaData> => {
     const store: GenericMap = await obtainProjectsStore();
     const id = await getUID();
     const projectMetaData = createProjectInMemory(params, id)(store);
@@ -179,12 +179,19 @@ export const findProjectById = async (id: number): Promise<ProjectMetaData> => {
 export const deleteProject = async (projectId: number) =>
   lockAndUse(projectsFilePath)(async () => {
     const store: GenericMap = await obtainProjectsStore();
+    let projectKey: string;
     for (const [key, value] of store.entries()) {
       if (value.id === projectId) {
+        projectKey = key;
         store.delete(key);
+        break;
       }
     }
     await writeJSONFileFromMapObject(projectsFilePath)(store);
+    return {
+      deleted: projectKey !== undefined,
+      key: projectKey,
+    };
   });
 
 const generateURLReport = (progress: ScrapingProgress) =>

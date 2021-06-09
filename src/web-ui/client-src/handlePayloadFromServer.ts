@@ -2,24 +2,14 @@ import {
   PAYLOAD_TYPE_REDUX_ACTION,
 } from '../../constants';
 
-const handlePayloadFromServer = (store: any) =>
-  (payload: Map<string, any>) => {
-    // eslint-disable-next-line no-console
-    console.log('Received data from server!!', payload);
-
-    if (payload.has('type')) {
-      switch (payload.get('type')) {
-        case PAYLOAD_TYPE_REDUX_ACTION: {
-          store.dispatch(payload.get('action'));
-          break;
-        }
-
-        default: {
-          // eslint-disable-next-line no-console
-          console.warn(`Unhandled payload received with type "${payload.get('type')}".`);
-        }
-      }
+export const handleServerDispatchedReduxAction = (store: any) =>
+  (payload: any) => {
+    if (
+      Object.prototype.hasOwnProperty.call(payload, 'type') &&
+      payload.type === PAYLOAD_TYPE_REDUX_ACTION
+    ) {
+      store.dispatch(payload.action);
     }
   };
 
-export default handlePayloadFromServer;
+export default handleServerDispatchedReduxAction;

@@ -17,7 +17,7 @@ import {
 
 import {
   askServer,
-} from '../webSocketsUISide';
+} from '../webSocketsIO';
 
 import {
   addNotificationAction,

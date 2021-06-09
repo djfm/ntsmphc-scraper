@@ -16,7 +16,7 @@ import hash from 'object-hash';
 
 import {
   askServer,
-} from '../webSocketsUISide';
+} from '../webSocketsIO';
 
 import {
   addNotificationAction,

@@ -22,7 +22,7 @@ import {
 
 import {
   askServer,
-} from '../webSocketsUISide';
+} from '../webSocketsIO';
 
 const ScrapingProjects = () => {
   const dispatch = useDispatch();

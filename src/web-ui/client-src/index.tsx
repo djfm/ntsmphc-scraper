@@ -11,11 +11,14 @@ import store from './redux/store';
 import './style/index.sass';
 
 import {
-  addOnInfoCallback,
-  clearOnInfoCallbacks,
-} from './webSocketsUISide';
+  addServerListener,
+  clearServerListeners,
+  ensureConnectionToServer,
+} from './webSocketsIO';
 
-import handlePayloadFromServer from './handlePayloadFromServer';
+import {
+  handleServerDispatchedReduxAction,
+} from './handlePayloadFromServer';
 
 const ReduxApp = () => (
   <Provider store={store}>
@@ -29,16 +32,17 @@ const render = () => {
   ReactDOM.render(<ReduxApp />, rootElement);
 };
 
-addOnInfoCallback(handlePayloadFromServer(store));
+ensureConnectionToServer();
+addServerListener(handleServerDispatchedReduxAction(store));
 
 if (process.env.NODE_ENV !== 'production' && module.hot) {
   module.hot.accept('./handlePayloadFromServer', () => {
     // eslint-disable-next-line no-console
     console.log('[HMR] Attempting to hot-reload on-info callbacks...');
-    clearOnInfoCallbacks();
+    clearServerListeners();
 
-    const next = require('./webSocketsUISide');
-    next.addOnInfoCallback(next.handlePayloadFromServer(store));
+    const next = require('./webSocketsIO');
+    next.addServerListener(next.handleServerDispatchedReduxAction(store));
   });
 }
 

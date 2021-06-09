@@ -7,10 +7,13 @@ import WebSocket from 'ws';
 import webpack from 'webpack';
 
 import webpackConfig from '../../webpack.config';
-import handleMessageReceivedFromClientUI from './server-src/webSocketsServerSide';
+import {
+  respondToWebUIRequest,
+} from './server-src/respondToWebUIRequest';
 
 import {
   serialize,
+  deserialize,
 } from '../util/serialization';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -55,6 +58,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
+const openSockets = new Set<WebSocket>();
+
 const main = async () => {
   const port = process.env.PORT || 8080;
 
@@ -62,27 +67,59 @@ const main = async () => {
     console.log(`Head over to http://localhost:${port}/ and happy scraping!`);
   });
 
+  const wsDataToString = (data: WebSocket.Data): string => {
+    if (data instanceof Buffer) {
+      return data.toString();
+    }
+
+    if (typeof data === 'string') {
+      return data;
+    }
+
+    throw new Error('unexpected data type when trying to convert to string');
+  };
+
   const wss = new WebSocket.Server({
     server,
     path: '/wss-internal',
   });
 
-  const sendPayloadToUI = (ws: WebSocket) =>
-    async (payload: object) => {
-      ws.send(serialize({
-        type: 'payloadFromServer',
-        payload,
-      }));
-    };
+  const sendToWebUI = (ws: WebSocket) =>
+    async (data: any) =>
+      ws.send(serialize(data));
+
+  const broadcastPayloadToUI = (payload: any) => {
+    [...openSockets].forEach((ws: WebSocket) => sendToWebUI(ws)({ payload }));
+  };
 
   wss.on('connection', (ws: WebSocket) => {
-    ws.on('message', (message: any) => {
-      // TODO rename messageReceived to something like handleMessageReceived
-      // because it took me 5 minutes to grasp what this line meant
-      handleMessageReceivedFromClientUI(ws, sendPayloadToUI(ws))(message);
+    openSockets.add(ws);
+
+    ws.on('open', () => {
+      openSockets.add(ws);
+    });
+
+    /**
+     * Ok, yes, I'm re-inventing a mechanism of request / response while we already
+     * have HTTP that is designed for this.
+     *
+     * I know. But since I also need to have a websocket permanently open to get notifications
+     * from my app I thought the overhead wouldn't be much and did it anyway. It's fun.
+     */
+    ws.on('message', (message: WebSocket.Data) => {
+      const { id, action, params } = deserialize(wsDataToString(message));
+
+      respondToWebUIRequest({
+        respond: (response) => sendToWebUI(ws)({
+          id,
+          response,
+        }),
+        broadcast: broadcastPayloadToUI,
+      })(action, params);
     });
 
     ws.on('close', () => {
+      openSockets.delete(ws);
     });
   });
 };
