@@ -88,11 +88,21 @@ const extractCanonical = async (
   return attributesMap.get('href');
 };
 
-export const scrapeURL = (
+export type ScrapeParams = {
+  nonNormalizedURL: urlString,
+  foundOnURL: urlString,
+};
+
+export type ScrapeURLUtils = {
   isInternalURL: URLPredicate,
   normalizeURL: StrToStrFunc,
-) => (protocol: ChromeProtocol) =>
-  async (nonNormalizedURL: urlString, foundOnURL: urlString): Promise<URLScrapingResult> => {
+};
+
+export const scrapeURL = ({
+  isInternalURL,
+  normalizeURL,
+}: ScrapeURLUtils) => (protocol: ChromeProtocol) =>
+  async ({ nonNormalizedURL, foundOnURL }: ScrapeParams): Promise<URLScrapingResult> => {
     const currentURL = normalizeURL(nonNormalizedURL);
 
     const result: URLScrapingResult = {

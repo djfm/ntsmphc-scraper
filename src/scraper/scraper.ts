@@ -12,6 +12,7 @@ import {
   createURLScrapingResult,
   createURLProblem,
   addURLProblem,
+  ScrapeParams,
 } from './scrapeURL';
 
 export type ScrapingTaskParams = {
@@ -62,7 +63,10 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       normalizeURL,
     } = makeURLHelpers(params.startURL);
 
-    const scrape = scrapeURL(isInternalURL, normalizeURL);
+    const scrape = scrapeURL({
+      isInternalURL,
+      normalizeURL,
+    });
 
     const remainingURLs = new Map();
     const seenURLs = new Set();
@@ -79,11 +83,11 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       }
     };
 
-    const scrapeWithChrome = async (
-      nextURL: string,
-      foundOnURL: string,
-      tryCount: number = 0,
-    ): Promise<ScrapingProgress> => {
+    const scrapeWithChrome = async ({
+      nonNormalizedURL,
+      foundOnURL,
+    } : ScrapeParams,
+    tryCount: number = 0): Promise<ScrapingProgress> => {
       nChromesRunning += 1;
       // console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
       const chrome = await chromeProvider();
@@ -96,23 +100,30 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
       let result: URLScrapingResult;
       try {
-        result = await (scrape(chrome)(nextURL, foundOnURL));
+        result = await (scrape(chrome)({
+          nonNormalizedURL,
+          foundOnURL,
+        }));
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.log(`[OOPS] Encountered error while trying to scrape page "${nextURL}":`);
+        console.log(`[OOPS] Encountered error while trying to scrape page "${nonNormalizedURL}":`);
         // eslint-disable-next-line no-console
         console.error(err);
         if (tryCount < 3) {
           await waitMs(1000);
-          const retry = await scrapeWithChrome(nextURL, foundOnURL, tryCount + 1);
+          const retry = await scrapeWithChrome({
+            nonNormalizedURL,
+            foundOnURL,
+          },
+          tryCount + 1);
           return retry;
         }
 
         const failedResult = createURLScrapingResult();
-        failedResult.url = normalizeURL(nextURL);
+        failedResult.url = normalizeURL(nonNormalizedURL);
         addURLProblem(failedResult)({
           ...createURLProblem(),
-          url: nextURL,
+          url: failedResult.url,
           message: `The page could not be scraped after ${tryCount} tries.`,
         });
 
@@ -155,11 +166,14 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       }
 
       while (remainingURLs.size > 0 && nChromesRunning < params.nParallel) {
-        const [nextURL, foundOnURL] = remainingURLs.entries().next().value;
-        remainingURLs.delete(nextURL);
-        seenURLs.add(normalizeURL(nextURL));
+        const [nonNormalizedURL, foundOnURL] = remainingURLs.entries().next().value;
+        remainingURLs.delete(nonNormalizedURL);
+        seenURLs.add(normalizeURL(nonNormalizedURL));
 
-        const next = scrapeWithChrome(nextURL, foundOnURL).then(
+        const next = scrapeWithChrome({
+          nonNormalizedURL,
+          foundOnURL,
+        }, 0).then(
           (p) => processNextURLs().then((ps) => reduceScrapingProgresses([p, ps])),
         );
 
