@@ -29,7 +29,8 @@ const pendingRequests = new Map<number, PromiseSettler>();
 const onInfoReceivedCallbacks: OnInfoCallback[] = [];
 
 const createNewSocket = async (): Promise<WebSocket> => {
-  const s = new WebSocket(`ws://${host}/wss-internal`);
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const s = new WebSocket(`${wsProtocol}//${host}/wss-internal`);
 
   return new Promise<WebSocket>((resolve, reject) => {
     if (s.readyState === 1) {
