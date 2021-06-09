@@ -32,20 +32,14 @@ if (isDevelopment) {
   app.use(hotMiddleware);
 }
 
-app.use(express.static(path.resolve(__dirname, 'public'), {
-  index: false,
-}));
-
-app.get('/', (req, res) => {
-  // enable "Cross Origin Isolation"
-  // followed this: https://web.dev/cross-origin-isolation-guide/
-  // didn't try to understand what it is yet
+app.use((req, res, next) => {
+  // https://web.dev/cross-origin-isolation-guide/
   res.set('Cross-Origin-Opener-Policy', 'same-origin');
   res.set('Cross-Origin-Embedder-Policy', 'require-corp');
-  res.set('Cross-Origin-Opener-Policy-Report-Only', 'same-origin');
-  res.set('Cross-Origin-Embedder-Policy-Report-Only', 'require-corp');
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+  next();
 });
+
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.get('/a-404', (req, res) => {
   res.status(404);
