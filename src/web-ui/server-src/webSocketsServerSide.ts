@@ -29,8 +29,6 @@ export type SendPayloadFunc = (payload: object) => Promise<any>;
 
 export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
   async (message: WebSocket.Data) => {
-    // eslint-disable-next-line no-console
-    console.log('Received from UI:', deserialize(dataToString(message)));
     const { id, action, params } = deserialize(dataToString(message)) as WSRequest;
     try {
       const response = await respond(sendPayload)(action, params);
