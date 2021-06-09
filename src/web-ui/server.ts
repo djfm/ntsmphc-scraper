@@ -76,7 +76,6 @@ const main = async () => {
     });
 
     ws.on('close', () => {
-      console.log('Websocket is closed.');
     });
   });
 };
