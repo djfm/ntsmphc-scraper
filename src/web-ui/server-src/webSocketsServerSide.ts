@@ -27,7 +27,7 @@ const dataToString = (data: WebSocket.Data): string => {
 
 export type SendPayloadFunc = (payload: object) => Promise<any>;
 
-export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
+export const handleMessageReceivedFromClientUI = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
   async (message: WebSocket.Data) => {
     const { id, action, params } = deserialize(dataToString(message)) as WSRequest;
     try {
@@ -44,4 +44,4 @@ export const messageReceived = (ws: WebSocket, sendPayload: SendPayloadFunc) =>
     }
   };
 
-export default messageReceived;
+export default handleMessageReceivedFromClientUI;

@@ -7,7 +7,7 @@ import WebSocket from 'ws';
 import webpack from 'webpack';
 
 import webpackConfig from '../../webpack.config';
-import messageReceived from './server-src/webSocketsServerSide';
+import handleMessageReceivedFromClientUI from './server-src/webSocketsServerSide';
 
 import {
   serialize,
@@ -79,7 +79,7 @@ const main = async () => {
     ws.on('message', (message: any) => {
       // TODO rename messageReceived to something like handleMessageReceived
       // because it took me 5 minutes to grasp what this line meant
-      messageReceived(ws, sendPayloadToUI(ws))(message);
+      handleMessageReceivedFromClientUI(ws, sendPayloadToUI(ws))(message);
     });
 
     ws.on('close', () => {
