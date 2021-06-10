@@ -20,7 +20,7 @@ const ScrapingFeedback = ({ state }: Props) => (
       <dt>Approximate percentage complete:</dt>
       <dd>{state.statistics.approximatePctComplete}%</dd>
     </p>
-    {state.isScraping && (
+    {state.isScraping === true && (
     <section>
       <h1>
         Last URLs Scraped
