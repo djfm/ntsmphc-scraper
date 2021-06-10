@@ -21,8 +21,6 @@ import {
   // eslint-disable-next-line import/no-extraneous-dependencies
 } from 'history';
 
-import { URL } from 'whatwg-url';
-
 import {
   askServer,
 } from '../webSocketsIO';
@@ -38,6 +36,8 @@ import {
 
 const isValidURL = (url: string) => {
   try {
+    // the URL constructor will throw an error
+    // if the URL is not valid
     // eslint-disable-next-line no-new
     new URL(url);
     return true;
