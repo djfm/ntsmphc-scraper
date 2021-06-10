@@ -7,15 +7,18 @@ import {
   NOTIFY_PAGE_SCRAPED,
   NOTIFY_SCRAPING_STATISTICS,
   SET_SCRAPER_STATE,
+  UPDATE_SCRAPING_DONE,
   PageScrapedAction,
 } from '../actions';
 
 import {
   ScraperProjectState,
   defaultScraperProjectState,
-} from '../../../server-src/scraperState';
+  IsScrapingState,
+} from '../../../server-src/types';
 
 export type ProjectScrapingState = {
+  isScraping: IsScrapingState;
   lastURLsScraped: string[];
 } & ScraperProjectState;
 
@@ -78,6 +81,12 @@ const scrapingReducer = (state: ScrapingState = initialState, action: AnyAction)
         },
         {},
       );
+    }
+
+    case UPDATE_SCRAPING_DONE: {
+      return mutateProjectState(action.projectId)((projectState) => {
+        projectState.isScraping = action.isScraping;
+      });
     }
 
     default: {

@@ -13,8 +13,9 @@ import {
 } from '../../../scraper/types';
 
 import {
+  IsScrapingState,
   ScraperState,
-} from '../../server-src/scraperState';
+} from '../../server-src/types';
 
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
@@ -27,6 +28,7 @@ export const NOTIFY_PAGE_SCRAPED = 'NOTIFY_PAGE_SCRAPED';
 export const NOTIFY_SCRAPING_STATISTICS = 'NOTIFY_SCRAPING_STATISTICS';
 
 export const SET_SCRAPER_STATE = 'SET_SCRAPER_STATE';
+export const UPDATE_SCRAPING_DONE = 'UPDATE_SCRAPING_DONE';
 
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
@@ -96,4 +98,10 @@ export const notifyScrapingStatisticsAction =
 export const setScraperStateAction = (scraperState: ScraperState) => ({
   type: SET_SCRAPER_STATE,
   scraperState,
+});
+
+export const updateIsScrapingAction = (projectId: number, isScraping: IsScrapingState) => ({
+  type: UPDATE_SCRAPING_DONE,
+  projectId,
+  isScraping,
 });

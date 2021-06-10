@@ -13,6 +13,7 @@ import {
 import {
   notifyPageScrapedAction,
   notifyScrapingStatisticsAction,
+  updateIsScrapingAction,
 } from '../client-src/redux/actions';
 
 import {
@@ -31,6 +32,7 @@ import {
   ScraperNotifiers,
   ScrapingStatistics,
   URLScrapingResult,
+  ScrapingAbortFlagHolder,
 } from '../../scraper/types';
 
 import {
@@ -84,6 +86,8 @@ const isCreateProjectParams = (params: object): params is CreateProjectParams =>
 const isScrapingTaskParams = (params: object): params is ScrapingTaskParams =>
   hasAllOwnProperties(['projectId', 'startURL', 'nParallel'])(params);
 
+const abortFlags = new Map<number, ScrapingAbortFlagHolder>();
+
 export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) =>
   async (action: string, params: object): Promise<any> => {
     const sendUINotification = (data: object) =>
@@ -122,6 +126,11 @@ export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) 
       }
 
       setIsScraping(params.projectId, true);
+      responders.broadcast(
+        prepareReduxActionDispatchPayload(
+          updateIsScrapingAction(params.projectId, true),
+        ),
+      );
 
       sendUINotification({
         message: `Starting scraping from "${params.startURL}"...`,
@@ -150,13 +159,31 @@ export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) 
 
       const startedAt = Date.now();
 
-      const scraping = startScraping(notifiers)(params);
+      const aborter: ScrapingAbortFlagHolder = {
+        abort: false,
+      };
+      abortFlags.set(params.projectId, aborter);
+
+      const scraping = startScraping(notifiers)(params, aborter);
 
       return scraping.then((progress: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
         const timeTaken = humanDuration(timeTakenSeconds);
 
         setIsScraping(params.projectId, 'done');
+        responders.broadcast(
+          prepareReduxActionDispatchPayload(
+            updateIsScrapingAction(params.projectId, 'done'),
+          ),
+        );
+
+        if (abortFlags.get(params.projectId).abort) {
+          sendUINotification({
+            message: `Successfully aborted scraping of project ${params.projectId}`,
+            severity: 'success',
+          });
+          return;
+        }
 
         // eslint-disable-next-line no-console
         console.log(`\n[DONE] Scraped ${progress.nURLsScraped} URLs total in ${timeTaken}!`);
@@ -180,6 +207,14 @@ export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) 
           severity: 'error',
         });
       });
+    }
+
+    if (action === 'abortScraping') {
+      if (!hasProjectId(params)) {
+        throw new Error('Error: params provided to "abortScraping" miss property "projectId');
+      }
+      abortFlags.get(params.projectId).abort = true;
+      return responders.respond('Aborting scraping.');
     }
 
     if (action === 'loadReports') {

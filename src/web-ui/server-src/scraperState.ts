@@ -1,25 +1,15 @@
 import {
   ScrapingStatistics,
-  defaultScrapingStatistics,
 } from '../../scraper/types';
 
-export type IsScrapingState = false | true | 'done';
-
-export type ScraperProjectState = {
-  isScraping: IsScrapingState;
-  statistics: ScrapingStatistics;
-};
-
-export type ScraperState = {
-  [key: number]: ScraperProjectState;
-};
+import {
+  ScraperState,
+  ScraperProjectState,
+  IsScrapingState,
+  defaultScraperProjectState,
+} from './types';
 
 export const scraperState: ScraperState = {};
-
-export const defaultScraperProjectState = (): ScraperProjectState => ({
-  isScraping: false,
-  statistics: defaultScrapingStatistics(),
-});
 
 export const getScraperProjectState = (projectId: number = undefined) =>
   scraperState[projectId] || defaultScraperProjectState();

@@ -93,3 +93,12 @@ export type ScraperNotifiers = {
   notifyPageScraped: (result: URLScrapingResult) => any;
   notifyStatistics: (statistics: ScrapingStatistics) => any;
 };
+
+export type ScrapingAbortFlagHolder = {
+  abort: boolean;
+};
+
+export const emptyProgress = (): ScrapingProgress => ({
+  nURLsScraped: 0,
+  results: [],
+});

@@ -10,7 +10,8 @@ type Props = {
 
 const ScrapingFeedback = ({ state }: Props) => (
   <section>
-    <h1>Scraping is currently in progress:</h1>
+    {state.isScraping === true && <h1>Scraping is currently in progress:</h1>}
+    {state.isScraping === 'done' && <h1>Scraping is done:</h1>}
     <p>
       <dt>URLs scraped so far:</dt>
       <dd>{state.statistics.nSeenURLs}</dd>
@@ -19,6 +20,7 @@ const ScrapingFeedback = ({ state }: Props) => (
       <dt>Approximate percentage complete:</dt>
       <dd>{state.statistics.approximatePctComplete}%</dd>
     </p>
+    {state.isScraping && (
     <section>
       <h1>
         Last URLs Scraped
@@ -31,7 +33,7 @@ const ScrapingFeedback = ({ state }: Props) => (
         ))}
       </ul>
     </section>
-
+    )}
   </section>
 );
 

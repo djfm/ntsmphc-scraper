@@ -14,6 +14,8 @@ import {
   ScrapingProgress,
   ScraperNotifiers,
   ScrapingTaskParams,
+  emptyProgress,
+  ScrapingAbortFlagHolder,
 } from './types';
 
 import {
@@ -38,7 +40,10 @@ const reduceScrapingProgresses = (progresses: ScrapingProgress[]): ScrapingProgr
   });
 
 export const startScraping = (notifiers: ScraperNotifiers) =>
-  async (params: ScrapingTaskParams) : Promise<ScrapingProgress> => {
+  async (
+    params: ScrapingTaskParams,
+    aborter: ScrapingAbortFlagHolder,
+  ) : Promise<ScrapingProgress> => {
     const {
       isInternalURL,
       normalizeURL,
@@ -69,6 +74,10 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       foundOnURL,
     } : ScrapeParams,
     tryCount: number = 0): Promise<ScrapingProgress> => {
+      if (aborter.abort) {
+        return emptyProgress();
+      }
+
       nChromesRunning += 1;
       // console.log(`Starting A chrome !! Now ${nChromesRunning} running.`);
       const chrome = await chromeProvider();
@@ -138,6 +147,9 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
     };
 
     const processNextURLs = async (): Promise<ScrapingProgress> => {
+      if (aborter.abort) {
+        return emptyProgress();
+      }
       const progresses: Promise<ScrapingProgress>[] = [];
 
       if (remainingURLs.size === 0) {

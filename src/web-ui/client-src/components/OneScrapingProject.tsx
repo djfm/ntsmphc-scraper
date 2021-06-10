@@ -23,6 +23,7 @@ import {
 import {
   getProjectById,
   getProjectScrapingState,
+  getProjectIsScraping,
 } from '../redux/selectors';
 
 import {
@@ -53,6 +54,7 @@ const OneScrapingProject = () => {
   const routerParams = useRouterParams() as any;
   const id: number = parseFloat(routerParams.id);
   const project = useSelector(getProjectById(id));
+  const isScraping = useSelector(getProjectIsScraping(id));
   const history = useHistory();
   const [nParallel, setNParallel] = useState(3);
   const scrapingState = useSelector(getProjectScrapingState(id));
@@ -123,10 +125,11 @@ const OneScrapingProject = () => {
   };
 
   const handleStopScraping = () => {
-    askServer('cancelScraping', { projectId: project.id }).then(() => dispatch(addNotificationAction({
-      message: 'Cancelled scraping operation',
-      severity: 'success',
-    }))).catch((err) => dispatch(addNotificationAction({
+    askServer('abortScraping', { projectId: project.id }).then(
+      () => dispatch(addNotificationAction({
+        message: `Aborting scraping operation of project ${project.id}...`,
+      })),
+    ).catch((err) => dispatch(addNotificationAction({
       message: err.message,
       severity: 'error',
     })));
@@ -195,12 +198,12 @@ const OneScrapingProject = () => {
                   </p>
                 </label>
                 <p>
-                  {(scrapingState?.isScraping !== true) && (
+                  {(isScraping !== true) && (
                     <button type="button" onClick={handleStartScraping}>
                       Start Scraping
                     </button>
                   )}
-                  {(scrapingState?.isScraping === true) && (
+                  {(isScraping === true) && (
                     <button type="button" onClick={handleStopScraping}>
                       Cancel Scraping
                     </button>
