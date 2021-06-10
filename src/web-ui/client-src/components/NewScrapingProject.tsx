@@ -46,12 +46,6 @@ const isValidURL = (url: string) => {
   }
 };
 
-/*
-const isReachableURL = async (url: string) => {
-
-};
-*/
-
 const NewScrapingProject = () => {
   const [startURL, setStartURL] = useState('');
   const [isStartURLValid, setStartURLValid] = useState(undefined);
