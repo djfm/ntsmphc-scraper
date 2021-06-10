@@ -9,11 +9,12 @@ import {
 
 import {
   URLScrapingResult,
-} from '../../../scraper/scrapeURL';
+  ScrapingStatistics,
+} from '../../../scraper/types';
 
 import {
-  ScrapingStatistics,
-} from '../../../scraper/scraper';
+  ScraperState,
+} from '../../server-src/scraperState';
 
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
@@ -24,6 +25,8 @@ export const ADD_PROJECT = 'ADD_PROJECT';
 
 export const NOTIFY_PAGE_SCRAPED = 'NOTIFY_PAGE_SCRAPED';
 export const NOTIFY_SCRAPING_STATISTICS = 'NOTIFY_SCRAPING_STATISTICS';
+
+export const SET_SCRAPER_STATE = 'SET_SCRAPER_STATE';
 
 export const addNotificationAction = (data: any = {}) => {
   const notification = {
@@ -89,3 +92,8 @@ export const notifyScrapingStatisticsAction =
     projectId,
     statistics,
   });
+
+export const setScraperStateAction = (scraperState: ScraperState) => ({
+  type: SET_SCRAPER_STATE,
+  scraperState,
+});

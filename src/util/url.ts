@@ -2,10 +2,9 @@ import { URL } from 'url';
 
 import fetch from 'node-fetch';
 
-export type urlString = string;
 export type canonicalUrlString = string;
 
-export type URLPredicate = (url: urlString) => boolean;
+export type URLPredicate = (url: string) => boolean;
 
 export const isValidURL = (url: string) => {
   try {
@@ -23,7 +22,7 @@ export const isValidURL = (url: string) => {
   }
 };
 
-export const isParsable = (url: urlString): (false | URL) => {
+export const isParsable = (url: string): (false | URL) => {
   try {
     return new URL(url);
   } catch (err) {
@@ -31,7 +30,7 @@ export const isParsable = (url: urlString): (false | URL) => {
   }
 };
 
-export const isJavascriptURL = (url: urlString) => {
+export const isJavascriptURL = (url: string) => {
   const parsed = isParsable(url);
   if (parsed !== false) {
     // eslint-disable-next-line no-script-url
@@ -43,11 +42,11 @@ export const isJavascriptURL = (url: urlString) => {
 // Generates the functions we need to interact with URLs.
 // parsedStartURL is the result of URL.parse called
 // on the URL given to the program.
-export const makeURLHelpers = (startURL: urlString) => {
+export const makeURLHelpers = (startURL: string) => {
   const parsedStartURL = new URL(startURL);
   // It's important to use 'hostname' and not 'host'
   // because hostname doesn't include the port if there is one.
-  const isInternalURL: URLPredicate = (url: urlString) =>
+  const isInternalURL: URLPredicate = (url: string) =>
     new URL(url).hostname === parsedStartURL.hostname;
 
   // Normalizes URLs to avoid scraping the same URL twice

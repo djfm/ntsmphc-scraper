@@ -20,25 +20,10 @@ export type WSRequest = {
 
 const { host } = window.location;
 let socket: WebSocket;
+
 let nextRequestId = 0;
 const pendingRequests = new Map<number, PromiseSettler>();
 const serverListeners: OnDataReceivedFromServerCallback[] = [];
-
-const createNewSocket = async (): Promise<WebSocket> => {
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const s = new WebSocket(`${wsProtocol}//${host}/wss-internal`);
-
-  return new Promise<WebSocket>((resolve, reject) => {
-    if (s.readyState === 1) {
-      resolve(s);
-    } else if (s.readyState !== 0) {
-      reject(new Error('Could not create socket.'));
-      return;
-    }
-
-    s.addEventListener('open', () => resolve(s));
-  });
-};
 
 const resolveRequest = (data: any) => {
   const { id } = data;
@@ -77,9 +62,26 @@ const setupMessageEventListeners = (s: WebSocket) => {
   s.addEventListener('message', defaultSocketMessageListener);
 };
 
-export const ensureConnectionToServer = async (): Promise<WebSocket> => {
-  const oldSocket = socket;
+const createNewSocket = async (): Promise<WebSocket> => {
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const s = new WebSocket(`${wsProtocol}//${host}/wss-internal`);
 
+  return new Promise<WebSocket>((resolve, reject) => {
+    if (s.readyState > 1) {
+      reject(new Error('Could not create socket.'));
+      return;
+    }
+
+    if (s.readyState === 1) {
+      resolve(s);
+    } else {
+      s.addEventListener('open', () => resolve(s));
+    }
+  });
+};
+
+let connecting: Promise<WebSocket>;
+export const ensureConnectionToServer = async (): Promise<WebSocket> => {
   // TODO check that a new socket is really obtained when needed
   // readyState can be:
   //  - 0 => CONNECTING
@@ -87,14 +89,17 @@ export const ensureConnectionToServer = async (): Promise<WebSocket> => {
   //  - 2 => CLOSING
   //  - 3 => CLOSED
   // see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-  if (!socket || socket.readyState >= 2) {
-    socket = await createNewSocket();
+  if (connecting) {
+    return connecting;
   }
 
-  // we got a new socket, so we need to setup
-  // its handlers for the app to function properly
-  if (oldSocket !== socket) {
-    setupMessageEventListeners(socket);
+  if (!socket || socket.readyState > 1) {
+    connecting = createNewSocket().then((s) => {
+      socket = s;
+      setupMessageEventListeners(s);
+      return socket;
+    });
+    return connecting;
   }
 
   return socket;

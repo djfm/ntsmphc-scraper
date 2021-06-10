@@ -16,6 +16,19 @@ import {
   deserialize,
 } from '../util/serialization';
 
+import {
+  PAYLOAD_TYPE_REDUX_ACTION,
+} from '../constants';
+
+import {
+  setScraperStateAction,
+  addNotificationAction,
+} from './client-src/redux/actions';
+
+import {
+  scraperState,
+} from './server-src/scraperState';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const app = express();
@@ -60,6 +73,25 @@ app.get('*', (req, res) => {
 
 const openSockets = new Set<WebSocket>();
 
+const sendToWebUI = (ws: WebSocket) =>
+  async (data: any) =>
+    ws.send(serialize(data));
+
+export const prepareReduxActionDispatchPayload = (action: object) => ({
+  payload: {
+    type: PAYLOAD_TYPE_REDUX_ACTION,
+    action,
+  },
+});
+
+// eslint-disable-next-line import/prefer-default-export
+export const prepareReduxNotificationPayload = (data: object) =>
+  prepareReduxActionDispatchPayload(addNotificationAction(data));
+
+const synchronizeUI = (ws: WebSocket) => sendToWebUI(ws)(
+  prepareReduxActionDispatchPayload(setScraperStateAction(scraperState)),
+);
+
 const main = async () => {
   const port = process.env.PORT || 8080;
 
@@ -84,20 +116,15 @@ const main = async () => {
     path: '/wss-internal',
   });
 
-  const sendToWebUI = (ws: WebSocket) =>
-    async (data: any) =>
-      ws.send(serialize(data));
-
-  const broadcastPayloadToUI = (payload: any) => {
-    [...openSockets].forEach((ws: WebSocket) => sendToWebUI(ws)({ payload }));
+  const broadcastDataToUI = (data: any) => {
+    [...openSockets].forEach((ws: WebSocket) => sendToWebUI(ws)(data));
   };
 
   wss.on('connection', (ws: WebSocket) => {
-    openSockets.add(ws);
-
-    ws.on('open', () => {
+    if (!openSockets.has(ws)) {
+      synchronizeUI(ws);
       openSockets.add(ws);
-    });
+    }
 
     /**
      * Ok, yes, I'm re-inventing a mechanism of request / response while we already
@@ -114,7 +141,7 @@ const main = async () => {
           id,
           response,
         }),
-        broadcast: broadcastPayloadToUI,
+        broadcast: broadcastDataToUI,
       })(action, params);
     });
 

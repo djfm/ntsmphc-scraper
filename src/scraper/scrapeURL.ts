@@ -1,7 +1,14 @@
 import {
-  URLPredicate,
-  urlString,
-  canonicalUrlString,
+  URLProblem,
+  createURLProblem,
+  createURLScrapingResult,
+  URLScrapingResult,
+  ScrapeURLUtils,
+  ScrapeParams,
+  NetworkResponse,
+} from './types';
+
+import {
   isParsable,
   isJavascriptURL,
 } from '../util/url';
@@ -15,62 +22,10 @@ import {
   ChromeDOM,
 } from './chromeProvider';
 
-export type URLProblem = {
-  url: urlString;
-  isValid: boolean;
-  status: number;
-  message: string;
-  referer: string;
-};
-
-export const createURLProblem = () => ({
-  url: '',
-  isValid: true,
-  status: -1,
-  message: '',
-  referer: '',
-});
-
-export type NetworkResponse = {
-  url: string,
-  referer?: string,
-  status: number,
-};
-
-export type URLScrapingResult = {
-  url: urlString;
-  status: number;
-  title: string;
-  canonical: urlString;
-  internalURLs: Map<urlString, canonicalUrlString>;
-  externalURLs: Map<urlString, canonicalUrlString>;
-  internalResources: Map<urlString, NetworkResponse>;
-  externalResources: Map<urlString, NetworkResponse>;
-  problematicURLs: URLProblem[];
-};
-
-export const createURLScrapingResult = () => ({
-  url: '',
-  status: 0,
-  title: '',
-  canonical: '',
-  internalURLs: new Map(),
-  externalURLs: new Map(),
-  internalResources: new Map(),
-  externalResources: new Map(),
-  problematicURLs: [],
-});
-
-export const addURLProblem = (result: URLScrapingResult) => (oops: URLProblem) => {
-  result.problematicURLs.push(oops);
-};
-
-export type StrToStrFunc = (input: string) => string;
-
 const extractCanonical = async (
   rootNodeId: number,
   DOM: ChromeDOM,
-): Promise<urlString | undefined> => {
+): Promise<string | undefined> => {
   const link = await DOM.querySelector({
     nodeId: rootNodeId,
     selector: 'head link[rel=canonical]',
@@ -88,14 +43,8 @@ const extractCanonical = async (
   return attributesMap.get('href');
 };
 
-export type ScrapeParams = {
-  nonNormalizedURL: urlString,
-  foundOnURL: urlString,
-};
-
-export type ScrapeURLUtils = {
-  isInternalURL: URLPredicate,
-  normalizeURL: StrToStrFunc,
+export const addURLProblem = (result: URLScrapingResult) => (oops: URLProblem) => {
+  result.problematicURLs.push(oops);
 };
 
 export const scrapeURL = ({

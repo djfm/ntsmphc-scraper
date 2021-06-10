@@ -6,26 +6,28 @@ import { cloneDeep } from 'lodash';
 import {
   NOTIFY_PAGE_SCRAPED,
   NOTIFY_SCRAPING_STATISTICS,
+  SET_SCRAPER_STATE,
   PageScrapedAction,
 } from '../actions';
 
 import {
+  ScraperProjectState,
+} from '../../../server-src/scraperState';
+
+import {
+  defaultScrapingStatistics,
   ScrapingStatistics,
-} from '../../../../scraper/scraper';
+} from '../../../../scraper/types';
 
 export type ProjectScrapingState = {
-  lastURLsScraped: string[],
-  totalURLsScraped: number,
-  nCurrentlyDiscoveredURLs: number,
-  approximatePctComplete: number,
+  lastURLsScraped: string[];
+  statistics: ScrapingStatistics;
 };
 
 const createInitialProjectState = (): ProjectScrapingState => {
   const initialProjectState = {
     lastURLsScraped: [],
-    totalURLsScraped: 0,
-    nCurrentlyDiscoveredURLs: 0,
-    approximatePctComplete: 0,
+    statistics: defaultScrapingStatistics(),
   };
 
   return initialProjectState;
@@ -60,16 +62,26 @@ const scrapingReducer = (state: ScrapingState = initialState, action: AnyAction)
         if (projectState.lastURLsScraped.length > nLastURLsToDisplay) {
           projectState.lastURLsScraped.pop();
         }
-        projectState.totalURLsScraped += 1;
       });
     }
 
     case NOTIFY_SCRAPING_STATISTICS: {
       return mutateProjectState(action.projectId)((projectState) => {
-        const statistics = action.statistics as ScrapingStatistics;
-        projectState.nCurrentlyDiscoveredURLs = statistics.nRemainingURLs + statistics.nSeenURLs;
-        projectState.approximatePctComplete = statistics.approximatePctComplete;
+        projectState.statistics = action.statistics;
       });
+    }
+
+    case SET_SCRAPER_STATE: {
+      return Object.entries(action.scraperState).reduce(
+        (scrapingState, [key, value]) => {
+          const knownState = value as ScraperProjectState;
+          return {
+            ...scrapingState,
+            [key]: { ...createInitialProjectState(), ...knownState.statistics },
+          };
+        },
+        {},
+      );
     }
 
     default: {

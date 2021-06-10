@@ -13,11 +13,11 @@ const ScrapingFeedback = ({ state }: Props) => (
     <h1>Scraping is currently in progress:</h1>
     <p>
       <dt>URLs scraped so far:</dt>
-      <dd>{state.totalURLsScraped}</dd>
+      <dd>{state.statistics.nSeenURLs}</dd>
       <dt>URLs discovered so far:</dt>
-      <dd>{state.nCurrentlyDiscoveredURLs}</dd>
+      <dd>{state.statistics.nDiscoveredURLs}</dd>
       <dt>Approximate percentage complete:</dt>
-      <dd>{state.approximatePctComplete}%</dd>
+      <dd>{state.statistics.approximatePctComplete}%</dd>
     </p>
     <section>
       <h1>

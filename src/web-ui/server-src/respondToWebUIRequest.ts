@@ -11,7 +11,6 @@ import {
 } from '../../util/functional';
 
 import {
-  addNotificationAction,
   notifyPageScrapedAction,
   notifyScrapingStatisticsAction,
 } from '../client-src/redux/actions';
@@ -27,20 +26,26 @@ import {
 } from '../../db';
 
 import {
-  PAYLOAD_TYPE_REDUX_ACTION,
-} from '../../constants';
-
-import {
   ScrapingTaskParams,
-  startScraping,
   ScrapingProgress,
   ScraperNotifiers,
   ScrapingStatistics,
+  URLScrapingResult,
+} from '../../scraper/types';
+
+import {
+  startScraping,
 } from '../../scraper/scraper';
 
 import {
-  URLScrapingResult,
-} from '../../scraper/scrapeURL';
+  setIsScraping,
+  setStatistics,
+} from './scraperState';
+
+import {
+  prepareReduxNotificationPayload,
+  prepareReduxActionDispatchPayload,
+} from '../server';
 
 interface WithURL {
   url: string;
@@ -82,10 +87,7 @@ const isScrapingTaskParams = (params: object): params is ScrapingTaskParams =>
 export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) =>
   async (action: string, params: object): Promise<any> => {
     const sendUINotification = (data: object) =>
-      responders.broadcast({
-        type: PAYLOAD_TYPE_REDUX_ACTION,
-        action: addNotificationAction(data),
-      });
+      responders.broadcast(prepareReduxNotificationPayload(data));
 
     if (action === 'isRespondingHTTP') {
       if (!hasURLParam(params)) {
@@ -119,21 +121,27 @@ export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) 
         throw new Error('Error: invalid params provided to `startScraping`.');
       }
 
+      setIsScraping(params.projectId, true);
+
       sendUINotification({
         message: `Starting scraping from "${params.startURL}"...`,
       });
 
       const notifyPageScraped = (result: URLScrapingResult) =>
-        responders.broadcast({
-          type: PAYLOAD_TYPE_REDUX_ACTION,
-          action: notifyPageScrapedAction(params.projectId, result),
-        });
+        responders.broadcast(
+          prepareReduxActionDispatchPayload(
+            notifyPageScrapedAction(params.projectId, result),
+          ),
+        );
 
-      const notifyStatistics = (statistics: ScrapingStatistics) =>
-        responders.broadcast({
-          type: PAYLOAD_TYPE_REDUX_ACTION,
-          action: notifyScrapingStatisticsAction(params.projectId, statistics),
-        });
+      const notifyStatistics = (statistics: ScrapingStatistics) => {
+        setStatistics(params.projectId, statistics);
+        responders.broadcast(
+          prepareReduxActionDispatchPayload(
+            notifyScrapingStatisticsAction(params.projectId, statistics),
+          ),
+        );
+      };
 
       const notifiers: ScraperNotifiers = {
         notifyPageScraped,
@@ -147,6 +155,8 @@ export const respondToWebUIRequest = (responders: ServerToWebUIResponseMethods) 
       return scraping.then((progress: ScrapingProgress) => {
         const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
         const timeTaken = humanDuration(timeTakenSeconds);
+
+        setIsScraping(params.projectId, 'done');
 
         // eslint-disable-next-line no-console
         console.log(`\n[DONE] Scraped ${progress.nURLsScraped} URLs total in ${timeTaken}!`);

@@ -8,37 +8,18 @@ import {
 
 import {
   URLScrapingResult,
-  scrapeURL,
   createURLScrapingResult,
   createURLProblem,
-  addURLProblem,
   ScrapeParams,
+  ScrapingProgress,
+  ScraperNotifiers,
+  ScrapingTaskParams,
+} from './types';
+
+import {
+  scrapeURL,
+  addURLProblem,
 } from './scrapeURL';
-
-export type ScrapingTaskParams = {
-  projectId: number;
-  startURL: string;
-  /**
-   * How many headless chrome instances to launch.
-   */
-  nParallel: number;
-};
-
-export type ScrapingProgress = {
-  nURLsScraped: number,
-  results: URLScrapingResult[],
-}
-
-export type ScrapingStatistics = {
-  nRemainingURLs: number;
-  nSeenURLs: number;
-  approximatePctComplete: number;
-};
-
-export type ScraperNotifiers = {
-  notifyPageScraped: (result: URLScrapingResult) => any;
-  notifyStatistics: (statistics: ScrapingStatistics) => any;
-};
 
 const waitMs = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -140,6 +121,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       notifiers.notifyStatistics({
         nSeenURLs: seenURLs.size,
         nRemainingURLs: remainingURLs.size,
+        nDiscoveredURLs: seenURLs.size + remainingURLs.size,
         // approximate because we discover more and more
         // pages to scrape as we go...
         approximatePctComplete: Math.round(
@@ -185,3 +167,5 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
 
     return processNextURLs();
   };
+
+export default startScraping;

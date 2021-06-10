@@ -23,12 +23,9 @@ import {
 } from './util/fs';
 
 import {
-  ScrapingProgress,
-} from './scraper/scraper';
-
-import {
   URLScrapingResult,
-} from './scraper/scrapeURL';
+  ScrapingProgress,
+} from './scraper/types';
 
 export interface CreateProjectParams {
   startURL: string;
