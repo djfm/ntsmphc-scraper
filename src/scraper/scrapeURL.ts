@@ -18,6 +18,10 @@ import {
 } from '../util/functional';
 
 import {
+  flattenNodeTreeAndGenerateSelectors,
+} from '../util/tree';
+
+import {
   ChromeProtocol,
   ChromeDOM,
 } from './chromeProvider';
@@ -157,6 +161,12 @@ export const scrapeURL = ({
       nodeId: doc.root.nodeId,
       selector: 'a',
     });
+
+    const flatNodes = await flattenNodeTreeAndGenerateSelectors(
+      protocol.DOM,
+    )(
+      doc.root,
+    );
 
     const linksAttributes = await Promise.all(
       links.nodeIds.map(
