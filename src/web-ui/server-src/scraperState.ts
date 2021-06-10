@@ -16,7 +16,7 @@ export type ScraperState = {
 
 export const scraperState: ScraperState = {};
 
-const defaultScraperProjectState = (): ScraperProjectState => ({
+export const defaultScraperProjectState = (): ScraperProjectState => ({
   isScraping: false,
   statistics: defaultScrapingStatistics(),
 });

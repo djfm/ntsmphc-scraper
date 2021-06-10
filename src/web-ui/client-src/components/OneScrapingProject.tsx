@@ -122,6 +122,16 @@ const OneScrapingProject = () => {
     );
   };
 
+  const handleStopScraping = () => {
+    askServer('cancelScraping', { projectId: project.id }).then(() => dispatch(addNotificationAction({
+      message: 'Cancelled scraping operation',
+      severity: 'success',
+    }))).catch((err) => dispatch(addNotificationAction({
+      message: err.message,
+      severity: 'error',
+    })));
+  };
+
   if (project === undefined) {
     return (
       <main>
@@ -185,9 +195,16 @@ const OneScrapingProject = () => {
                   </p>
                 </label>
                 <p>
-                  <button type="button" onClick={handleStartScraping}>
-                    Start Scraping
-                  </button>
+                  {(scrapingState?.isScraping !== true) && (
+                    <button type="button" onClick={handleStartScraping}>
+                      Start Scraping
+                    </button>
+                  )}
+                  {(scrapingState?.isScraping === true) && (
+                    <button type="button" onClick={handleStopScraping}>
+                      Cancel Scraping
+                    </button>
+                  )}
                 </p>
               </li>
               <li>
@@ -205,6 +222,7 @@ const OneScrapingProject = () => {
         </Route>
       </Switch>
     </main>
+
   );
 };
 

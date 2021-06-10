@@ -12,22 +12,17 @@ import {
 
 import {
   ScraperProjectState,
+  defaultScraperProjectState,
 } from '../../../server-src/scraperState';
-
-import {
-  defaultScrapingStatistics,
-  ScrapingStatistics,
-} from '../../../../scraper/types';
 
 export type ProjectScrapingState = {
   lastURLsScraped: string[];
-  statistics: ScrapingStatistics;
-};
+} & ScraperProjectState;
 
 const createInitialProjectState = (): ProjectScrapingState => {
   const initialProjectState = {
     lastURLsScraped: [],
-    statistics: defaultScrapingStatistics(),
+    ...defaultScraperProjectState(),
   };
 
   return initialProjectState;
@@ -58,6 +53,7 @@ const scrapingReducer = (state: ScrapingState = initialState, action: AnyAction)
     case NOTIFY_PAGE_SCRAPED: {
       const scrapedAction = action as PageScrapedAction;
       return mutateProjectState(action.projectId)((projectState) => {
+        projectState.isScraping = true;
         projectState.lastURLsScraped.unshift(scrapedAction.result.url);
         if (projectState.lastURLsScraped.length > nLastURLsToDisplay) {
           projectState.lastURLsScraped.pop();
@@ -77,7 +73,7 @@ const scrapingReducer = (state: ScrapingState = initialState, action: AnyAction)
           const knownState = value as ScraperProjectState;
           return {
             ...scrapingState,
-            [key]: { ...createInitialProjectState(), ...knownState.statistics },
+            [key]: { ...createInitialProjectState(), ...knownState },
           };
         },
         {},
