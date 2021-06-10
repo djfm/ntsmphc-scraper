@@ -14,17 +14,12 @@ import {
 } from '../util/url';
 
 import {
-  flattenNodeTree,
-} from '../util/tree';
-
-import {
   keyValueArrayToMap,
 } from '../util/functional';
 
 import {
   ChromeProtocol,
   ChromeDOM,
-  clickElement,
 } from './chromeProvider';
 
 const extractCanonical = async (
