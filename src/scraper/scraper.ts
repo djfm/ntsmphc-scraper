@@ -177,7 +177,7 @@ export const startScraping = (notifiers: ScraperNotifiers) =>
       return Promise.all(progresses).then(reduceScrapingProgresses);
     };
 
-    return processNextURLs();
+    return processNextURLs().then();
   };
 
 export default startScraping;

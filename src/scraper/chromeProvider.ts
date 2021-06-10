@@ -67,13 +67,69 @@ export type JustRawAttributes = {
   attributes: string[];
 };
 
+export type GetBoxModelOptions = {
+  nodeId?: number;
+  backendNodeId?: number;
+  /**
+   * https://chromedevtools.github.io/devtools-protocol/tot/Runtime/#type-RemoteObjectId
+   */
+  objectId?: string;
+};
+
+/**
+ * https://chromedevtools.github.io/devtools-protocol/tot/DOM/#type-Quad
+ */
+export type Quad = number[];
+
+/**
+ * https://chromedevtools.github.io/devtools-protocol/tot/DOM/#type-ShapeOutsideInfo
+ */
+export type ShapeOutsideInfo = {
+  bounds: Quad;
+  shape: any[];
+  marginShape: any[];
+};
+
+/**
+ * https://chromedevtools.github.io/devtools-protocol/tot/DOM/#type-BoxModel
+ */
+export type BoxModel = {
+  model: {
+    content: Quad;
+    padding: Quad;
+    border: Quad;
+    width: number;
+    height: number;
+    shapeOutside: ShapeOutsideInfo;
+  };
+};
+
 export type ChromeDOM = {
   getDocument: (options: GetDocumentOptions) => Promise<ChromeDocument>;
   // the nodeId in the returned object will be 0 if the selector doesn't match
   querySelector: (options: QuerySelectorOptions) => Promise<JustTheNodeId>;
   getAttributes: (options: JustTheNodeId) => Promise<JustRawAttributes>;
   describeNode: (options: DescribeNodeOptions) => Promise<{ node: ChromeNode }>;
-  querySelectorAll: (options: QuerySelectorOptions) => Promise<{nodeIds: number[]}>
+  querySelectorAll: (options: QuerySelectorOptions) => Promise<{ nodeIds: number[] }>;
+  getBoxModel: (options: GetBoxModelOptions) => Promise<BoxModel>;
+};
+
+/**
+ * https://chromedevtools.github.io/devtools-protocol/tot/Input/#method-dispatchMouseEvent
+ */
+export type DispatchMouseEventOptions = {
+  type: 'mousePressed' | 'mouseReleased' | 'mouseMoved' | 'mouseWheel';
+  x: number;
+  y: number;
+  button?: 'none' | 'left' | 'middle' | 'right' | 'back' | 'forward';
+  clickCount?: number;
+};
+
+/**
+ * https://chromedevtools.github.io/devtools-protocol/tot/Input/
+ */
+export type ChromeInput = {
+  dispatchMouseEvent: (options: DispatchMouseEventOptions) => Promise<void>;
 };
 
 type ByeFunction = () => Promise<void>;
@@ -83,6 +139,7 @@ export type ChromeProtocol = {
   Page: any;
   Runtime: any;
   DOM: ChromeDOM;
+  Input: ChromeInput;
   terminate: (onTerminate?: ByeFunction) => Promise<void>;
 };
 
@@ -105,6 +162,7 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     Page,
     Runtime,
     DOM,
+    Input,
   } = protocol;
 
   // don't wanna expose too much stuff inadvertently
@@ -113,6 +171,7 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
     Page,
     Runtime,
     DOM,
+    Input,
     terminate: async (onTerminate?: ByeFunction) => {
       if (onTerminate) {
         await onTerminate();
@@ -124,9 +183,26 @@ export const chromeProvider = async (): Promise<ChromeProtocol> => {
 
   // Apparently this needs to be done before starting to use
   // the APIs.
-  await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()]);
+  await Promise.all([
+    Network.enable(),
+    Page.enable(),
+    DOM.enable(),
+    Runtime.enable(),
+  ]);
 
   return myProtocol;
 };
+
+export const clickElement = (protocol: ChromeProtocol) =>
+  async (nodeId: number): Promise<void> => {
+    const box = await protocol.DOM.getBoxModel({ nodeId });
+    await protocol.Input.dispatchMouseEvent({
+      type: 'mousePressed',
+      x: (box.model.content[0] + box.model.content[2]) / 2,
+      y: (box.model.content[1] + box.model.content[3]) / 2,
+      button: 'left',
+      clickCount: 1,
+    });
+  };
 
 export default chromeProvider;

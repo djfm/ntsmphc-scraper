@@ -14,16 +14,17 @@ import {
 } from '../util/url';
 
 import {
+  flattenNodeTree,
+} from '../util/tree';
+
+import {
   keyValueArrayToMap,
 } from '../util/functional';
 
 import {
-  flattenNodeTreeAndGenerateSelectors,
-} from '../util/tree';
-
-import {
   ChromeProtocol,
   ChromeDOM,
+  clickElement,
 } from './chromeProvider';
 
 const extractCanonical = async (
@@ -162,12 +163,6 @@ export const scrapeURL = ({
       selector: 'a',
     });
 
-    const flatNodes = await flattenNodeTreeAndGenerateSelectors(
-      protocol.DOM,
-    )(
-      doc.root,
-    );
-
     const linksAttributes = await Promise.all(
       links.nodeIds.map(
         (nodeId) => protocol.DOM.getAttributes({ nodeId }),
@@ -200,6 +195,20 @@ export const scrapeURL = ({
         targetMap.set(href, linkCanonical);
       }
     }
+
+    /*
+    const nodes = flattenNodeTree(doc.root);
+
+    for (const node of nodes) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await clickElement(protocol)(node.nodeId);
+        console.log('Clicked', node.nodeId, 'got', res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    */
 
     return result;
   };
