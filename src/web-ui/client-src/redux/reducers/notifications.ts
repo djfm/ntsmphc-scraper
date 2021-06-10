@@ -11,7 +11,7 @@ export type NotificationSeverity = 'info' | 'success' | 'error' | 'warning';
 export type Milliseconds = number;
 
 export type Notification = {
-  id: number,
+  id: string,
   message: string,
   severity: NotificationSeverity,
   createdAt: number,
@@ -21,9 +21,11 @@ export type Notification = {
 
 let totalNumberOfNotificationsCreated = 0;
 
+const isBrowser = () => process.env.APP_ENV === 'browser';
+
 const makeUniqueNotificationId = () => {
   totalNumberOfNotificationsCreated += 1;
-  return totalNumberOfNotificationsCreated;
+  return `${isBrowser() ? 'browser' : 'node'}#${totalNumberOfNotificationsCreated}`;
 };
 
 export const createDefaultNotification = (): Notification => ({

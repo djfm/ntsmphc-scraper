@@ -12,6 +12,12 @@ const plugins = [];
 const babelLoaderPlugins = [];
 const entry = ['./src/web-ui/client-src/index.tsx'];
 
+plugins.push(new webpack.DefinePlugin({
+  'process.env': {
+    APP_ENV: JSON.stringify('browser'),
+  },
+}));
+
 if (isDevelopment) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
   plugins.push(new ReactRefreshWebpackPlugin());
