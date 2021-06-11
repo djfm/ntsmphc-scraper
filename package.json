@@ -9,7 +9,8 @@
     "build": "NODE_ENV=production webpack",
     "test": "jest",
     "tdd": "jest --watch",
-    "lint": "eslint src test"
+    "lint": "eslint src test",
+    "generate-cri-api": "ts-node src/generateChromeDevtoolsTSAPI.ts"
   },
   "private": true,
   "author": "François-Marie de Jouvencel<fm.de.jouvencel@gmail.com>",
