@@ -11,3 +11,5 @@ it's not a lot but it's already quite useful for the websites I work on.
 
 Now that the base mechanism of discovering and going through all of the URLs of a website
 starting at a given domain is in place, I plan to add more feature as needed for my work.
+
+Oh and the UI is a web one, written in React.
