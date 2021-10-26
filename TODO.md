@@ -1,0 +1,1 @@
+- remove auto-generated types stuff, as the chrome-remote-interface now comes with types!

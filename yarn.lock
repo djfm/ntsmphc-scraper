@@ -1746,6 +1746,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chrome-remote-interface@npm:^0.31.4":
+  version: 0.31.4
+  resolution: "@types/chrome-remote-interface@npm:0.31.4"
+  dependencies:
+    devtools-protocol: 0.0.927104
+  checksum: 91c6cf9c749adedc08458b772db12f4142172f36fe885dc741921d259bdb7ec47d64b9e294d793a6c36f0435c6855d6470754fd143711e0b2ff204878dd4f721
+  languageName: node
+  linkType: hard
+
 "@types/connect@npm:*":
   version: 3.4.34
   resolution: "@types/connect@npm:3.4.34"
@@ -3879,6 +3888,13 @@ __metadata:
   version: 3.1.0
   resolution: "detect-newline@npm:3.1.0"
   checksum: ae6cd429c41ad01b164c59ea36f264a2c479598e61cba7c99da24175a7ab80ddf066420f2bec9a1c57a6bead411b4655ff15ad7d281c000a89791f48cbe939e7
+  languageName: node
+  linkType: hard
+
+"devtools-protocol@npm:0.0.927104":
+  version: 0.0.927104
+  resolution: "devtools-protocol@npm:0.0.927104"
+  checksum: 13617e735f326b9822e64480060e59068434e937a6141ffe18353d0c7626be890e94d3118e7c262e6fd17eea3a4a2a18c221d0ff1eb31768ebcf0a0b95475d32
   languageName: node
   linkType: hard
 
@@ -7367,6 +7383,7 @@ __metadata:
     "@babel/preset-env": ^7.14.1
     "@babel/preset-typescript": ^7.13.0
     "@pmmmwh/react-refresh-webpack-plugin": latest
+    "@types/chrome-remote-interface": ^0.31.4
     "@types/express": ^4.17.11
     "@types/jest": ^26.0.23
     "@types/lodash": ^4.14.169
