@@ -13,17 +13,13 @@ const defaultChromeFlags = [
 export const chromeProvider = async (
   chromeFlags = defaultChromeFlags,
   connectionPollInterval = 500,
-): Promise<DevTools> => {
+): Promise<DevTools=> {
   const chrome = await launchChrome({
     chromeFlags,
     connectionPollInterval,
   });
 
   const protocol = await CRI({ port: chrome.port });
-
-  const {
-    DOM,
-  } = protocol;
 
   const terminate = async (onTerminate?: () => Promise<void>) => {
     if (onTerminate) {
